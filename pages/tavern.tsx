@@ -1,9 +1,9 @@
 import Head from "next/head"
 import React, { useState } from "react"
 import { RecoilRoot, useSetRecoilState } from "recoil"
-import { NodeGraph } from "../lib/NodeGraph"
+import { NodeGraph } from "../src/graph/NodeGraph"
 
-import { exampleGraph, writeGraph } from "../lib/exampleGraph"
+import { exampleGraph, writeGraph } from "../src/graph/exampleGraph"
 
 function Graph() {
 	const write = useSetRecoilState(writeGraph)
