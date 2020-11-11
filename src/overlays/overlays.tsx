@@ -15,16 +15,6 @@ export default function Overlays() {
 				left: 8,
 			}}
 		>
-			<input
-				type="range"
-				min={0}
-				max={10000}
-				style={{ width: "600px", pointerEvents: "all", marginBottom: 80 }}
-				step={100}
-				onChange={(e) => {
-					state.send("RESET_BOXES", e.currentTarget.value)
-				}}
-			/>
 			{showPositions && <Positions />}
 			<button
 				style={{ marginTop: 8, pointerEvents: "all" }}

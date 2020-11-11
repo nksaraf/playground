@@ -1,11 +1,10 @@
 import * as React from "react"
 import state from "../state"
 import { useStateDesigner } from "@state-designer/react"
+import { useStateSelector } from "../hooks/useStateSelector"
 
 export default function Model() {
-	const local = useStateDesigner(state)
-
-	const { camera } = local.data
+	const camera = useStateSelector("camera")
 
 	return (
 		<div

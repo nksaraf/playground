@@ -8,7 +8,7 @@ import useViewBox from "./hooks/useViewBox"
 import Toolbar from "./toolbar/toolbar"
 import ZoomIndicator from "./overlays/zoom-indicator"
 import Overlays from "./overlays/overlays"
-import Canvas from "./canvas-pixi/canvas"
+import Canvas from "./canvas-tavern/canvas"
 
 const Container = styled.div({
 	width: "100vw",
@@ -30,6 +30,7 @@ export default function App() {
 
 	return (
 		<Container ref={ref}>
+			<Canvas width={width} height={height} style={{ userSelect: "none" }} />
 			<Overlays />
 			<ZoomIndicator />
 			<Toolbar />

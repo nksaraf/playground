@@ -1055,4 +1055,4 @@ const state = createState({
 
 export default state
 
-// state.onUpdate(update => console.log(state.active))
+state.onUpdate((update) => console.log(state.active))

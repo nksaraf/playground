@@ -23,7 +23,7 @@ export default function Toolbar() {
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
 				/>
-				<IconButton
+				{/* <IconButton
 					src="Box"
 					isActive={local.isIn("boxTool")}
 					onClick={() => state.send("SELECTED_BOX_TOOL")}
@@ -110,14 +110,14 @@ export default function Toolbar() {
 					event="DISTRIBUTED_Y"
 					disabled={!hasManySelectedBoxes}
 					shortcut="⌥ ⌃ V"
-				/>
-				<Divider />
+				/> */}
+				{/* <Divider />
 				<IconButton
 					src="Delete"
 					event="DELETED_SELECTED"
 					shortcut="⌫"
 					disabled={!hasSelection}
-				/>
+				/> */}
 			</ButtonGroup>
 			<ButtonGroup>
 				<IconButton
