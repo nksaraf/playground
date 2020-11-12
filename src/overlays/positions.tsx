@@ -2,7 +2,6 @@ import * as React from "react"
 import Value from "./value"
 import { useAtom } from "../state/atom"
 import { scene } from "../state/scene"
-import { initialPointer } from "../state"
 
 function Scene() {
 	const [camera] = useAtom(scene.camera)
@@ -42,7 +41,7 @@ function PointerPositions() {
 	return (
 		<>
 			<Position atom={scene.documentPointer} label="Pointer (Document)" />
-			<Position atom={initialPointer} label="Pointer (Initial)" />
+			<Position atom={scene.lastPointPosition} label="Last Click (Document)" />
 			<Position atom={scene.screenPointerPosition} label="Pointer (Screen)" />
 			<Position atom={scene.brushStart} label="Brush start (Document)" />
 			<Position atom={scene.brushEnd} label="Brush end (Document)" />
