@@ -11,6 +11,7 @@ import Overlays from "./overlays/overlays"
 import { exampleGraph, writeGraph } from "./state/graph-io"
 import { useAtom, useUpdateAtom } from "./state/atom"
 import { scene } from "./state/scene"
+import Br from "./canvas-tavern/brush"
 
 const Container = styled.div({
 	width: "100vw",
@@ -47,10 +48,11 @@ export default function App() {
 
 function SvgWrapper({ children }) {
 	const [viewBoxSize] = useAtom(scene.viewBoxSize)
+	const [{ x, y }] = useAtom(scene.cameraPosition)
 	return (
 		<svg
 			style={{ height: "100%", width: "100%" }}
-			viewBox={`0 0 ${viewBoxSize.width} ${viewBoxSize.height}`}
+			viewBox={`${x} ${y} ${viewBoxSize.width} ${viewBoxSize.height}`}
 		>
 			{children}
 		</svg>
@@ -62,8 +64,6 @@ function Brush() {
 	const [brushEnd] = useAtom(scene.brushEnd)
 
 	return brushStart ? (
-		<polyline
-			points={`${brushStart.x},${brushStart.y} ${brushStart.x},${brushEnd.y} ${brushEnd.x},${brushEnd.y} ${brushEnd.x},${brushStart.y}`}
-		/>
+		<Br x0={brushStart.x} y0={brushStart.y} x1={brushEnd.x} y1={brushEnd.y} />
 	) : null
 }
