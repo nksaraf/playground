@@ -228,13 +228,20 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		const fromNode = getNodeById(val.nodes, conn.from_node)
 		const toNode = getNodeById(val.nodes, conn.to_node)
 
+		const fromfieldId = `${fromNode.nid}/output/${computePinIdxfromLabel(
+			fromNode.fields.out,
+			conn.from
+		)}/${conn.from}`
+
+		const toFieldId = `${toNode.nid}/input/${computePinIdxfromLabel(
+			toNode.fields.in,
+			conn.to
+		)}/${conn.to}`
+
 		set(graph.getConnectionParams(connId), {
 			from: {
 				node: conn.from_node.toString(),
-				field: `${fromNode.nid}/output/${computePinIdxfromLabel(
-					fromNode.fields.out,
-					conn.from
-				)}/${conn.from}`,
+				field: fromfieldId,
 			},
 			to: {
 				field: `${toNode.nid}/input/${computePinIdxfromLabel(
@@ -244,7 +251,11 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 				node: conn.to_node.toString(),
 			},
 		})
+
+		set(graph.getOutputConnectionIDs(fromfieldId), (prev) => [...prev, connId])
+		set(graph.getInputConnectionIDs(toFieldId), (prev) => [...prev, connId])
 	})
+
 	set(
 		graph.connectionIDs,
 		val.connections.map(

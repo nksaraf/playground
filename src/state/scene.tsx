@@ -87,14 +87,30 @@ const viewBox = atom((get) => ({
 const brushStart = atom(null as null | IPoint)
 const brushEnd = atom(null as null | IPoint)
 
+const brush = atom((get) => {
+	const start = get(brushStart)
+	const end = get(brushEnd)
+
+	if (start && end) {
+		return { x0: start.x, y0: start.y, x1: end.x, y1: end.y }
+	} else {
+		return null
+	}
+})
+
+const lastPointPosition = atom({ x: 0, y: 0 })
+
 export const scene = {
 	cameraZoom,
 	cameraPosition,
 	camera,
+	lastPointPosition,
 	viewBox,
 	viewBoxPosition,
 	viewBoxSize,
 	viewBoxScroll,
+	documentViewBoxPosition,
+	documentViewBoxSize,
 	screenPointerPosition,
 	screenPointerDelta,
 	screenPointer,
@@ -102,4 +118,5 @@ export const scene = {
 	documentViewBox,
 	brushStart,
 	brushEnd,
+	brush,
 }

@@ -132,10 +132,8 @@ const updateCameraZoom = atom(null, (get, set, newZoom: number) => {
 	}))
 })
 
-export const initialPointer = atom({ x: 0, y: 0 })
-
-const setInitialPointer = atom(null, (get, set) => {
-	set(initialPointer, get(scene.documentPointer))
+const setPointer = atom(null, (get, set) => {
+	set(scene.lastPointPosition, get(scene.documentPointer))
 })
 
 const clearSelection = atom(null, (get, set) => {
@@ -173,7 +171,7 @@ const toolState = atom("selectTool")
 const startBrushWithWorker = atom(null, (get, set) => {
 	const { x, y } = get(scene.documentPointer)
 
-	const pointer = get(initialPointer)
+	const pointer = get(scene.lastPointPosition)
 	set(scene.brushStart, { ...pointer })
 	set(scene.brushEnd, { x, y })
 
@@ -202,8 +200,8 @@ const setSelectedIdsFromWorker = atom(null, (get, set) => {
 })
 
 const completeBrush = atom(null, (get, set) => {
-	set(scene.brushStart, null)
-	set(scene.brushEnd, null)
+	// set(scene.brushStart, null)
+	// set(scene.brushEnd, null)
 })
 
 const selectToolDispatch = atom(
@@ -251,11 +249,12 @@ const selectToolDispatch = atom(
 			case "pointingCanvas": {
 				switch (type) {
 					case "MOVED_POINTER": {
-						const initial = get(initialPointer)
+						const initial = get(scene.lastPointPosition)
 						const pointer = get(scene.screenPointerPosition)
 
 						const isDistanceFarEnough =
 							Math.hypot(pointer.x - initial.x, pointer.y - initial.y) > 4
+
 						if (isDistanceFarEnough) {
 							set(selectToolState, "brushSelecting")
 							set(clearSelection, null)
@@ -304,7 +303,7 @@ const globalDispatch = atom(null, (get, set, { type, payload }: Actions) => {
 			return set(loadRedoState, null)
 		}
 		case "STARTED_POINTING": {
-			return set(setInitialPointer, payload)
+			return set(setPointer, payload)
 		}
 		case "MOVED_POINTER":
 			return set(updatePointerOnPointerMove, payload as IPoint)

@@ -47,23 +47,43 @@ export default function App() {
 }
 
 function SvgWrapper({ children }) {
+	const state = useMachine()
+	function handleWheel(e: React.WheelEvent<SVGSVGElement>) {
+		const { deltaX, deltaY } = e
+
+		if (e.ctrlKey) {
+			// Zooming
+			state.send("ZOOMED", deltaY / 100)
+			state.send("MOVED_POINTER")
+		} else {
+			// Panning
+			state.send("PANNED", {
+				x: deltaX,
+				y: deltaY,
+			})
+			state.send("MOVED_POINTER")
+		}
+	}
 	const [viewBoxSize] = useAtom(scene.viewBoxSize)
-	const [{ x, y }] = useAtom(scene.cameraPosition)
+	const [{ x, y, zoom }] = useAtom(scene.camera)
 	return (
 		<svg
-			style={{ height: "100%", width: "100%" }}
-			viewBox={`${x} ${y} ${viewBoxSize.width} ${viewBoxSize.height}`}
+			onWheel={handleWheel}
+			style={{ height: "100%", width: "100%", userSelect: "none" }}
+			viewBox={`${0} ${0} ${viewBoxSize.width} ${viewBoxSize.height}`}
 		>
-			{children}
+			<g
+				transform={`scale(${zoom}) translate(${-x / zoom} ${-y / zoom}) `}
+				strokeWidth={1 / zoom}
+			>
+				{children}
+			</g>
 		</svg>
 	)
 }
 
 function Brush() {
-	const [brushStart] = useAtom(scene.brushStart)
-	const [brushEnd] = useAtom(scene.brushEnd)
+	const [brush] = useAtom(scene.brush)
 
-	return brushStart ? (
-		<Br x0={brushStart.x} y0={brushStart.y} x1={brushEnd.x} y1={brushEnd.y} />
-	) : null
+	return brush ? <Br {...brush} /> : null
 }
