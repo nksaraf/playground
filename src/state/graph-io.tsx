@@ -164,103 +164,91 @@ export const exampleGraph = {
 	],
 }
 
-import { selector } from "recoil"
-import {
-	nodeTypeByID,
-	nodePositionByID,
-	inputIDsByNodeID,
-	inputStateByID,
-	outputIDsByNodeID,
-	outputStateByID,
-	nodeIDs,
-	connectionParamsByID,
-	connectionIDs,
-} from "./store"
+import { atom } from "./atom"
+import { graph } from "./graph"
 
-export const writeGraph = selector({
-	key: "store",
-	get: () => {
-		return null
-	},
-	set: ({ set, get }, val: typeof exampleGraph) => {
-		val.nodes.map((node) => {
-			const nodeId = `${node.nid}`
-			set(nodeTypeByID(nodeId), node.type)
-			set(nodePositionByID(nodeId), { x: node.x, y: node.y })
-			set(
-				inputIDsByNodeID(nodeId),
-				node.fields.in.map(
-					(field, index) => `${nodeId}/input/${index}/${field.name}`
-				)
+export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
+	val.nodes.map((node) => {
+		const nodeId = `${node.nid}`
+		set(graph.getNodeMetadata(nodeId), { type: node.type, id: nodeId })
+		set(graph.getNodePosition(nodeId), { x: node.x, y: node.y })
+		set(
+			graph.getNodeInputIDs(nodeId),
+			node.fields.in.map(
+				(field, index) => `${nodeId}/input/${index}/${field.name}`
 			)
-			node.fields.in.forEach((field, index) => {
-				set(inputStateByID(`${nodeId}/input/${index}/${field.name}`), {
-					name: field.name,
-					parentNode: nodeId,
-					index,
-				})
-			})
-			set(
-				outputIDsByNodeID(nodeId),
-				node.fields.out.map(
-					(field, index) => `${nodeId}/output/${index}/${field.name}`
-				)
-			)
-			node.fields.out.forEach((field, index) => {
-				set(outputStateByID(`${nodeId}/output/${index}/${field.name}`), {
-					name: field.name,
-					parentNode: nodeId,
-					index,
-				})
+		)
+		node.fields.in.forEach((field, index) => {
+			set(graph.getInputState(`${nodeId}/input/${index}/${field.name}`), {
+				name: field.name,
+				parentNode: nodeId,
+				index,
 			})
 		})
 		set(
-			nodeIDs,
-			val.nodes.map((node) => `${node.nid}`)
+			graph.getNodeOutputIDs(nodeId),
+			node.fields.out.map(
+				(field, index) => `${nodeId}/output/${index}/${field.name}`
+			)
 		)
-		const computePinIdxfromLabel = (pins, pinLabel) => {
-			let reval = 0
-			for (let pin of pins) {
-				if (pin.name === pinLabel) {
-					return reval
-				} else {
-					reval++
-				}
+		node.fields.out.forEach((field, index) => {
+			set(graph.getOutputState(`${nodeId}/output/${index}/${field.name}`), {
+				name: field.name,
+				parentNode: nodeId,
+				index,
+			})
+		})
+	})
+	set(
+		graph.nodeIDs,
+		val.nodes.map((node) => `${node.nid}`)
+	)
+	const computePinIdxfromLabel = (pins, pinLabel) => {
+		let reval = 0
+		for (let pin of pins) {
+			if (pin.name === pinLabel) {
+				return reval
+			} else {
+				reval++
 			}
 		}
-		const getNodeById = (nodes, nid) => {
-			let reval = 0
-			for (const node of nodes) {
-				if (node.nid === nid) {
-					return nodes[reval]
-				} else {
-					reval++
-				}
+	}
+	const getNodeById = (nodes, nid) => {
+		let reval = 0
+		for (const node of nodes) {
+			if (node.nid === nid) {
+				return nodes[reval]
+			} else {
+				reval++
 			}
 		}
-		val.connections.map((conn) => {
-			const connId = `${conn.from_node}/${conn.from}->${conn.to_node}/${conn.to}`
-			const fromNode = getNodeById(val.nodes, conn.from_node)
-			const toNode = getNodeById(val.nodes, conn.to_node)
+	}
+	val.connections.map((conn) => {
+		const connId = `${conn.from_node}/${conn.from}->${conn.to_node}/${conn.to}`
+		const fromNode = getNodeById(val.nodes, conn.from_node)
+		const toNode = getNodeById(val.nodes, conn.to_node)
 
-			set(connectionParamsByID(connId), {
-				fromNode: conn.from_node.toString(),
-				inputField: `${toNode.nid}/input/${computePinIdxfromLabel(
-					toNode.fields.in,
-					conn.to
-				)}/${conn.to}`,
-				outputField: `${fromNode.nid}/output/${computePinIdxfromLabel(
+		set(graph.getConnectionParams(connId), {
+			from: {
+				node: conn.from_node.toString(),
+				field: `${fromNode.nid}/output/${computePinIdxfromLabel(
 					fromNode.fields.out,
 					conn.from
 				)}/${conn.from}`,
-				toNode: conn.to_node.toString(),
-			})
+			},
+			to: {
+				field: `${toNode.nid}/input/${computePinIdxfromLabel(
+					toNode.fields.in,
+					conn.to
+				)}/${conn.to}`,
+				node: conn.to_node.toString(),
+			},
 		})
-		set(
-			connectionIDs,
-			val.connections.map(
-				(conn) => `${conn.from_node}/${conn.from}->${conn.to_node}/${conn.to}`
-			)
+	})
+	set(
+		graph.connectionIDs,
+		val.connections.map(
+			(conn) => `${conn.from_node}/${conn.from}->${conn.to_node}/${conn.to}`
 		)
-	},
+	)
 })

@@ -1,6 +1,5 @@
 import * as React from "react"
 import Positions from "./positions"
-import state from "../state"
 
 export default function Overlays() {
 	const [showPositions, setShowPositions] = React.useState(true)

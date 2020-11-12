@@ -1,7 +1,8 @@
 import * as React from "react"
-import state from "../state"
+import { useMachine } from "./useViewBox"
 
 export default function useWindowEvents() {
+	const state = useMachine()
 	React.useEffect(() => {
 		function handlePointerMove(e: PointerEvent) {
 			state.send("MOVED_POINTER", { x: e.clientX, y: e.clientY })
@@ -13,6 +14,7 @@ export default function useWindowEvents() {
 
 		function handlePointerDown(e: PointerEvent) {
 			state.send("STARTED_POINTING", { x: e.clientX, y: e.clientY })
+			state.send("STARTED_POINTING_CANVAS")
 		}
 
 		function handleScroll() {

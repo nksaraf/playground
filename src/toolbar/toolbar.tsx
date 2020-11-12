@@ -1,25 +1,25 @@
 import * as React from "react"
-import state from "../state"
-import { useStateDesigner } from "@state-designer/react"
 import { ToolbarWrapper, ButtonGroup, Divider } from "./styled"
 import IconButton from "./icon-button"
+import { graph } from "../state/graph"
+import { useAtom } from "../state/atom"
 
 export default function Toolbar() {
-	const local = useStateDesigner(state)
-
-	const { selectedBoxIds = [], selectedArrowIds = [] } = local.data
+	const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
+	const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
 
 	const hasSelection = selectedBoxIds.length + selectedArrowIds.length > 0
 	const hasSelectedBox = selectedBoxIds.length > 0
 	const hasSelectedBoxes = selectedBoxIds.length > 1
-	const hasManySelectedBoxes = selectedBoxIds.length > 2
+	const hasManySelectedBoxes = selectedBoxIds.length > 1
 
 	return (
 		<ToolbarWrapper onClick={(e) => e.stopPropagation()}>
 			<ButtonGroup>
 				<IconButton
 					src="Select"
-					isActive={local.isIn("selectTool")}
+					// isActive={local.isIn("selectTool")}
+					isActive={true}
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
 				/>
@@ -119,7 +119,7 @@ export default function Toolbar() {
 					disabled={!hasSelection}
 				/> */}
 			</ButtonGroup>
-			<ButtonGroup>
+			{/* <ButtonGroup>
 				<IconButton
 					src="Undo"
 					event="UNDO"
@@ -132,7 +132,7 @@ export default function Toolbar() {
 					shortcut="⌘ ⇧ Z"
 					disabled={local.values.redosLength === 0}
 				/>
-			</ButtonGroup>
+			</ButtonGroup> */}
 		</ToolbarWrapper>
 	)
 }

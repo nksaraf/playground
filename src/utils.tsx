@@ -1,7 +1,6 @@
 import { getBoxToBoxArrow, ArrowOptions } from "perfect-arrows"
 import uniqueId from "lodash/uniqueId"
 import { IPoint, IBounds, IFrame, IBox, IArrow } from "../types"
-import state from "./state/index"
 
 export let scale = 1
 export const pressedKeys = {} as Record<string, boolean>
@@ -10,7 +9,7 @@ export const origin = { x: 0, y: 0 }
 export const cameraOrigin = { x: 0, y: 0 }
 export const camera = { x: 0, y: 0, cx: 0, cy: 0, width: 0, height: 0 }
 
-let dpr = 2
+export const DPR = window.devicePixelRatio || 1
 
 export function viewBoxToCamera(
 	point: IPoint,
@@ -23,7 +22,7 @@ export function viewBoxToCamera(
 	}
 }
 
-export function getBoundingBox(boxes: IBox[]): IBounds {
+export function getBoundingBox(boxes: IFrame[]): IBounds {
 	if (boxes.length === 0) {
 		return {
 			x: 0,
@@ -113,81 +112,9 @@ export function getArrow(
 	)
 }
 
-const keyDownActions = {
-	Escape: "CANCELLED",
-	Alt: "ENTERED_ALT_MODE",
-	" ": "ENTERED_SPACE_MODE",
-	Backspace: "DELETED_SELECTED",
-	Shift: "ENTERED_SHIFT_MODE",
-	Control: "ENTERED_CONTROL_MODE",
-	Meta: "ENTERED_META_MODE",
-	f: "SELECTED_BOX_TOOL",
-	v: "SELECTED_SELECT_TOOL",
-	r: "INVERTED_ARROWS",
-	t: "FLIPPED_ARROWS",
-	a: "STARTED_PICKING_ARROW",
-}
-
-const keyUpActions = {
-	Alt: "EXITED_ALT_MODE",
-	" ": "EXITED_SPACE_MODE",
-	Shift: "EXITED_SHIFT_MODE",
-	Control: "EXITED_CONTROL_MODE",
-	Meta: "EXITED_META_MODE",
-	v: "SELECTED_SELECT_TOOL",
-	r: "INVERTED_ARROWS",
-	t: "FLIPPED_ARROWS",
-	a: "STARTED_PICKING_ARROW",
-}
-
-export function testKeyCombo(event: string, ...keys: string[]) {
-	if (keys.every((key) => pressedKeys[key])) state.send(event)
-}
-
-export function handleKeyDown(e: KeyboardEvent) {
-	pressedKeys[e.key] = true
-	const action = keyDownActions[e.key]
-	if (action) state.send(action)
-
-	// Handle shift here?
-}
-
-export function handleKeyUp(e: KeyboardEvent) {
-	if (
-		pressedKeys.Option ||
-		pressedKeys.Shift ||
-		pressedKeys.Meta ||
-		pressedKeys.Control
-	) {
-		testKeyCombo("ALIGNED_LEFT", "Option", "a")
-		testKeyCombo("ALIGNED_CENTER_X", "Option", "h")
-		testKeyCombo("ALIGNED_RIGHT", "Option", "d")
-		testKeyCombo("ALIGNED_TOP", "Option", "w")
-		testKeyCombo("ALIGNED_CENTER_Y", "Option", "v")
-		testKeyCombo("ALIGNED_BOTTOM", "Option", "s")
-		testKeyCombo("DISTRIBUTED_X", "Option", "Control", "h")
-		testKeyCombo("DISTRIBUTED_Y", "Option", "Control", "v")
-		testKeyCombo("STRETCHED_X", "Option", "Shift", "h")
-		testKeyCombo("STRETCHED_Y", "Option", "Shift", "v")
-		testKeyCombo("BROUGHT_FORWARD", "Meta", "]")
-		testKeyCombo("SENT_BACKWARD", "Meta", "[")
-		testKeyCombo("BROUGHT_TO_FRONT", "Meta", "Shift", "]")
-		testKeyCombo("SENT_TO_BACK", "Meta", "Shift", "[")
-		testKeyCombo("PASTED", "Meta", "v")
-		testKeyCombo("COPIED", "Meta", "c")
-		testKeyCombo("UNDO", "Meta", "z")
-		testKeyCombo("REDO", "Meta", "Shift", "z")
-		return
-	} else {
-		const action = keyUpActions[e.key]
-		if (action) state.send(action)
-	}
-
-	pressedKeys[e.key] = false
-}
-
 export function handleKeyPress(e: KeyboardEvent) {
-	if (e.key === " " && !state.isInAny("editingLabel", "editingArrowLabel")) {
+	if (e.key === " ") {
+		// && !state.isInAny("editingLabel", "editingArrowLabel")) {
 		e.preventDefault()
 	}
 }

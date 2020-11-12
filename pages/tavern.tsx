@@ -1,12 +1,11 @@
-import Head from "next/head"
-import React, { useState } from "react"
-import { RecoilRoot, useSetRecoilState } from "recoil"
+import React from "react"
 import { NodeGraph } from "../src/graph/NodeGraph"
-
-import { exampleGraph, writeGraph } from "../src/graph/exampleGraph"
+import { Provider } from "jotai"
+import { exampleGraph, writeGraph } from "../src/state/graph-io"
+import { useUpdateAtom } from "../src/state/atom"
 
 function Graph() {
-	const write = useSetRecoilState(writeGraph)
+	const write = useUpdateAtom(writeGraph)
 	React.useEffect(() => {
 		write(exampleGraph)
 	}, [write])
@@ -16,8 +15,10 @@ function Graph() {
 
 export default function Index() {
 	return (
-		<RecoilRoot>
+		// <RecoilRoot>
+		<Provider>
 			<Graph />
-		</RecoilRoot>
+		</Provider>
+		// </RecoilRoot>
 	)
 }

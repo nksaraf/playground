@@ -1,11 +1,25 @@
 import * as React from "react"
 import useResizeObserver from "use-resize-observer"
-import state from "../state"
+import { Actions, dispatch } from "../state"
+import { useUpdateAtom } from "../state/atom"
+
+export function useMachine() {
+	const send = useUpdateAtom(dispatch)
+	return {
+		send: React.useCallback(
+			(type: Actions["type"], payload?: Actions["payload"]) => {
+				send({ type, payload } as any)
+			},
+			[send]
+		),
+	}
+}
 
 export default function useViewBox<T extends HTMLElement = HTMLDivElement>() {
 	// Resize Observer
 	const { ref, width = 0, height = 0 } = useResizeObserver<T>()
 
+	const state = useMachine()
 	/**
 	 * Update the state when the element moves or resizes. Resizing is tracked automatically,
 	 * however you'll need to call `handleMove()` manually if you change the position of the

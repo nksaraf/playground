@@ -1,10 +1,9 @@
+import { useAtom } from "../state/atom"
 import * as React from "react"
-import { useStateDesigner } from "@state-designer/react"
-import state from "../state"
-import { useStateSelector } from "../hooks/useStateSelector"
+import { scene } from "../state/scene"
 
 export default function ZoomIndicator() {
-	const { zoom } = useStateSelector("camera")
+	const [zoom] = useAtom(scene.cameraZoom)
 
 	return (
 		<span

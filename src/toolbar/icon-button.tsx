@@ -1,7 +1,7 @@
 import * as React from "react"
-import state from "../state"
 import { ButtonWrapper, ShortcutHint, Button } from "./styled"
 import * as Icons from "./icons/svgr"
+import { useMachine } from "../hooks/useViewBox"
 
 type IconButtonProps = {
 	event: string
@@ -19,6 +19,7 @@ export default function IconButton({
 	...props
 }: IconButtonProps) {
 	const Icon = Icons[src]
+	const state = useMachine()
 
 	return (
 		<ButtonWrapper>
@@ -26,7 +27,7 @@ export default function IconButton({
 				disabled={props.disabled}
 				status={isActive ? "active" : ""}
 				type="button"
-				onClick={() => state.send(event)}
+				onClick={() => state.send(event as any)}
 			>
 				<Icon />
 			</Button>

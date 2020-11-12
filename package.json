@@ -10,11 +10,13 @@
 	"dependencies": {
 		"@state-designer/react": "^1.2.31",
 		"@stitches/react": "^0.0.2",
+		"@types/lodash": "^4.14.165",
 		"@types/rbush": "^3.0.0",
 		"@types/uuid": "^8.3.0",
 		"@zeit/next-workers": "^1.0.0",
 		"comlink": "^4.3.0",
 		"framer-motion": "^2.7.9",
+		"jotai": "^0.10.5",
 		"lodash": "^4.17.20",
 		"next": "^10.0.1",
 		"perfect-arrows": "^0.3.3",

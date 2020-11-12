@@ -1,12 +1,12 @@
 import * as React from "react"
-import { useStateDesigner } from "@state-designer/react"
-import state, { pointerState } from "../state"
 import Value from "./value"
-import { useStateSelector } from "../hooks/useStateSelector"
+import { useAtom } from "../state/atom"
+import { scene } from "../state/scene"
+import { initialPointer } from "../state"
 
 function Scene() {
-	const camera = useStateSelector("camera")
-	const viewBox = useStateSelector("viewBox")
+	const [camera] = useAtom(scene.camera)
+	const [viewBox] = useAtom(scene.viewBox)
 
 	return (
 		<>
@@ -26,26 +26,32 @@ function Scene() {
 	)
 }
 
-function PointerPositions() {
-	const {
-		data: { screen, document },
-	} = useStateDesigner(pointerState)
+function Position({ atom, label }) {
+	const [document] = useAtom(atom) as any
 
 	return (
 		<>
-			{" "}
-			<Value label="x">{Math.trunc(document.x)}</Value>
-			<Value label="y">{Math.trunc(document.y)}</Value>
-			<div style={{ gridColumn: "span 2" }}>Pointer (Document)</div>
-			<Value label="x">{Math.trunc(screen.x)}</Value>
-			<Value label="y">{Math.trunc(screen.y)}</Value>
-			<div style={{ gridColumn: "span 2" }}>Pointer (Screen)</div>
+			<Value label="x">{document ? Math.trunc(document.x) : "-"}</Value>
+			<Value label="y">{document ? Math.trunc(document.y) : "-"}</Value>
+			<div style={{ gridColumn: "span 2" }}>{label}</div>
+		</>
+	)
+}
+
+function PointerPositions() {
+	return (
+		<>
+			<Position atom={scene.documentPointer} label="Pointer (Document)" />
+			<Position atom={initialPointer} label="Pointer (Initial)" />
+			<Position atom={scene.screenPointerPosition} label="Pointer (Screen)" />
+			<Position atom={scene.brushStart} label="Brush start (Document)" />
+			<Position atom={scene.brushEnd} label="Brush end (Document)" />
 		</>
 	)
 }
 
 export default function Positions() {
-	const viewBox = useStateSelector("viewBox")
+	const [viewBox] = useAtom(scene.viewBox)
 
 	return (
 		<div

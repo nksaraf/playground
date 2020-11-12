@@ -1,10 +1,11 @@
 import * as React from "react"
-import state from "../state"
 import { useStateDesigner } from "@state-designer/react"
-import { useStateSelector } from "../hooks/useStateSelector"
+import { useAtom } from "jotai"
+import { scene } from "../state/scene"
+import { useRecoilState } from "recoil"
 
 export default function Model() {
-	const camera = useStateSelector("camera")
+	const [camera, _] = useRecoilState(scene.camera)
 
 	return (
 		<div

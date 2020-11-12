@@ -1,4 +1,4 @@
-import { IBoxSnapshot, IPoint, IBounds, IBox } from "../../types"
+import { IBoxSnapshot, IPoint, IBounds, IBox, IFrame } from "../../types"
 
 export function stretchBoxesX(boxes: IBox[]) {
 	const [first, ...rest] = boxes
@@ -119,7 +119,7 @@ export function alignBoxesRight(boxes: IBox[]) {
 	for (let box of boxes) box.x = maxX - box.width
 }
 
-export function getBoundingBox(boxes: IBox[]): IBounds {
+export function getBoundingBox(boxes: IFrame[]): IBounds {
 	if (boxes.length === 0) {
 		return {
 			x: 0,
