@@ -9,7 +9,10 @@ import {
 var key = 0
 
 type Getter = <Value>(atom: RecoilState<Value>) => Value
-type Setter = <Value>(atom: RecoilState<Value>, val: any) => void
+type Setter = <Value>(
+	atom: RecoilState<Value>,
+	val?: Value | ((old: Value) => Value)
+) => void
 
 export function atom<Value>(
 	read: (get: Getter) => Value | Promise<Value>,

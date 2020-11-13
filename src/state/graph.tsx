@@ -1,5 +1,7 @@
 import { atom, atomFamily } from "./atom"
 import { IFrame, IPoint, ISize } from "../../types"
+import flatten from "lodash/flatten"
+import { getBoundingBox } from "./box-transforms"
 
 const nodeIDs = atom([])
 
@@ -60,11 +62,18 @@ const nodes = atom((get) =>
 	get(nodeIDs).map((id) => ({
 		...get(getNodeMetadata(id)),
 		...get(getNodeBox(id)),
+		inputs: get(getNodeInputIDs(id)).map((inp) => ({
+			...get(getInputState(inp)),
+			connections: get(getInputConnectionIDs(inp)),
+			id: inp,
+		})),
+		ouputs: get(getNodeOutputIDs(id)).map((inp) => ({
+			...get(getOutputState(inp)),
+			connections: get(getOutputConnectionIDs(inp)),
+			id: inp,
+		})),
 	}))
 )
-
-import flatten from "lodash/flatten"
-import { getBoundingBox } from "./box-transforms"
 
 const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
 	return flatten([
@@ -105,6 +114,13 @@ const isNodeSelected = atomFamily((id: string) => (get) =>
 	get(selectedNodeIDs).includes(id)
 )
 
+const snapshot = atom((get) => ({
+	nodes: get(nodes),
+	connections: get(connections),
+	selectedNodeIDs: get(selectedNodeIDs),
+	selectedConnectionIDs: get(selectedConnectionIDs),
+}))
+
 export const graph = {
 	nodeIDs,
 	nodes,
@@ -128,4 +144,5 @@ export const graph = {
 	selected,
 	selectionBounds,
 	isNodeSelected,
+	snapshot,
 }

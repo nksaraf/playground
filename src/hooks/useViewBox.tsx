@@ -1,19 +1,6 @@
 import * as React from "react"
 import useResizeObserver from "use-resize-observer"
-import { Actions, dispatch } from "../state"
-import { useUpdateAtom } from "../state/atom"
-
-export function useMachine() {
-	const send = useUpdateAtom(dispatch)
-	return {
-		send: React.useCallback(
-			(type: Actions["type"], payload?: Actions["payload"]) => {
-				send({ type, payload } as any)
-			},
-			[send]
-		),
-	}
-}
+import { useMachine } from "../state/useMachine"
 
 export default function useViewBox<T extends HTMLElement = HTMLDivElement>() {
 	// Resize Observer

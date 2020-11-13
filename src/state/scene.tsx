@@ -1,5 +1,6 @@
 import { atom } from "./atom"
 import { IPoint } from "../../types"
+import { RecoilState } from "recoil"
 
 const cameraPosition = atom({
 	x: 0,
@@ -98,13 +99,22 @@ const brush = atom((get) => {
 	}
 })
 
-const lastPointPosition = atom({ x: 0, y: 0 })
+type ValueOf<T> = T extends RecoilState<infer U> ? U : null
+
+const lastPointState = atom(
+	null as {
+		screenPointer: IPoint
+		documentPointer: IPoint
+		camera: ValueOf<typeof camera>
+		viewBox: ValueOf<typeof viewBox>
+	} | null
+)
 
 export const scene = {
 	cameraZoom,
 	cameraPosition,
 	camera,
-	lastPointPosition,
+	lastPointState,
 	viewBox,
 	viewBoxPosition,
 	viewBoxSize,

@@ -41,7 +41,6 @@ function PointerPositions() {
 	return (
 		<>
 			<Position atom={scene.documentPointer} label="Pointer (Document)" />
-			<Position atom={scene.lastPointPosition} label="Last Click (Document)" />
 			<Position atom={scene.screenPointerPosition} label="Pointer (Screen)" />
 			<Position atom={scene.brushStart} label="Brush start (Document)" />
 			<Position atom={scene.brushEnd} label="Brush end (Document)" />

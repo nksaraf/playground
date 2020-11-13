@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMachine } from "./useViewBox"
+import { useMachine } from "../state/useMachine"
 
 export default function useWindowEvents() {
 	const state = useMachine()
@@ -14,7 +14,6 @@ export default function useWindowEvents() {
 
 		function handlePointerDown(e: PointerEvent) {
 			state.send("STARTED_POINTING", { x: e.clientX, y: e.clientY })
-			state.send("STARTED_POINTING_CANVAS")
 		}
 
 		function handleScroll() {

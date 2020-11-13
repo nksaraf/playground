@@ -106,36 +106,42 @@ export const ControlledNode = ({
 
 	const ref = React.useRef()
 
-	React.useLayoutEffect(() => {}, [])
-
 	return (
-		<Draggable
-			position={pos}
-			handle=".node-header"
-			onStart={(eve, ui) => {
-				eve.preventDefault()
-				eve.stopPropagation()
-				handleDragStart(eve, ui)
+		// <Draggable
+		// 	position={pos}
+		// 	handle=".node-header"
+		// 	onStart={(eve, ui) => {
+		// 		eve.preventDefault()
+		// 		eve.stopPropagation()
+		// 		handleDragStart(eve, ui)
+		// 	}}
+		// 	onStop={(eve, ui) => handleDragStop(eve, ui)}
+		// 	onDrag={(eve, ui) => handleDrag(eve, ui)}
+		// >
+		<section
+			className="node absolute"
+			ref={ref}
+			onMouseDown={onNodeStart()}
+			style={{
+				zIndex: 10000,
+				transform: `translateX(${pos.x}px) translateY(${pos.y}px)`,
 			}}
-			onStop={(eve, ui) => handleDragStop(eve, ui)}
-			onDrag={(eve, ui) => handleDrag(eve, ui)}
 		>
-			<section className="node absolute" ref={ref} style={{ zIndex: 10000 }}>
-				<header className={"node-header"}>
-					<span className={"node-title"}>{title}</span>
-				</header>
-				<div className={"node-content"}>
-					<NodeInputList
-						items={inputs}
-						onCompleteConnector={(idx) => handleOnCompleteConnector(idx)}
-					/>
-					<NodeOutputList
-						items={outputs}
-						onStartConnector={(idx) => handleOnStartConnector(idx)}
-					/>
-				</div>
-			</section>
-		</Draggable>
+			<header className={"node-header"}>
+				<span className={"node-title"}>{title}</span>
+			</header>
+			<div className={"node-content"}>
+				<NodeInputList
+					items={inputs}
+					onCompleteConnector={(idx) => handleOnCompleteConnector(idx)}
+				/>
+				<NodeOutputList
+					items={outputs}
+					onStartConnector={(idx) => handleOnStartConnector(idx)}
+				/>
+			</div>
+		</section>
+		// </Draggable>
 	)
 }
 
