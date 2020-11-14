@@ -5,40 +5,52 @@ import { selector, selectToolDispatch } from "./selector"
 import { undo } from "./undo"
 import { scene } from "./scene"
 
-const toolState = atom("selectTool")
+export const toolState = atom("selectTool")
 
-const globalDispatch = atom(null, (get, set, { type, payload }: Actions) => {
-	switch (type) {
-		case "FORCED_IDS": {
-			return set(selector.selectedNodeIDs, payload as any)
-		}
-		// case "RESET_BOXES": "resetBoxes",
-		case "UNDO": {
-			return set(undo.actions.loadUndoState, null)
-		}
-		case "REDO": {
-			return set(undo.actions.loadRedoState, null)
-		}
-		case "STARTED_POINTING": {
-			return set(scene.actions.savePointer, payload)
-		}
-		case "MOVED_POINTER":
-			return set(scene.actions.updatePointerOnPointerMove, payload as IPoint)
-		case "ZOOMED":
-			return set(scene.actions.updateCameraZoom, payload as number)
-		case "PANNED": {
-			set(scene.actions.updateCameraPoint, payload as IPoint)
-			set(scene.actions.updatePointerOnPan, payload as IPoint)
-			return
-		}
-		case "SCROLLED_VIEWPORT":
-			return set(scene.actions.updateViewBoxOnScroll, payload as IPoint)
-		case "UPDATED_VIEWBOX": {
-			set(scene.actions.updateCameraOnViewBoxChange, payload as IFrame)
-			set(scene.actions.updateViewBox, payload as IFrame)
-			return
+export const globalDispatch = atom(
+	null,
+	(get, set, { type, payload }: Actions) => {
+		switch (type) {
+			case "FORCED_IDS": {
+				return set(selector.selectedNodeIDs, payload as any)
+			}
+			// case "RESET_BOXES": "resetBoxes",
+			case "UNDO": {
+				return set(undo.actions.loadUndoState, null)
+			}
+			case "REDO": {
+				return set(undo.actions.loadRedoState, null)
+			}
+			case "STARTED_POINTING": {
+				return set(scene.actions.savePointer, payload)
+			}
+			case "MOVED_POINTER":
+				return set(scene.actions.updatePointerOnPointerMove, payload as IPoint)
+			case "ZOOMED":
+				return set(scene.actions.updateCameraZoom, payload as number)
+			case "PANNED": {
+				set(scene.actions.updateCameraPoint, payload as IPoint)
+				set(scene.actions.updatePointerOnPan, payload as IPoint)
+				return
+			}
+			case "SCROLLED_VIEWPORT":
+				return set(scene.actions.updateViewBoxOnScroll, payload as IPoint)
+			case "UPDATED_VIEWBOX": {
+				set(scene.actions.updateCameraOnViewBoxChange, payload as IFrame)
+				set(scene.actions.updateViewBox, payload as IFrame)
+				return
+			}
 		}
 	}
+)
+
+const states = {
+	selectTool: selector.selectToolState,
+	insertTool: selector.selectToolState,
+}
+
+export const activeState = atom((get) => {
+	return [get(toolState), get(states[get(toolState)])]
 })
 
 export const dispatch = atom(null, (get, set, action: Actions) => {
@@ -46,12 +58,6 @@ export const dispatch = atom(null, (get, set, action: Actions) => {
 	set(globalDispatch, action)
 	set(selectToolDispatch, action)
 })
-
-export const machine = {
-	toolState,
-	globalDispatch,
-	dispatch,
-}
 
 export type Action<S, T = undefined> = {
 	type: S

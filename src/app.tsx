@@ -7,7 +7,7 @@ import useViewBox from "./hooks/useViewBox"
 import Toolbar from "./components/toolbar/toolbar"
 import ZoomIndicator from "./components/overlays/zoom-indicator"
 import Overlays from "./components/overlays/overlays"
-import { exampleGraph, writeGraph } from "./state/graph-io"
+import { exampleGraph, writeGraph } from "./lib/graph-io"
 import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/Canvas"
 
