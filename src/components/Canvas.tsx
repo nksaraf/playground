@@ -3,9 +3,9 @@ import { useMachine } from "../hooks/useMachine"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
 import { CanvasBackground } from "./CanvasBackground"
-import { useAtom } from "../atom/atom"
+import { useAtom } from "../atom"
 import { Connection } from "./Connection"
-import { graph } from "../state"
+import { graph, scene, selector } from "../state"
 import { Node } from "./Node"
 
 export function useWheel() {
@@ -52,6 +52,7 @@ export function Canvas({ width, height }) {
 		>
 			<SvgCanvas height={height} width={width}>
 				<SelectionBrush />
+				<NewComponentGhost />
 				<Connections />
 			</SvgCanvas>
 			<CanvasBackground height={height} width={width}>
@@ -59,6 +60,23 @@ export function Canvas({ width, height }) {
 			</CanvasBackground>
 		</div>
 	)
+}
+
+function NewComponentGhost() {
+	const [state] = useAtom(selector.selectToolState)
+	const [pointer] = useAtom(scene.documentPointer)
+
+	return state === "inserting" ? (
+		<rect
+			x={pointer.x}
+			y={pointer.y}
+			width={20}
+			height={20}
+			fill="rgba(0,0,100, .1)"
+			stroke="rgba(0,0,100, .2)"
+			strokeWidth={1}
+		/>
+	) : null
 }
 
 export const Connections = React.memo(() => {

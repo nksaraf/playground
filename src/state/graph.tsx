@@ -1,7 +1,6 @@
-import { atom, atomFamily } from "../atom/atom"
+import { atom, atomFamily } from "../atom"
 import { IFrame, IPoint, ISize } from "../../types"
 import flatten from "lodash/flatten"
-import { getBoundingBox } from "./box-transforms"
 
 const nodeIDs = atom([])
 
@@ -102,28 +101,7 @@ const connections = atom((get) =>
 	}))
 )
 
-const selectedNodeIDs = atom([])
-const selectedConnectionIDs = atom([])
-
-const selected = atom((get) => ({
-	nodesIDs: get(selectedNodeIDs),
-	connectionIDs: get(selectedConnectionIDs),
-}))
-
-const selectionBounds = atom((get) => {
-	const ids = get(selectedNodeIDs)
-	if (ids.length === 0) {
-		return null
-	} else {
-		return getBoundingBox(ids.map((id) => get(getNodeBox(id))))
-	}
-})
-
-const isNodeSelected = atomFamily((id: string) => (get) =>
-	get(selectedNodeIDs).includes(id)
-)
-
-const getNodeInputs = atomFamily((id: string) => (get) => {
+const getNodeInputIDs = atomFamily((id: string) => (get) => {
 	const nodePorts = get(getNodePortIDs(id))
 		.map((pid) => get(getPortMetadata(pid)))
 		.filter((port) => port.type === "input")
@@ -131,7 +109,7 @@ const getNodeInputs = atomFamily((id: string) => (get) => {
 	return nodePorts.map((np) => np.id)
 })
 
-const getNodeOutputs = atomFamily((id: string) => (get) => {
+const getNodeOutputIDs = atomFamily((id: string) => (get) => {
 	const nodePorts = get(getNodePortIDs(id))
 		.map((pid) => get(getPortMetadata(pid)))
 		.filter((port) => port.type === "output")
@@ -142,8 +120,6 @@ const getNodeOutputs = atomFamily((id: string) => (get) => {
 const snapshot = atom((get) => ({
 	nodes: get(nodes),
 	connections: get(connections),
-	selectedNodeIDs: get(selectedNodeIDs),
-	selectedConnectionIDs: get(selectedConnectionIDs),
 }))
 
 export const graph = {
@@ -161,13 +137,8 @@ export const graph = {
 	getPortMetadata,
 	getPortConnectionIDs,
 	getNodeSize,
-	selectedNodeIDs,
-	getNodeInputIDs: getNodeInputs,
-	getNodeOutputIDs: getNodeOutputs,
-	selectedConnectionIDs,
-	selected,
-	selectionBounds,
-	isNodeSelected,
+	getNodeInputIDs,
+	getNodeOutputIDs,
 	snapshot,
 	getPortOffset,
 	getPortPosition,

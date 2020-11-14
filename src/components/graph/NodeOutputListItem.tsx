@@ -1,6 +1,6 @@
 import React from "react"
 import { useRecoilState } from "recoil"
-import { useAtom, useUpdateAtom } from "../../atom/atom"
+import { useAtom, useUpdateAtom } from "../../atom"
 import { graph } from "../../state/graph"
 import { outputStateByID } from "./store"
 

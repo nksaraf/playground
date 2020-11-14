@@ -1,11 +1,12 @@
 import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
-import { useAtom } from "../atom/atom"
+import { useAtom } from "../atom"
 import { graph } from "../state/graph"
 import { ControlledNode } from "./graph/Node"
+import { selector } from "../state"
 
 export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
-	const [isSelected, setIsSelected] = useAtom(graph.isNodeSelected(nodeID))
+	const [isSelected, setIsSelected] = useAtom(selector.isNodeSelected(nodeID))
 	const [{ type: nodeType }] = useAtom(graph.getNodeMetadata(nodeID))
 	const [nodePosition, setNodePosition] = useAtom(graph.getNodePosition(nodeID))
 	const [nodeInputIDs] = useAtom(graph.getNodeInputIDs(nodeID))

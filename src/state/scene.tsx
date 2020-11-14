@@ -1,6 +1,9 @@
-import { atom } from "../atom/atom"
+import { atom } from "../atom"
 import { IPoint } from "../../types"
 import { RecoilState } from "recoil"
+
+import { IFrame } from "../../types"
+import clamp from "lodash/clamp"
 
 const cameraPosition = atom({
 	x: 0,
@@ -85,20 +88,6 @@ const viewBox = atom((get) => ({
 	document: get(documentViewBox),
 }))
 
-const brushStart = atom(null as null | IPoint)
-const brushEnd = atom(null as null | IPoint)
-
-const brush = atom((get) => {
-	const start = get(brushStart)
-	const end = get(brushEnd)
-
-	if (start && end) {
-		return { x0: start.x, y0: start.y, x1: end.x, y1: end.y }
-	} else {
-		return null
-	}
-})
-
 type ValueOf<T> = T extends RecoilState<infer U> ? U : null
 
 const lastPointState = atom(
@@ -109,6 +98,81 @@ const lastPointState = atom(
 		viewBox: ValueOf<typeof viewBox>
 	} | null
 )
+
+const updatePointerOnPointerMove = atom(null, (get, set, point: IPoint) => {
+	if (!point) return // Probably triggered by a zoom / scroll
+
+	const zoom = get(cameraZoom)
+	const oldPos = get(screenPointerPosition)
+	set(screenPointerPosition, point)
+	set(screenPointerDelta, {
+		dx: (point.x - oldPos.x) / zoom,
+		dy: (point.y - oldPos.y) / zoom,
+	})
+})
+
+const updatePointerOnPan = atom(null, (get, set, delta: IPoint) => {
+	const zoom = get(cameraZoom)
+	set(screenPointerDelta, { dx: delta.x / zoom, dy: delta.y / zoom })
+})
+
+const updateCameraPoint = atom(null, (get, set, delta: IPoint) => {
+	set(cameraPosition, (pos) => ({
+		x: pos.x + delta.x,
+		y: pos.y + delta.y,
+	}))
+})
+
+const updateViewBoxOnScroll = atom(null, (get, set, point: IPoint) => {
+	const { scrollX, scrollY } = get(viewBoxScroll)
+
+	set(viewBoxPosition, (pos) => ({
+		x: pos.x + scrollX - point.x,
+		y: pos.y + scrollY - point.y,
+	}))
+
+	set(viewBoxScroll, {
+		scrollX: point.x,
+		scrollY: point.y,
+	})
+})
+
+const updateCameraOnViewBoxChange = atom(null, (get, set, frame: IFrame) => {
+	const viewBox = get(viewBoxSize)
+	if (viewBox.width > 0) {
+		set(cameraPosition, (pos) => ({
+			x: pos.x + (viewBox.width - frame.width) / 2,
+			y: pos.y + (viewBox.height - frame.height) / 2,
+		}))
+	}
+})
+
+const updateViewBox = atom(null, (get, set, frame: IFrame) => {
+	set(viewBoxPosition, { x: frame.x, y: frame.y })
+	set(viewBoxSize, { height: frame.height, width: frame.width })
+})
+
+const updateCameraZoom = atom(null, (get, set, newZoom: number) => {
+	const prev = get(cameraZoom)
+	const next = clamp(prev - newZoom, 0.25, 100)
+	const delta = next - prev
+	const pointer = get(screenPointerPosition)
+
+	set(cameraZoom, next)
+	set(cameraPosition, (pos) => ({
+		x: pos.x + ((pos.x + pointer.x) * delta) / prev,
+		y: pos.y + ((pos.y + pointer.y) * delta) / prev,
+	}))
+})
+
+const savePointer = atom(null, (get, set) => {
+	set(lastPointState, {
+		screenPointer: get(screenPointer),
+		documentPointer: get(documentPointer),
+		viewBox: get(viewBox),
+		camera: get(camera),
+	})
+})
 
 export const scene = {
 	cameraZoom,
@@ -126,7 +190,14 @@ export const scene = {
 	screenPointerDelta,
 	screenPointer,
 	documentPointer,
-	brushStart,
-	brushEnd,
-	brush,
+	actions: {
+		updatePointerOnPointerMove,
+		updatePointerOnPan,
+		updateCameraPoint,
+		updateViewBoxOnScroll,
+		updateCameraOnViewBoxChange,
+		updateViewBox,
+		updateCameraZoom,
+		savePointer,
+	},
 }

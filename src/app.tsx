@@ -8,7 +8,7 @@ import Toolbar from "./components/toolbar/toolbar"
 import ZoomIndicator from "./components/overlays/zoom-indicator"
 import Overlays from "./components/overlays/overlays"
 import { exampleGraph, writeGraph } from "./state/graph-io"
-import { useUpdateAtom } from "./atom/atom"
+import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/Canvas"
 
 export default function App() {

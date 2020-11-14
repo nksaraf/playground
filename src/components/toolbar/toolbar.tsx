@@ -2,32 +2,36 @@ import * as React from "react"
 import { ToolbarWrapper, ButtonGroup, Divider } from "./styled"
 import IconButton from "./icon-button"
 import { graph } from "../../state/graph"
-import { useAtom } from "../../atom/atom"
+import { useAtom } from "../../atom"
+import { useMachine } from "../../state"
 
 export default function Toolbar() {
-	const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
-	const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
+	const machine = useMachine()
+	// const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
+	// const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
 
-	const hasSelection = selectedBoxIds.length + selectedArrowIds.length > 0
-	const hasSelectedBox = selectedBoxIds.length > 0
-	const hasSelectedBoxes = selectedBoxIds.length > 1
-	const hasManySelectedBoxes = selectedBoxIds.length > 1
+	// const hasSelection = selectedBoxIds.length + selectedArrowIds.length > 0
+	// const hasSelectedBox = selectedBoxIds.length > 0
+	// const hasSelectedBoxes = selectedBoxIds.length > 1
+	// const hasManySelectedBoxes = selectedBoxIds.length > 1
 
 	return (
 		<ToolbarWrapper onClick={(e) => e.stopPropagation()}>
 			<ButtonGroup>
-				<IconButton
+				{/* <IconButton
 					src="Select"
 					// isActive={local.isIn("selectTool")}
 					isActive={true}
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
-				/>
+				/> */}
 				<IconButton
 					src="Box"
 					// isActive={local.isIn("selectTool")}
 					isActive={false}
-					event="INSERT_NEW_COMPONENT"
+					onClick={() =>
+						machine.send("INSERT_NEW_COMPONENT", { componentID: 1 })
+					}
 				/>
 				{/* <IconButton
 					src="Box"

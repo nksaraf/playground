@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useAtom } from "../atom/atom"
+import { useAtom } from "../atom"
 import { scene } from "../state/scene"
 
 export function CanvasBackground({ children, height, width }) {

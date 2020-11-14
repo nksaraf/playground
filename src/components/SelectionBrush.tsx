@@ -1,14 +1,13 @@
 import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
-import { useAtom } from "../atom/atom"
-import { scene } from "../state/scene"
-import { machine } from "../state"
+import { useAtom } from "../atom"
+import { selector } from "../state"
 import { IBrush } from "../../types"
 
 export function SelectionBrush() {
-	const [brush] = useAtom(scene.brush)
+	const [brush] = useAtom(selector.selectionBrush)
 	const state = useMachine()
-	const [selectToolState] = useAtom(machine.selectToolState)
+	const [selectToolState] = useAtom(selector.selectToolState)
 
 	React.useEffect(() => {
 		if (selectToolState === "recentlyPointed") {

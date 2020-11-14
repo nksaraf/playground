@@ -2,7 +2,7 @@ import * as React from "react"
 import Positions from "./positions"
 import JSONView from "react-json-view"
 import { graph } from "../../state/graph"
-import { useAtom } from "../../atom/atom"
+import { useAtom } from "../../atom"
 export default function Overlays() {
 	const [showPositions, setShowPositions] = React.useState(true)
 

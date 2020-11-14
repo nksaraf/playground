@@ -4,18 +4,19 @@ import * as Icons from "./icons/svgr"
 import { useMachine } from "../../hooks/useMachine"
 
 type IconButtonProps = {
-	event: string
+	// event: string
 	isActive?: boolean
 	src: string
 	shortcut?: string
 } & React.HTMLProps<HTMLButtonElement>
 
 export default function IconButton({
-	event = "",
+	// event = "",
 	isActive = false,
 	src,
 	shortcut,
 	children,
+	onClick,
 	...props
 }: IconButtonProps) {
 	const Icon = Icons[src]
@@ -27,7 +28,7 @@ export default function IconButton({
 				disabled={props.disabled}
 				status={isActive ? "active" : ""}
 				type="button"
-				onClick={() => state.send(event as any)}
+				onClick={onClick}
 			>
 				<Icon />
 			</Button>

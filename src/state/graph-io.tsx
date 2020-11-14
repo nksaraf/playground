@@ -164,7 +164,7 @@ export const exampleGraph = {
 	],
 }
 
-import { atom } from "../atom/atom"
+import { atom } from "../atom"
 import { graph } from "./graph"
 
 export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {

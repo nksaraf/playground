@@ -1,31 +1,124 @@
-import { IPoint, IFrame } from "../../types"
-import { atom } from "../atom/atom"
+import { IPoint } from "../../types"
+import { atom } from "../atom"
 import { graph } from "./graph"
+import { scene } from "./scene"
+import { undo } from "./undo"
+import * as Comlink from "comlink"
 
-import {
-	clearSelection,
-	saveUndoState,
-	deleteSelected,
-	startBrushWithWorker,
-	setInitialSelectedIDs,
-	moveBrush,
-	setSelectedIdsFromWorker,
-	completeBrush,
-	loadUndoState,
-	loadRedoState,
-	setPointer,
-	updatePointerOnPointerMove,
-	updateCameraZoom,
-	updateCameraPoint,
-	updatePointerOnPan,
-	updateViewBoxOnScroll,
-	updateCameraOnViewBoxChange,
-	updateViewBox,
-	scene,
-	moveDraggingBoxes,
-} from "./index"
+let id = 100
 
-export const selectToolState = atom(
+import { atomFamily } from "../atom"
+import flatten from "lodash/flatten"
+import { Actions } from "./index"
+
+type GetFromWorker = (type: string, payload: any) => Promise<any>
+
+export const getFromWorker = Comlink.wrap<GetFromWorker>(
+	new Worker("service.worker.js")
+)
+
+import { getBoundingBox } from "../utils"
+
+const selectionBrushStart = atom(null as null | IPoint)
+const selectionBrushEnd = atom(null as null | IPoint)
+
+const selectedNodeIDs = atom([])
+const selectedConnectionIDs = atom([])
+
+const selected = atom((get) => ({
+	nodesIDs: get(selectedNodeIDs),
+	connectionIDs: get(selectedConnectionIDs),
+}))
+
+const selectionBounds = atom((get) => {
+	const ids = get(selectedNodeIDs)
+	if (ids.length === 0) {
+		return null
+	} else {
+		return getBoundingBox(ids.map((id) => get(graph.getNodeBox(id))))
+	}
+})
+
+const selectionBrush = atom((get) => {
+	const start = get(selectionBrushStart)
+	const end = get(selectionBrushEnd)
+
+	if (start && end) {
+		return { x0: start.x, y0: start.y, x1: end.x, y1: end.y }
+	} else {
+		return null
+	}
+})
+
+const moveDraggingBoxes = atom(null, (get, set) => {
+	const pointer = get(scene.screenPointer)
+	get(selector.selectedNodeIDs).forEach((id) => {
+		set(graph.getNodePosition(id), (pos) => ({
+			x: pos.x + pointer.dx,
+			y: pos.y + pointer.dy,
+		}))
+	})
+})
+
+const clearSelection = atom(null, (get, set) => {
+	set(selectedConnectionIDs, [])
+	set(selectedNodeIDs, [])
+})
+
+const deleteSelected = atom(null, (get, set) => {
+	const selectedIDs = get(selectedNodeIDs)
+	const connectionIDs = flatten([
+		...selectedIDs.map((id) => graph.getNodeConnectionIDs(id)),
+		get(selectedConnectionIDs),
+	])
+
+	set(clearSelection, null)
+
+	set(graph.nodeIDs, (ids) => ids.filter((id) => !selectedIDs.includes(id)))
+	set(graph.connectionIDs, (ids) =>
+		ids.filter((id) => !connectionIDs.includes(id))
+	)
+})
+
+const startBrushWithWorker = atom(null, (get, set) => {
+	const { x, y } = get(scene.documentPointer)
+
+	const { documentPointer } = get(scene.lastPointState)
+	set(selectionBrushStart, { ...documentPointer })
+	set(selectionBrushEnd, { x, y })
+
+	getFromWorker("selecter", {
+		origin: { x, y },
+	})
+})
+const initialSelectedNodeIDs = atom([])
+
+const setInitialSelectedIDs = atom(null, (get, set) => {
+	set(initialSelectedNodeIDs, [...get(selectedNodeIDs)])
+})
+
+const moveBrush = atom(null, (get, set) => {
+	set(selectionBrushEnd, { ...get(scene.documentPointer) })
+})
+
+const completeBrush = atom(null, (get, set) => {
+	set(selectionBrushStart, null)
+	set(selectionBrushEnd, null)
+})
+
+const setSelectedIdsFromWorker = atom(null, (get, set) => {
+	getFromWorker("selected", get(scene.documentPointer)).then((r) => {
+		if (r.length !== get(selectedNodeIDs).length) {
+			set(selectedNodeIDs, r)
+		}
+	})
+})
+
+const isNodeSelected = atomFamily((id: string) => (get) =>
+	get(selectedNodeIDs).includes(id)
+)
+
+const selectToolState = atom(
 	"selectingIdle" as
 		| "selectingIdle"
 		| "dragging"
@@ -45,33 +138,51 @@ const resetTouch = atom(null, (get, set) => {
 	}
 })
 
-const selectToolDispatch = atom(
+const addingComponentWithID = atom(null as string | null)
+
+export const selector = {
+	selectionBrushStart,
+	selectionBrushEnd,
+	selectionBrush,
+	selected,
+	selectToolState,
+	isNodeSelected,
+	selectedNodeIDs,
+	selectedConnectionIDs,
+	selectionBounds,
+	actions: {
+		clearSelection,
+		deleteSelected,
+		startBrushWithWorker,
+		setInitialSelectedIDs,
+		moveBrush,
+		completeBrush,
+		setSelectedIdsFromWorker,
+	},
+}
+
+export const selectToolDispatch = atom(
 	null,
 	(get, set, { payload, type }: Actions) => {
 		switch (get(selectToolState)) {
 			case "selectingIdle": {
 				switch (type) {
 					case "CANCELLED": {
-						set(clearSelection, null)
+						set(selector.actions.clearSelection, null)
 						return
 					}
 					case "DELETED_SELECTED": {
-						set(saveUndoState, null)
-						set(deleteSelected, null)
-						set(saveUndoState, null)
+						set(undo.actions.saveUndoState, null)
+						set(selector.actions.deleteSelected, null)
+						set(undo.actions.saveUndoState, null)
 						return
 					}
 					case "INSERT_NEW_COMPONENT": {
+						set(selectToolState, "inserting")
+						set(addingComponentWithID, (payload as any).componentID)
+
 						return
 					}
-					// case "STARTED_POINTING_BOUNDS_EDGE": {
-					// 	set(selectToolState, "edgeResizing")
-					// 	return
-					// }
-					// case "STARTED_POINTING_BOUNDS_CORNER": {
-					// 	set(selectToolState, "cornerResizing")
-					// 	return
-					// }
 					case "STARTED_POINTING_CANVAS": {
 						set(selectToolState, "pointingCanvas")
 						const i = setTimeout(() => {
@@ -87,15 +198,16 @@ const selectToolDispatch = atom(
 					// 	return
 					// }
 					case "STARTED_POINTING_BOX": {
-						console.log(get(graph.isNodeSelected((payload as any).id)))
-						if (!get(graph.isNodeSelected((payload as any).id))) {
-							set(graph.selectedNodeIDs, [(payload as any).id])
+						console.log(get(selector.isNodeSelected((payload as any).id)))
+						if (!get(selector.isNodeSelected((payload as any).id))) {
+							set(selector.selectedNodeIDs, [(payload as any).id])
 						}
 						set(selectToolState, "dragging")
 						return
 					}
 					case "STARTED_POINTING_BOUNDS": {
 						set(selectToolState, "dragging")
+
 						return
 					}
 				}
@@ -103,7 +215,15 @@ const selectToolDispatch = atom(
 			}
 			case "inserting": {
 				switch (type) {
-					
+					case "STOPPED_POINTING": {
+						const pid = id++
+						// set(insertNewComponent, {
+						// 	component: get(addingComponentWithID),
+						// 	id: pid,
+						// })
+						set(selector.selectedNodeIDs, [(payload as any).id])
+						set(selectToolState, "selectingIdle")
+					}
 				}
 				return
 			}
@@ -208,7 +328,7 @@ const selectToolDispatch = atom(
 						return
 					}
 					case "STOPPED_POINTING": {
-						set(clearSelection, null)
+						set(selector.actions.clearSelection, null)
 						set(selectToolState, "recentlyPointed")
 						return
 					}
@@ -219,9 +339,9 @@ const selectToolDispatch = atom(
 				switch (type) {
 					case "STARTED_POINTING_CANVAS": {
 						set(selectToolState, "brushSelecting")
-						set(clearSelection, null)
-						set(startBrushWithWorker, null)
-						set(setInitialSelectedIDs, null)
+						set(selector.actions.clearSelection, null)
+						set(selector.actions.startBrushWithWorker, null)
+						set(selector.actions.setInitialSelectedIDs, null)
 						return
 					}
 					case "RESET_POINTED": {
@@ -234,12 +354,12 @@ const selectToolDispatch = atom(
 			case "brushSelecting": {
 				switch (type) {
 					case "MOVED_POINTER": {
-						set(moveBrush, null)
-						set(setSelectedIdsFromWorker, null)
+						set(selector.actions.moveBrush, null)
+						set(selector.actions.setSelectedIdsFromWorker, null)
 						return
 					}
 					case "STOPPED_POINTING": {
-						set(completeBrush, null)
+						set(selector.actions.completeBrush, null)
 						set(selectToolState, "selectingIdle")
 						return
 					}
@@ -249,80 +369,3 @@ const selectToolDispatch = atom(
 		}
 	}
 )
-
-const toolState = atom("selectTool")
-
-const globalDispatch = atom(null, (get, set, { type, payload }: Actions) => {
-	switch (type) {
-		case "FORCED_IDS": {
-			return set(graph.selectedNodeIDs, payload as any)
-		}
-		// case "RESET_BOXES": "resetBoxes",
-		case "UNDO": {
-			return set(loadUndoState, null)
-		}
-		case "REDO": {
-			return set(loadRedoState, null)
-		}
-		case "STARTED_POINTING": {
-			return set(setPointer, payload)
-		}
-		case "MOVED_POINTER":
-			return set(updatePointerOnPointerMove, payload as IPoint)
-		case "ZOOMED":
-			return set(updateCameraZoom, payload as number)
-		case "PANNED": {
-			set(updateCameraPoint, payload as IPoint)
-			set(updatePointerOnPan, payload as IPoint)
-			return
-		}
-		case "SCROLLED_VIEWPORT":
-			return set(updateViewBoxOnScroll, payload as IPoint)
-		case "UPDATED_VIEWBOX": {
-			set(updateCameraOnViewBoxChange, payload as IFrame)
-			set(updateViewBox, payload as IFrame)
-			return
-		}
-	}
-})
-
-export const dispatch = atom(null, (get, set, action: Actions) => {
-	// action.type !== "MOVED_POINTER" && console.log(action)
-	set(globalDispatch, action)
-	set(selectToolDispatch, action)
-})
-
-export const machine = {
-	toolState,
-	globalDispatch,
-	dispatch,
-	selectToolDispatch,
-	selectToolState,
-}
-
-export type Action<S, T = undefined> = {
-	type: S
-	payload: T
-}
-
-export type Actions =
-	| Action<"UPDATED_VIEWBOX", IFrame>
-	| Action<"MOVED_POINTER", IPoint | undefined>
-	| Action<"CANCELLED">
-	| Action<"DELETED_SELECTED">
-	// | Action<"STARTED_POINTING_BOUNDS_EDGE">
-	// | Action<"STARTED_POINTING_BOUNDS_CORNER">
-	| Action<"STARTED_POINTING_CANVAS">
-	| Action<"STARTED_POINTING_BOX", { id: string }>
-	| Action<"STARTED_POINTING_BOUNDS">
-	| Action<"STOPPED_POINTING">
-	| Action<"FORCED_IDS">
-	| Action<"RESET_POINTED">
-	| Action<"UNDO">
-	| Action<"REDO">
-	| Action<"STARTED_POINTING">
-	| Action<"DOUBLE_TAPPED_CANVAS">
-	| Action<"ZOOMED", number>
-	| Action<"PANNED", IPoint>
-	| Action<"SCROLLED_VIEWPORT", IPoint>
-	| Action<"UPDATED_VIEWBOX", IFrame>

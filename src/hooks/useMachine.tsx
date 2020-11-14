@@ -1,13 +1,13 @@
 import * as React from "react"
-import { Actions } from "../state/select-tool"
-import { dispatch } from "../state/select-tool"
-import { useUpdateAtom } from "../atom/atom"
+import { Actions } from "../state/machine"
+import { dispatch } from "../state/machine"
+import { useUpdateAtom } from "../atom"
 
 export function useMachine() {
 	const send = useUpdateAtom(dispatch)
 	return {
 		send: React.useCallback(
-			(type: Actions["type"], payload?: Actions["payload"]) => {
+			(type: Actions["type"], payload?: any) => {
 				send({ type, payload } as any)
 			},
 			[send]

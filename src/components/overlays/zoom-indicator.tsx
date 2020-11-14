@@ -1,4 +1,4 @@
-import { useAtom } from "../../atom/atom"
+import { useAtom } from "../../atom"
 import * as React from "react"
 import { scene } from "../../state/scene"
 
