@@ -1,16 +1,17 @@
 import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
 import { useAtom } from "../atom"
-import { selector } from "../state"
+import { activeState, selector } from "../state"
 import { IBrush } from "../../types"
 
 export function SelectionBrush() {
 	const [brush] = useAtom(selector.selectionBrush)
 	const state = useMachine()
-	const [selectToolState] = useAtom(selector.selectToolState)
+	const [active] = useAtom(activeState)
 
+	console.log(active)
 	React.useEffect(() => {
-		if (selectToolState === "recentlyPointed") {
+		if (active.includes("recentlyPointed")) {
 			const i = setTimeout(() => {
 				state.send("RESET_POINTED", null)
 			}, 400)
@@ -18,9 +19,9 @@ export function SelectionBrush() {
 				clearTimeout(i)
 			}
 		}
-	}, [selectToolState, state.send])
+	}, [active, state.send])
 
-	return selectToolState === "brushSelecting" ? <Brush {...brush} /> : null
+	return active.includes("brushSelecting") ? <Brush {...brush} /> : null
 }
 
 export function Brush({ x0, y0, x1, y1 }: IBrush) {

@@ -5,19 +5,16 @@ import { scene } from "./scene"
 import { undo } from "./undo"
 import * as Comlink from "comlink"
 
-let id = 100
-
 import { atomFamily } from "../atom"
 import flatten from "lodash/flatten"
 import { Actions } from "./index"
+import { getBoundingBox } from "../utils"
 
 type GetFromWorker = (type: string, payload: any) => Promise<any>
 
 export const getFromWorker = Comlink.wrap<GetFromWorker>(
 	new Worker("service.worker.js")
 )
-
-import { getBoundingBox } from "../utils"
 
 const selectionBrushStart = atom(null as null | IPoint)
 const selectionBrushEnd = atom(null as null | IPoint)
@@ -138,8 +135,6 @@ const resetTouch = atom(null, (get, set) => {
 	}
 })
 
-const addingComponentWithID = atom(null as string | null)
-
 export const selector = {
 	selectionBrushStart,
 	selectionBrushEnd,
@@ -161,211 +156,119 @@ export const selector = {
 	},
 }
 
-export const selectToolDispatch = atom(
-	null,
-	(get, set, { payload, type }: Actions) => {
-		switch (get(selectToolState)) {
-			case "selectingIdle": {
-				switch (type) {
-					case "CANCELLED": {
-						set(selector.actions.clearSelection, null)
-						return
+export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
+	switch (get(selectToolState)) {
+		case "selectingIdle": {
+			switch (action.type) {
+				case "CANCELLED": {
+					set(selector.actions.clearSelection, null)
+					return
+				}
+				case "DELETED_SELECTED": {
+					set(undo.actions.saveUndoState, null)
+					set(selector.actions.deleteSelected, null)
+					set(undo.actions.saveUndoState, null)
+					return
+				}
+				case "STARTED_POINTING_CANVAS": {
+					set(selectToolState, "pointingCanvas")
+					const i = setTimeout(() => {
+						set(resetTouch, null)
+					}, 100)
+					return
+				}
+				case "STARTED_POINTING_BOX": {
+					console.log(get(selector.isNodeSelected(action.payload.id)))
+					if (!get(selector.isNodeSelected(action.payload.id))) {
+						set(selector.selectedNodeIDs, [action.payload.id])
 					}
-					case "DELETED_SELECTED": {
-						set(undo.actions.saveUndoState, null)
-						set(selector.actions.deleteSelected, null)
-						set(undo.actions.saveUndoState, null)
-						return
-					}
-					case "INSERT_NEW_COMPONENT": {
-						set(selectToolState, "inserting")
-						set(addingComponentWithID, (payload as any).componentID)
+					set(selectToolState, "dragging")
+					return
+				}
+				case "STARTED_POINTING_BOUNDS": {
+					set(selectToolState, "dragging")
 
-						return
-					}
-					case "STARTED_POINTING_CANVAS": {
-						set(selectToolState, "pointingCanvas")
-						const i = setTimeout(() => {
-							set(resetTouch, null)
-						}, 100)
-						return
-					}
-					// case "DOUBLE_TAPPED_CANVAS": {
+					return
+				}
+			}
+			return
+		}
+		case "dragging": {
+			switch (action.type) {
+				case "MOVED_POINTER": {
+					set(moveDraggingBoxes)
+					// set(selectToolState, "dragActive")
+					return
+				}
+				case "STOPPED_POINTING": {
+					set(selectToolState, "selectingIdle")
+					return
+				}
+			}
+			return
+		}
+
+		case "pointingCanvas": {
+			switch (action.type) {
+				case "MOVED_POINTER": {
+					const { screenPointer: initial, camera } = get(scene.lastPointState)
+					const pointer = get(scene.screenPointerPosition)
+
+					set(scene.cameraPosition, {
+						x: camera.x - (pointer.x - initial.x),
+						y: camera.y - (pointer.y - initial.y),
+					})
+
+					// const isDistanceFarEnough =
+					// 	Math.hypot(pointer.x - initial.x, pointer.y - initial.y) > 4
+
+					// if (isDistanceFarEnough) {
 					// 	set(selectToolState, "brushSelecting")
 					// 	set(clearSelection, null)
 					// 	set(startBrushWithWorker, null)
 					// 	set(setInitialSelectedIDs, null)
-					// 	return
 					// }
-					case "STARTED_POINTING_BOX": {
-						console.log(get(selector.isNodeSelected((payload as any).id)))
-						if (!get(selector.isNodeSelected((payload as any).id))) {
-							set(selector.selectedNodeIDs, [(payload as any).id])
-						}
-						set(selectToolState, "dragging")
-						return
-					}
-					case "STARTED_POINTING_BOUNDS": {
-						set(selectToolState, "dragging")
-
-						return
-					}
+					// return
+					return
 				}
-				return
-			}
-			case "inserting": {
-				switch (type) {
-					case "STOPPED_POINTING": {
-						const pid = id++
-						// set(insertNewComponent, {
-						// 	component: get(addingComponentWithID),
-						// 	id: pid,
-						// })
-						set(selector.selectedNodeIDs, [(payload as any).id])
-						set(selectToolState, "selectingIdle")
-					}
+				case "STOPPED_POINTING": {
+					set(selector.actions.clearSelection, null)
+					set(selectToolState, "recentlyPointed")
+					return
 				}
-				return
 			}
-			case "dragging": {
-				switch (type) {
-					case "MOVED_POINTER": {
-						set(moveDraggingBoxes)
-						// set(selectToolState, "dragActive")
-						return
-					}
-					case "STOPPED_POINTING": {
-						set(selectToolState, "selectingIdle")
-						return
-					}
+			return
+		}
+		case "recentlyPointed": {
+			switch (action.type) {
+				case "STARTED_POINTING_CANVAS": {
+					set(selectToolState, "brushSelecting")
+					set(selector.actions.clearSelection, null)
+					set(selector.actions.startBrushWithWorker, null)
+					set(selector.actions.setInitialSelectedIDs, null)
+					return
 				}
-				return
-			}
-			// case "dragActive": {
-			// 	switch (type) {
-			// 		case 'MOVED_POINTER': {
-			// 			set(moveDraggingBoxes)
-			// 			set(selectToolState, "dragActive")
-			// 			return;
-			// 		}
-			// 		case 'STOPPED_POINTING': {
-			// 			set(selectToolState, "selectingIdle")
-			// 			return;
-			// 		}
-			// 	}
-			// 	return;
-			// }
-			// dragging: {
-			// 	states: {
-			// 		dragIdle: {
-			// 			onEnter: ["setInitialPointer", "setInitialSnapshot"],
-			// 			on: {
-			// 				MOVED_POINTER: {
-			// 					do: ["moveDraggingBoxes", "moveBounds"],
-			// 					to: "dragActive",
-			// 				},
-			// 				STOPPED_POINTING: { to: "selectingIdle" },
-			// 			},
-			// 		},
-			// 		dragActive: {
-			// 			onExit: "saveUndoState",
-			// 			on: {
-			// 				MOVED_POINTER: ["moveDraggingBoxes", "moveBounds"],
-			// 				STOPPED_POINTING: {
-			// 					do: ["updateBounds"],
-			// 					to: "selectingIdle",
-			// 				},
-			// 			},
-			// 		},
-			// 	},
-			// },
-
-			case "pointingCanvas": {
-				// click and drag to select
-				// switch (type) {
-				// 	case "MOVED_POINTER": {
-				// 		const initial = get(scene.lastPointPosition)
-				// 		const pointer = get(scene.screenPointerPosition)
-
-				// 		const isDistanceFarEnough =
-				// 			Math.hypot(pointer.x - initial.x, pointer.y - initial.y) > 4
-
-				// 		if (isDistanceFarEnough) {
-				// 			set(selectToolState, "brushSelecting")
-				// 			set(clearSelection, null)
-				// 			set(startBrushWithWorker, null)
-				// 			set(setInitialSelectedIDs, null)
-				// 		}
-				// 		return
-				// 	}
-				// 	case "STOPPED_POINTING": {
-				// 		set(clearSelection, null)
-				// 		set(selectToolState, "selectingIdle")
-				// 		return
-				// 	}
-				// }
-
-				switch (type) {
-					case "MOVED_POINTER": {
-						const { screenPointer: initial, camera } = get(scene.lastPointState)
-						const pointer = get(scene.screenPointerPosition)
-
-						set(scene.cameraPosition, {
-							x: camera.x - (pointer.x - initial.x),
-							y: camera.y - (pointer.y - initial.y),
-						})
-
-						// const isDistanceFarEnough =
-						// 	Math.hypot(pointer.x - initial.x, pointer.y - initial.y) > 4
-
-						// if (isDistanceFarEnough) {
-						// 	set(selectToolState, "brushSelecting")
-						// 	set(clearSelection, null)
-						// 	set(startBrushWithWorker, null)
-						// 	set(setInitialSelectedIDs, null)
-						// }
-						// return
-						return
-					}
-					case "STOPPED_POINTING": {
-						set(selector.actions.clearSelection, null)
-						set(selectToolState, "recentlyPointed")
-						return
-					}
+				case "RESET_POINTED": {
+					set(selectToolState, "selectingIdle")
+					return
 				}
-				return
 			}
-			case "recentlyPointed": {
-				switch (type) {
-					case "STARTED_POINTING_CANVAS": {
-						set(selectToolState, "brushSelecting")
-						set(selector.actions.clearSelection, null)
-						set(selector.actions.startBrushWithWorker, null)
-						set(selector.actions.setInitialSelectedIDs, null)
-						return
-					}
-					case "RESET_POINTED": {
-						set(selectToolState, "selectingIdle")
-						return
-					}
+			return
+		}
+		case "brushSelecting": {
+			switch (action.type) {
+				case "MOVED_POINTER": {
+					set(selector.actions.moveBrush, null)
+					set(selector.actions.setSelectedIdsFromWorker, null)
+					return
 				}
-				return
-			}
-			case "brushSelecting": {
-				switch (type) {
-					case "MOVED_POINTER": {
-						set(selector.actions.moveBrush, null)
-						set(selector.actions.setSelectedIdsFromWorker, null)
-						return
-					}
-					case "STOPPED_POINTING": {
-						set(selector.actions.completeBrush, null)
-						set(selectToolState, "selectingIdle")
-						return
-					}
+				case "STOPPED_POINTING": {
+					set(selector.actions.completeBrush, null)
+					set(selectToolState, "selectingIdle")
+					return
 				}
-				return
 			}
+			return
 		}
 	}
-)
+})

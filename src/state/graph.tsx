@@ -1,6 +1,8 @@
 import { atom, atomFamily } from "../atom"
 import { IFrame, IPoint, ISize } from "../../types"
 import flatten from "lodash/flatten"
+import { Actions } from "./machine"
+import { scene, selector, toolState } from "."
 
 const nodeIDs = atom([])
 
@@ -122,6 +124,62 @@ const snapshot = atom((get) => ({
 	connections: get(connections),
 }))
 
+const insertToolState = atom("insertIdle")
+
+import uniqueId from "lodash/uniqueId"
+import { v4 as uuid } from "uuid"
+
+// let surface: Surface | undefined = undefined
+const id = uuid()
+
+function getId() {
+	return uniqueId(id)
+}
+
+const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
+	set(nodeIDs, (ids) => [...ids, id])
+	const pointer = get(scene.documentPointer)
+	set(getNodeMetadata(id), {
+		type: "component",
+		// componentID,
+		id,
+	})
+	set(getNodePosition(id), { ...pointer })
+})
+
+const addingComponentWithID = atom(null as string | null)
+
+export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
+	switch (get(insertToolState)) {
+		case "insertIdle": {
+			switch (action.type) {
+				case "INSERT_NEW_COMPONENT": {
+					set(insertToolState, "inserting")
+					set(addingComponentWithID, action.payload.componentID)
+				}
+			}
+		}
+		case "inserting": {
+			switch (action.type) {
+				case "CANCELLED": {
+					set(toolState, "selectTool")
+					return
+				}
+				case "STOPPED_POINTING": {
+					const id = getId()
+					set(toolState, "selectTool")
+					set(insertNewComponent, {
+						componentID: get(addingComponentWithID),
+						id,
+					})
+					set(selector.selectedNodeIDs, [id])
+					return
+				}
+			}
+		}
+	}
+})
+
 export const graph = {
 	nodeIDs,
 	nodes,
@@ -143,4 +201,6 @@ export const graph = {
 	getPortOffset,
 	getPortPosition,
 	getConnectionPosition,
+
+	insertToolState,
 }

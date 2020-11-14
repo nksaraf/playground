@@ -5,7 +5,7 @@ import { SelectionBrush } from "./SelectionBrush"
 import { CanvasBackground } from "./CanvasBackground"
 import { useAtom } from "../atom"
 import { Connection } from "./Connection"
-import { graph, scene, selector } from "../state"
+import { activeState, graph, scene, selector } from "../state"
 import { Node } from "./Node"
 
 export function useWheel() {
@@ -63,10 +63,10 @@ export function Canvas({ width, height }) {
 }
 
 function NewComponentGhost() {
-	const [state] = useAtom(selector.selectToolState)
+	const [state] = useAtom(activeState)
 	const [pointer] = useAtom(scene.documentPointer)
 
-	return state === "inserting" ? (
+	return state.includes("inserting") ? (
 		<rect
 			x={pointer.x}
 			y={pointer.y}
