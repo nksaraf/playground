@@ -1,7 +1,7 @@
 import * as React from "react"
-import { Actions } from "./selectToolState"
-import { dispatch } from "./selectToolState"
-import { useUpdateAtom } from "./atom"
+import { Actions } from "../state/select-tool"
+import { dispatch } from "../state/select-tool"
+import { useUpdateAtom } from "../atom/atom"
 
 export function useMachine() {
 	const send = useUpdateAtom(dispatch)

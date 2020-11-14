@@ -1,4 +1,4 @@
-import { atom } from "./atom"
+import { atom } from "../atom/atom"
 import { IPoint } from "../../types"
 import { RecoilState } from "recoil"
 
@@ -121,11 +121,11 @@ export const scene = {
 	viewBoxScroll,
 	documentViewBoxPosition,
 	documentViewBoxSize,
+	documentViewBox,
 	screenPointerPosition,
 	screenPointerDelta,
 	screenPointer,
 	documentPointer,
-	documentViewBox,
 	brushStart,
 	brushEnd,
 	brush,

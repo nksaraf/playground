@@ -1,5 +1,5 @@
 import { IPoint, IFrame } from "../../types"
-import { atom } from "./atom"
+import { atom } from "../atom/atom"
 import { graph } from "./graph"
 
 import {

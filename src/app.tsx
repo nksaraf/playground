@@ -4,19 +4,22 @@ import { styled } from "./theme"
 import useKeyboardEvents from "./hooks/useKeyboardEvents"
 import useWindowEvents from "./hooks/useWindowEvents"
 import useViewBox from "./hooks/useViewBox"
-import { useMachine } from "./state/useMachine"
+import { useMachine } from "./hooks/useMachine"
 
 import Toolbar from "./toolbar/toolbar"
 import ZoomIndicator from "./overlays/zoom-indicator"
 import Overlays from "./overlays/overlays"
 import { exampleGraph, writeGraph } from "./state/graph-io"
-import { useAtom, useUpdateAtom } from "./state/atom"
+import { useAtom, useUpdateAtom } from "./atom/atom"
 import { scene } from "./state/scene"
 import { graph } from "./state/graph"
 import Brush from "./canvas-tavern/brush"
 import { ControlledNode } from "./graph/Node"
 import { machine } from "./state"
+import RecoilizeDebugger from "recoilize"
+import { Spline } from "./graph/Spline"
 
+const root = document.getElementById("__next")
 export default function App() {
 	const { ref, width, height } = useViewBox()
 
@@ -32,6 +35,8 @@ export default function App() {
 
 	return (
 		<div ref={ref} className="w-screen h-screen absolue t-0 l-0">
+			{/* <RecoilizeDebugger root={root} /> */}
+
 			<Canvas width={width} height={height} style={{ userSelect: "none" }} />
 			<Overlays />
 			<ZoomIndicator />
@@ -72,6 +77,7 @@ function CanvasBackground({ children, height, width }) {
 				transform: `scale(${zoom}) translateX(${-x / zoom}px) translateY(${
 					-y / zoom
 				}px)`,
+				transformOrigin: "0px 0px",
 				height,
 				width,
 			}}
@@ -102,15 +108,28 @@ function Canvas({ width, height, style }) {
 		>
 			<SvgCanvas height={height} width={width}>
 				<SelectionBrush />
-				{/* <Connections /> */}
+			</SvgCanvas>
+			<SvgCanvas height={height} width={width}>
+				<Connections />
 			</SvgCanvas>
 			<CanvasBackground height={height} width={width}>
-				{/* <Connections /> */}
 				<Nodes />
 			</CanvasBackground>
 		</div>
 	)
 }
+
+const Connections = React.memo(() => {
+	const [allConnectionIDs] = useAtom(graph.connectionIDs)
+
+	return (
+		<>
+			{allConnectionIDs.map((id) => {
+				return <Connection connectionID={id} key={id} />
+			})}
+		</>
+	)
+})
 
 const Nodes = React.memo(() => {
 	const [nodeIDs] = useAtom(graph.nodeIDs)
@@ -128,11 +147,12 @@ const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [isSelected, setIsSelected] = React.useState(false)
 	const [{ type: nodeType }] = useAtom(graph.getNodeMetadata(nodeID))
 	const [nodePosition, setNodePosition] = useAtom(graph.getNodePosition(nodeID))
-	const [nodeInputIDs] = useAtom(graph.getNodeInputIDs(nodeID))
-	const [nodeOutputIDs] = useAtom(graph.getNodeOutputIDs(nodeID))
-
+	const [nodeInputIDs] = useAtom(graph.getNodePortIDs(nodeID))
+	// const [nodeOutputIDs] = useAtom(graph.getNodeOutputIDs(nodeID))
+	const [nodeSize, setNodeSize] = useAtom(graph.getNodeSize(nodeID))
 	return (
 		<ControlledNode
+			onResize={setNodeSize}
 			isSelected={isSelected}
 			onNodeDeselect={() => setIsSelected(false)}
 			onNodeSelect={() => setIsSelected(true)}
@@ -144,17 +164,39 @@ const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 			onStartConnector={() => {}}
 			onCompleteConnector={() => {}}
 			onNodeStop={() => {}}
-			pos={nodePosition}
+			position={nodePosition}
+			size={nodeSize}
 			title={nodeType}
 			inputs={nodeInputIDs}
-			outputs={nodeOutputIDs}
+			outputs={[]}
 		/>
 	)
 })
 
+export const Connection = React.memo(
+	({ connectionID }: { connectionID: string }) => {
+		const [{ start, end }] = useAtom(graph.getConnectionPosition(connectionID))
+		console.log(start, end)
+		return <Spline start={start} end={end} />
+	}
+)
+
+function Transform({ children }) {
+	const [{ x, y, zoom }] = useAtom(scene.camera)
+
+	return (
+		<g
+			fill={"#AAAAAAA"}
+			transform={`scale(${zoom}) translate(${-x / zoom} ${-y / zoom})`}
+			strokeWidth={1 / zoom}
+		>
+			{children}
+		</g>
+	)
+}
+
 function SvgCanvas({ children, height, width }) {
 	const [viewBoxSize] = useAtom(scene.viewBoxSize)
-	const [{ x, y, zoom }] = useAtom(scene.camera)
 	return (
 		<svg
 			className="absolute"
@@ -165,12 +207,7 @@ function SvgCanvas({ children, height, width }) {
 			}}
 			viewBox={`${0} ${0} ${viewBoxSize.width} ${viewBoxSize.height}`}
 		>
-			<g
-				transform={`scale(${zoom}) translate(${-x / zoom} ${-y / zoom})`}
-				strokeWidth={1 / zoom}
-			>
-				{children}
-			</g>
+			<Transform>{children}</Transform>
 		</svg>
 	)
 }

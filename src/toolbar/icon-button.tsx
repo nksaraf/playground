@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ButtonWrapper, ShortcutHint, Button } from "./styled"
 import * as Icons from "./icons/svgr"
-import { useMachine } from "../state/useMachine"
+import { useMachine } from "../hooks/useMachine"
 
 type IconButtonProps = {
 	event: string

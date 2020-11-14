@@ -12,6 +12,7 @@ import {
 	inputIDsByNodeID,
 	outputIDsByNodeID,
 } from "./store"
+import useResizeObserver from "use-resize-observer"
 
 export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [isSelected, setIsSelected] = React.useState(false)
@@ -49,6 +50,7 @@ export const ControlledNode = ({
 	onNodeStart,
 	onNodeStop,
 	onNodeMove,
+	onResize,
 	//   onClick,
 	//   onDoubleClick,
 	onStartConnector,
@@ -57,7 +59,8 @@ export const ControlledNode = ({
 	outputs,
 	nodeId,
 	isSelected,
-	pos,
+	size,
+	position,
 	title,
 }) => {
 	// const [selected, setSelected] = useState(false);
@@ -104,7 +107,9 @@ export const ControlledNode = ({
 	//   setSelected(false);
 	// };
 
-	const ref = React.useRef()
+	const { ref } = useResizeObserver({
+		onResize,
+	})
 
 	return (
 		// <Draggable
@@ -124,11 +129,13 @@ export const ControlledNode = ({
 			onMouseDown={onNodeStart()}
 			style={{
 				zIndex: 10000,
-				transform: `translateX(${pos.x}px) translateY(${pos.y}px)`,
+				transform: `translateX(${position.x}px) translateY(${position.y}px)`,
 			}}
 		>
 			<header className={"node-header"}>
-				<span className={"node-title"}>{title}</span>
+				<span className={"node-title"}>
+					{title} {size.width} x {size.height}
+				</span>
 			</header>
 			<div className={"node-content"}>
 				<NodeInputList

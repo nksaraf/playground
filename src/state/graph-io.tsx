@@ -164,7 +164,7 @@ export const exampleGraph = {
 	],
 }
 
-import { atom } from "./atom"
+import { atom } from "../atom/atom"
 import { graph } from "./graph"
 
 export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
@@ -172,30 +172,34 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		const nodeId = `${node.nid}`
 		set(graph.getNodeMetadata(nodeId), { type: node.type, id: nodeId })
 		set(graph.getNodePosition(nodeId), { x: node.x, y: node.y })
-		set(
-			graph.getNodeInputIDs(nodeId),
-			node.fields.in.map(
+		set(graph.getNodePortIDs(nodeId), (old) => [
+			...old,
+			...node.fields.in.map(
 				(field, index) => `${nodeId}/input/${index}/${field.name}`
-			)
-		)
+			),
+		])
 		node.fields.in.forEach((field, index) => {
-			set(graph.getInputState(`${nodeId}/input/${index}/${field.name}`), {
+			set(graph.getPortMetadata(`${nodeId}/input/${index}/${field.name}`), {
 				name: field.name,
 				parentNode: nodeId,
 				index,
+				id: `${nodeId}/input/${index}/${field.name}`,
+				type: "input",
 			})
 		})
-		set(
-			graph.getNodeOutputIDs(nodeId),
-			node.fields.out.map(
+		set(graph.getNodePortIDs(nodeId), (old) => [
+			...old,
+			...node.fields.out.map(
 				(field, index) => `${nodeId}/output/${index}/${field.name}`
-			)
-		)
+			),
+		])
 		node.fields.out.forEach((field, index) => {
-			set(graph.getOutputState(`${nodeId}/output/${index}/${field.name}`), {
+			set(graph.getPortMetadata(`${nodeId}/output/${index}/${field.name}`), {
 				name: field.name,
 				parentNode: nodeId,
 				index,
+				id: `${nodeId}/output/${index}/${field.name}`,
+				type: "output",
 			})
 		})
 	})
@@ -241,10 +245,10 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		set(graph.getConnectionParams(connId), {
 			from: {
 				node: conn.from_node.toString(),
-				field: fromfieldId,
+				port: fromfieldId,
 			},
 			to: {
-				field: `${toNode.nid}/input/${computePinIdxfromLabel(
+				port: `${toNode.nid}/input/${computePinIdxfromLabel(
 					toNode.fields.in,
 					conn.to
 				)}/${conn.to}`,
@@ -252,8 +256,8 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 			},
 		})
 
-		set(graph.getOutputConnectionIDs(fromfieldId), (prev) => [...prev, connId])
-		set(graph.getInputConnectionIDs(toFieldId), (prev) => [...prev, connId])
+		set(graph.getPortConnectionIDs(fromfieldId), (prev) => [...prev, connId])
+		set(graph.getPortConnectionIDs(toFieldId), (prev) => [...prev, connId])
 	})
 
 	set(

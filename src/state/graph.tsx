@@ -1,4 +1,4 @@
-import { atom, atomFamily } from "./atom"
+import { atom, atomFamily } from "../atom/atom"
 import { IFrame, IPoint, ISize } from "../../types"
 import flatten from "lodash/flatten"
 import { getBoundingBox } from "./box-transforms"
@@ -8,8 +8,8 @@ const nodeIDs = atom([])
 const connectionIDs = atom([])
 
 const getConnectionParams = atomFamily((id: string) => ({
-	from: { node: "", field: "" },
-	to: { node: "", field: "" },
+	from: { node: "", port: "" },
+	to: { node: "", port: "" },
 }))
 
 const getConnectionMetadata = atomFamily((id: string) => ({
@@ -22,6 +22,14 @@ const getNodeMetadata = atomFamily((id: string) => ({
 	id: id,
 }))
 
+const getPortMetadata = atomFamily((id: string) => ({
+	type: "",
+	id: id,
+	name: "input",
+	parentNode: null,
+	index: -1,
+}))
+
 const getNodePosition = atomFamily<IPoint>((id: string) => ({
 	x: 0,
 	y: 0,
@@ -32,25 +40,15 @@ const getNodeSize = atomFamily<ISize>((id: string) => ({
 	height: 0,
 }))
 
-const getNodeInputIDs = atomFamily<string[]>((id: string) => [])
+const getNodePortIDMap = atomFamily<any>((id: string) => ({}))
 
-const getNodeOutputIDs = atomFamily((id: string) => [])
+const getNodePortIDs = atomFamily<string[]>(
+	(id: string) => (get) => Object.keys(get(getNodePortIDMap(id))),
+	(id: string) => (get, set, update) =>
+		set(getNodePortIDMap(id), Object.fromEntries(update.map((u) => [u, true])))
+)
 
-const getInputState = atomFamily((id: string) => ({
-	name: "input",
-	parentNode: null,
-	index: -1,
-}))
-
-const getOutputState = atomFamily((id: string) => ({
-	name: "input",
-	parentNode: null,
-	index: -1,
-}))
-
-const getInputConnectionIDs = atomFamily((id: string) => [])
-
-const getOutputConnectionIDs = atomFamily((id: string) => [])
+const getPortConnectionIDs = atomFamily((id: string) => [])
 
 const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	...get(getNodeSize(id)),
@@ -58,32 +56,54 @@ const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	id,
 }))
 
+const getPortOffset = atomFamily((id: string) => ({ x: 0, y: 0 }))
+
+const getPortPosition = atomFamily((id: string) => (get) => {
+	const port = get(getPortMetadata(id))
+	const nodePos = get(getNodePosition(port.parentNode))
+	const portOffset = get(getPortOffset(id))
+
+	return { x: nodePos.x + portOffset.x, y: nodePos.y + portOffset.y }
+})
+
+const getConnectionPosition = atomFamily((id: string) => (get) => {
+	const params = get(getConnectionParams(id))
+
+	// const fromNode = get(nodePositionByID(params.fromNode))
+	// const toNode = get(nodePositionByID(params.toNode))
+
+	// const toField = get(inputStateByID(params.inputField))
+	// const fromField = get(outputStateByID(params.outputField))
+
+	// let splinestart = computeOutOffsetByIndex(
+	// 	fromNode.x,
+	// 	fromNode.y,
+	// 	fromField.index
+	// )
+	// let splineend = computeInOffsetByIndex(toNode.x, toNode.y, toField.index)
+	return {
+		start: get(getPortPosition(params.from.port)),
+		end: get(getPortPosition(params.to.port)),
+	}
+})
 const nodes = atom((get) =>
 	get(nodeIDs).map((id) => ({
 		...get(getNodeMetadata(id)),
 		...get(getNodeBox(id)),
-		inputs: get(getNodeInputIDs(id)).map((inp) => ({
-			...get(getInputState(inp)),
-			connections: get(getInputConnectionIDs(inp)),
-			id: inp,
-		})),
-		ouputs: get(getNodeOutputIDs(id)).map((inp) => ({
-			...get(getOutputState(inp)),
-			connections: get(getOutputConnectionIDs(inp)),
+		ports: get(getNodePortIDs(id)).map((inp) => ({
+			...get(getPortMetadata(inp)),
+			connections: get(getPortConnectionIDs(inp)),
 			id: inp,
 		})),
 	}))
 )
 
 const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
-	return flatten([
-		...get(getNodeOutputIDs(id)).map((outputID) =>
-			get(getOutputConnectionIDs(outputID))
-		),
-		...get(getNodeInputIDs(id)).map((inputID) =>
-			get(getInputConnectionIDs(inputID))
-		),
-	])
+	return flatten(
+		get(getNodePortIDs(id)).map((outputID) =>
+			get(getPortConnectionIDs(outputID))
+		)
+	)
 })
 
 const connections = atom((get) =>
@@ -131,13 +151,10 @@ export const graph = {
 	getNodeMetadata,
 	getNodePosition,
 	getNodeBox,
-	getNodeInputIDs,
+	getNodePortIDs,
 	getNodeConnectionIDs,
-	getNodeOutputIDs,
-	getInputConnectionIDs,
-	getOutputConnectionIDs,
-	getInputState,
-	getOutputState,
+	getPortMetadata,
+	getPortConnectionIDs,
 	getNodeSize,
 	selectedNodeIDs,
 	selectedConnectionIDs,
@@ -145,4 +162,7 @@ export const graph = {
 	selectionBounds,
 	isNodeSelected,
 	snapshot,
+	getPortOffset,
+	getPortPosition,
+	getConnectionPosition,
 }

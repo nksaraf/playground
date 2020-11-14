@@ -8,8 +8,7 @@ import {
 	IArrow,
 	IBoxSnapshot,
 } from "../../types"
-import { atom } from "./atom"
-// import Surface from "../canvas/surface"
+import { atom } from "../atom/atom"
 import { pressedKeys, getBoundingBox } from "../utils"
 import { saveToDatabase } from "./database"
 import { BoxSelecter, getBoxSelecter } from "./box-selecter"
@@ -21,7 +20,7 @@ import flatten from "lodash/flatten"
 import * as Comlink from "comlink"
 import { graph } from "./graph"
 import { scene } from "./scene"
-import { Action } from "./selectToolState"
+import { Action } from "./select-tool"
 
 type GetFromWorker = (type: string, payload: any) => Promise<any>
 
@@ -192,11 +191,11 @@ export const setSelectedIdsFromWorker = atom(null, (get, set) => {
 })
 
 export const completeBrush = atom(null, (get, set) => {
-	set(scene.brushStart, null)
-	set(scene.brushEnd, null)
+	// set(scene.brushStart, null)
+	// set(scene.brushEnd, null)
 })
 
-export * from "./selectToolState"
+export * from "./select-tool"
 export * from "./graph"
 export * from "./scene"
-export * from "./useMachine"
+export * from "../hooks/useMachine"

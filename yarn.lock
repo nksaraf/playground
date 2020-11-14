@@ -5467,6 +5467,11 @@ recoil@^0.1.2:
   resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.1.2.tgz#844c612f535826dbe54c977761a67ded16f6d063"
   integrity sha512-hIRrHlkmW4yITlBFprVYjVPhzPKYrJKoaDrrJtAtbkMeXfXaa/XE5OlyR10n+rNfnKWNToCKb3Z4fo86IGjkzg==
 
+recoilize@^0.9.5:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/recoilize/-/recoilize-0.9.5.tgz#95d39a3ff1b25428de09912a9edd32f136c74d2b"
+  integrity sha512-Gieo/n+Oon1aF/93S5OmSvMOKnngu7bdt7DwZ5aSQ6nY/jLv/IT5ikaJDFxWml5Ue6j6C0/kMDXWMW823STOHQ==
+
 reduce-css-calc@^2.1.6:
   version "2.1.7"
   resolved "https://registry.yarnpkg.com/reduce-css-calc/-/reduce-css-calc-2.1.7.tgz#1ace2e02c286d78abcd01fd92bfe8097ab0602c2"

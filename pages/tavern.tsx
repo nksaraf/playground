@@ -2,7 +2,7 @@ import React from "react"
 import { NodeGraph } from "../src/graph/NodeGraph"
 import { Provider } from "jotai"
 import { exampleGraph, writeGraph } from "../src/state/graph-io"
-import { useUpdateAtom } from "../src/state/atom"
+import { useUpdateAtom } from "../src/atom/atom"
 
 function Graph() {
 	const write = useUpdateAtom(writeGraph)

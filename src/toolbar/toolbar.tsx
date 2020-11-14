@@ -2,7 +2,7 @@ import * as React from "react"
 import { ToolbarWrapper, ButtonGroup, Divider } from "./styled"
 import IconButton from "./icon-button"
 import { graph } from "../state/graph"
-import { useAtom } from "../state/atom"
+import { useAtom } from "../atom/atom"
 
 export default function Toolbar() {
 	const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
