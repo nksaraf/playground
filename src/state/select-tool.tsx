@@ -22,12 +22,14 @@ import {
 	updateCameraOnViewBoxChange,
 	updateViewBox,
 	scene,
+	moveDraggingBoxes,
 } from "./index"
 
 export const selectToolState = atom(
 	"selectingIdle" as
 		| "selectingIdle"
 		| "dragging"
+		| "inserting"
 		| "edgeResizing"
 		| "cornerResizing"
 		| "pointingCanvas"
@@ -59,6 +61,9 @@ const selectToolDispatch = atom(
 						set(saveUndoState, null)
 						return
 					}
+					case "INSERT_NEW_COMPONENT": {
+						return
+					}
 					// case "STARTED_POINTING_BOUNDS_EDGE": {
 					// 	set(selectToolState, "edgeResizing")
 					// 	return
@@ -82,6 +87,7 @@ const selectToolDispatch = atom(
 					// 	return
 					// }
 					case "STARTED_POINTING_BOX": {
+						console.log(get(graph.isNodeSelected((payload as any).id)))
 						if (!get(graph.isNodeSelected((payload as any).id))) {
 							set(graph.selectedNodeIDs, [(payload as any).id])
 						}
@@ -95,6 +101,65 @@ const selectToolDispatch = atom(
 				}
 				return
 			}
+			case "inserting": {
+				switch (type) {
+					
+				}
+				return
+			}
+			case "dragging": {
+				switch (type) {
+					case "MOVED_POINTER": {
+						set(moveDraggingBoxes)
+						// set(selectToolState, "dragActive")
+						return
+					}
+					case "STOPPED_POINTING": {
+						set(selectToolState, "selectingIdle")
+						return
+					}
+				}
+				return
+			}
+			// case "dragActive": {
+			// 	switch (type) {
+			// 		case 'MOVED_POINTER': {
+			// 			set(moveDraggingBoxes)
+			// 			set(selectToolState, "dragActive")
+			// 			return;
+			// 		}
+			// 		case 'STOPPED_POINTING': {
+			// 			set(selectToolState, "selectingIdle")
+			// 			return;
+			// 		}
+			// 	}
+			// 	return;
+			// }
+			// dragging: {
+			// 	states: {
+			// 		dragIdle: {
+			// 			onEnter: ["setInitialPointer", "setInitialSnapshot"],
+			// 			on: {
+			// 				MOVED_POINTER: {
+			// 					do: ["moveDraggingBoxes", "moveBounds"],
+			// 					to: "dragActive",
+			// 				},
+			// 				STOPPED_POINTING: { to: "selectingIdle" },
+			// 			},
+			// 		},
+			// 		dragActive: {
+			// 			onExit: "saveUndoState",
+			// 			on: {
+			// 				MOVED_POINTER: ["moveDraggingBoxes", "moveBounds"],
+			// 				STOPPED_POINTING: {
+			// 					do: ["updateBounds"],
+			// 					to: "selectingIdle",
+			// 				},
+			// 			},
+			// 		},
+			// 	},
+			// },
+
 			case "pointingCanvas": {
 				// click and drag to select
 				// switch (type) {

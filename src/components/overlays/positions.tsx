@@ -1,7 +1,7 @@
 import * as React from "react"
 import Value from "./value"
-import { useAtom } from "../atom/atom"
-import { scene } from "../state/scene"
+import { useAtom } from "../../atom/atom"
+import { scene } from "../../state/scene"
 
 function Scene() {
 	const [camera] = useAtom(scene.camera)

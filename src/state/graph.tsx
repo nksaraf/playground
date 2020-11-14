@@ -69,23 +69,12 @@ const getPortPosition = atomFamily((id: string) => (get) => {
 const getConnectionPosition = atomFamily((id: string) => (get) => {
 	const params = get(getConnectionParams(id))
 
-	// const fromNode = get(nodePositionByID(params.fromNode))
-	// const toNode = get(nodePositionByID(params.toNode))
-
-	// const toField = get(inputStateByID(params.inputField))
-	// const fromField = get(outputStateByID(params.outputField))
-
-	// let splinestart = computeOutOffsetByIndex(
-	// 	fromNode.x,
-	// 	fromNode.y,
-	// 	fromField.index
-	// )
-	// let splineend = computeInOffsetByIndex(toNode.x, toNode.y, toField.index)
 	return {
 		start: get(getPortPosition(params.from.port)),
 		end: get(getPortPosition(params.to.port)),
 	}
 })
+
 const nodes = atom((get) =>
 	get(nodeIDs).map((id) => ({
 		...get(getNodeMetadata(id)),
@@ -134,6 +123,22 @@ const isNodeSelected = atomFamily((id: string) => (get) =>
 	get(selectedNodeIDs).includes(id)
 )
 
+const getNodeInputs = atomFamily((id: string) => (get) => {
+	const nodePorts = get(getNodePortIDs(id))
+		.map((pid) => get(getPortMetadata(pid)))
+		.filter((port) => port.type === "input")
+
+	return nodePorts.map((np) => np.id)
+})
+
+const getNodeOutputs = atomFamily((id: string) => (get) => {
+	const nodePorts = get(getNodePortIDs(id))
+		.map((pid) => get(getPortMetadata(pid)))
+		.filter((port) => port.type === "output")
+
+	return nodePorts.map((np) => np.id)
+})
+
 const snapshot = atom((get) => ({
 	nodes: get(nodes),
 	connections: get(connections),
@@ -157,6 +162,8 @@ export const graph = {
 	getPortConnectionIDs,
 	getNodeSize,
 	selectedNodeIDs,
+	getNodeInputIDs: getNodeInputs,
+	getNodeOutputIDs: getNodeOutputs,
 	selectedConnectionIDs,
 	selected,
 	selectionBounds,

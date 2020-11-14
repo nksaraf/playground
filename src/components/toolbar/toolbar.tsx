@@ -1,8 +1,8 @@
 import * as React from "react"
 import { ToolbarWrapper, ButtonGroup, Divider } from "./styled"
 import IconButton from "./icon-button"
-import { graph } from "../state/graph"
-import { useAtom } from "../atom/atom"
+import { graph } from "../../state/graph"
+import { useAtom } from "../../atom/atom"
 
 export default function Toolbar() {
 	const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
@@ -22,6 +22,12 @@ export default function Toolbar() {
 					isActive={true}
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
+				/>
+				<IconButton
+					src="Box"
+					// isActive={local.isIn("selectTool")}
+					isActive={false}
+					event="INSERT_NEW_COMPONENT"
 				/>
 				{/* <IconButton
 					src="Box"

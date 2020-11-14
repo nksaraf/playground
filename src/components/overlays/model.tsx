@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useStateDesigner } from "@state-designer/react"
 import { useAtom } from "jotai"
-import { scene } from "../state/scene"
+import { scene } from "../../state/scene"
 import { useRecoilState } from "recoil"
 
 export default function Model() {

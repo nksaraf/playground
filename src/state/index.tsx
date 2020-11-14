@@ -172,6 +172,16 @@ export const startBrushWithWorker = atom(null, (get, set) => {
 	})
 })
 
+export const moveDraggingBoxes = atom(null, (get, set) => {
+	const pointer = get(scene.screenPointer)
+	get(graph.selectedNodeIDs).forEach((id) => {
+		set(graph.getNodePosition(id), (pos) => ({
+			x: pos.x + pointer.dx,
+			y: pos.y + pointer.dy,
+		}))
+	})
+})
+
 const initialSelectedNodeIDs = atom([])
 
 export const setInitialSelectedIDs = atom(null, (get, set) => {

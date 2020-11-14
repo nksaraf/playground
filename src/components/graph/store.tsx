@@ -1,5 +1,5 @@
 import { atomFamily, atom } from "recoil"
-import { IPoint } from "../../types"
+import { IPoint } from "../../../types"
 
 export const nodeIDs = atom({
 	key: "nodeIDs",
