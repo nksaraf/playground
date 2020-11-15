@@ -24,9 +24,11 @@ const getNodeMetadata = atomFamily(
 			type: "component",
 			componentID: "-1",
 			id: id,
-		} as { id: string } & {
+		} as {
+			id: string
 			type: "component"
 			componentID: string
+			[key: string]: any
 		})
 )
 
@@ -190,7 +192,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 		case "insertingComponent": {
 			switch (action.type) {
-				case "CANCELLED": {
+				case "ESCAPE": {
 					set(insertToolState, "insertIdle")
 					set(addingComponentWithID, null)
 					set(toolState, "selectTool")
@@ -232,45 +234,50 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 		case "insertingConnector": {
 			switch (action.type) {
-				case "CANCELLED": {
+				case "ESCAPE": {
 					set(insertToolState, "insertIdle")
 					set(addingConnectorFromPinID, null)
 					set(toolState, "selectTool")
 					return
 				}
 				case "POINTER_UP_ON_PIN": {
-					const fromPin = get(addingConnectorFromPinID)
-					if (fromPin === action.payload.pinID) {
-					} else if (
-						get(getPinMetadata(fromPin)).parentNode ===
-							get(getPinMetadata(action.payload.pinID)).parentNode ||
-						get(getPinMetadata(fromPin)).type ===
-							get(getPinMetadata(action.payload.pinID)).type
-					) {
-					} else {
-						set(
-							insertNewDataConnector,
-							get(getPinMetadata(fromPin)).type === "output"
-								? {
-										fromPin,
-										toPin: action.payload.pinID,
-								  }
-								: {
-										toPin: fromPin,
-										fromPin: action.payload.pinID,
-								  }
-						)
-						set(insertToolState, "insertIdle")
-						set(addingConnectorFromPinID, null)
-						set(toolState, "selectTool")
-					}
-
+					set(completeInsertingConnector, null)
 					return
 				}
 			}
 		}
 	}
 })
+
+const completeInsertingConnector = atom(
+	null,
+	(get, set, { pinID }: { pinID: string }) => {
+		const fromPin = get(addingConnectorFromPinID)
+		if (fromPin === pinID) {
+		} else if (
+			get(getPinMetadata(fromPin)).parentNode ===
+				get(getPinMetadata(pinID)).parentNode ||
+			get(getPinMetadata(fromPin)).type === get(getPinMetadata(pinID)).type
+		) {
+		} else {
+			set(
+				insertNewDataConnector,
+				get(getPinMetadata(fromPin)).type === "output"
+					? {
+							fromPin,
+							toPin: pinID,
+					  }
+					: {
+							toPin: fromPin,
+							fromPin: pinID,
+					  }
+			)
+			set(insertToolState, "insertIdle")
+			set(addingConnectorFromPinID, null)
+			set(toolState, "selectTool")
+		}
+	}
+)
 
 export const graph = {
 	nodeIDs,

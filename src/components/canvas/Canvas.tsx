@@ -1,11 +1,12 @@
 import * as React from "react"
-import { useMachine } from "../../hooks/useMachine"
+import { useMachine } from "../../state"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
 import { atom, useAtom } from "../../atom"
 import { Connection, Spline } from "./Connection"
 import { activeState, graph, scene, selector } from "../../state"
 import { Node } from "./Node"
+import useWindowEvents from "../../hooks/useWindowEvents"
 
 export function useWheel() {
 	const state = useMachine()

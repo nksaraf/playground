@@ -124,16 +124,8 @@ const selectToolState = atom(
 		| "cornerResizing"
 		| "pointingCanvas"
 		| "brushSelecting"
-		| "recentlyPointed"
+		| "waitingForDoublePress"
 )
-
-// const justTouched = atom(false)
-
-const resetTouch = atom(null, (get, set) => {
-	if (get(selectToolState) === "recentlyPointed") {
-		set(selectToolState, "seletingIdle")
-	}
-})
 
 export const selector = {
 	selectionBrushStart,
@@ -160,11 +152,11 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(selectToolState)) {
 		case "selectingIdle": {
 			switch (action.type) {
-				case "CANCELLED": {
+				case "ESCAPE": {
 					set(selector.actions.clearSelection, null)
 					return
 				}
-				case "DELETED_SELECTED": {
+				case "BACKSPACE": {
 					set(undo.actions.saveUndoState, null)
 					set(selector.actions.deleteSelected, null)
 					set(undo.actions.saveUndoState, null)
@@ -172,9 +164,6 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 				}
 				case "POINTER_DOWN_ON_CANVAS": {
 					set(selectToolState, "pointingCanvas")
-					const i = setTimeout(() => {
-						set(resetTouch, null)
-					}, 100)
 					return
 				}
 				case "POINTER_DOWN_ON_BOX": {
@@ -233,13 +222,13 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 				}
 				case "POINTER_UP": {
 					set(selector.actions.clearSelection, null)
-					set(selectToolState, "recentlyPointed")
+					set(selectToolState, "waitingForDoublePress")
 					return
 				}
 			}
 			return
 		}
-		case "recentlyPointed": {
+		case "waitingForDoublePress": {
 			switch (action.type) {
 				case "POINTER_DOWN_ON_CANVAS": {
 					set(selectToolState, "brushSelecting")
@@ -248,7 +237,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(selector.actions.setInitialSelectedIDs, null)
 					return
 				}
-				case "RESET_POINTED": {
+				case "STOP_WAITING_FOR_DOUBLE_PRESS": {
 					set(selectToolState, "selectingIdle")
 					return
 				}

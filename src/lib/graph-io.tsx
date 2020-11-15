@@ -172,8 +172,9 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		const nodeId = `${node.nid}`
 		set(graph.getNodeMetadata(nodeId), {
 			type: "component",
-			componentID: node.type,
+			componentID: "dummy",
 			id: nodeId,
+			title: node.type,
 		})
 		set(graph.getNodePosition(nodeId), { x: node.x, y: node.y })
 		set(graph.getNodePortIDs(nodeId), (old) => [

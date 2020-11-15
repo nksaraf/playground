@@ -1,4 +1,4 @@
-import { atom } from "../atom"
+import { atom, atomFamily } from "../atom"
 import { IFrame, IPoint } from "../../types"
 import { selector, selectToolDispatch } from "./selector"
 import { undo } from "./undo"
@@ -6,6 +6,8 @@ import { scene } from "./scene"
 import { graph, insertToolDispatch } from "./graph"
 
 export const toolState = atom("selectTool")
+
+const keyboardModifierMode = atomFamily((key: string) => false)
 
 export const globalDispatch = atom(null, (get, set, action: Actions) => {
 	switch (action.type) {
@@ -88,8 +90,6 @@ export type Action<S, T = undefined> = {
 export type Actions =
 	| Action<"UPDATED_VIEWBOX", IFrame>
 	| Action<"POINTER_MOVE", IPoint | undefined>
-	| Action<"CANCELLED">
-	| Action<"DELETED_SELECTED">
 	| Action<"POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: string }>
 	| Action<"POINTER_DOWN_ON_PIN", { pinID: string }>
 	| Action<"POINTER_UP_ON_PIN", { pinID: string }>
@@ -100,7 +100,7 @@ export type Actions =
 	| Action<"POINTER_DOWN_ON_BOUNDS">
 	| Action<"POINTER_UP">
 	| Action<"FORCED_IDS">
-	| Action<"RESET_POINTED">
+	| Action<"STOP_WAITING_FOR_DOUBLE_PRESS">
 	| Action<"UNDO">
 	| Action<"REDO">
 	| Action<"POINTER_DOWN">
@@ -109,3 +109,32 @@ export type Actions =
 	| Action<"PANNED", IPoint>
 	| Action<"SCROLLED_VIEWPORT", IPoint>
 	| Action<"UPDATED_VIEWBOX", IFrame>
+	| Action<"ESCAPE">
+	| Action<"ENTERED_ALT_MODE">
+	| Action<"ENTERED_SPACE_MODE">
+	| Action<"BACKSPACE">
+	| Action<"ENTERED_SHIFT_MODE">
+	| Action<"ENTERED_CONTROL_MODE">
+	| Action<"ENTERED_META_MODE">
+	| Action<"EXITED_ALT_MODE">
+	| Action<"EXITED_SPACE_MODE">
+	| Action<"EXITED_SHIFT_MODE">
+	| Action<"EXITED_CONTROL_MODE">
+	| Action<"EXITED_META_MODE">
+	| Action<"PASTED">
+	| Action<"COPIED">
+
+import * as React from "react"
+import { useUpdateAtom } from "../atom"
+
+export function useMachine() {
+	const send = useUpdateAtom(dispatch)
+	return {
+		send: React.useCallback(
+			(type: Actions["type"], payload?: Actions["payload"]) => {
+				send({ type, payload } as any)
+			},
+			[send]
+		),
+	}
+}

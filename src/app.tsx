@@ -10,9 +10,9 @@ import { Positions } from "./components/overlays/positions"
 import { exampleGraph, writeGraph } from "./lib/graph-io"
 import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/canvas/Canvas"
+import { useMachine } from "./state"
 
 export default function Tavern() {
-	useWindowEvents()
 	useKeyboardEvents()
 
 	const write = useUpdateAtom(writeGraph)
@@ -30,23 +30,29 @@ export default function Tavern() {
 	)
 }
 
-// body {
-// 	font-family: Nunito, sans-serif;
-// 	color: #323232;
-// 	line-height: 20px;
-// 	font-size: 14px;
-// 	font-weight: 600;
-// 	text-rendering: optimizeLegibility;
-// 	-webkit-font-smoothing: antialiased;
-// 	-moz-font-smoothing: antialiased;
-// }
-
 function Container({ children }) {
 	const { ref } = useViewBox()
+	useWindowEvents()
+	const state = useMachine()
 
 	return (
 		<div
 			ref={ref}
+			// onMouseMove={(e) => {
+			// 	state.send("POINTER_MOVE", { x: e.clientX, y: e.clientY })
+			// }}
+			// onMouseDown={(e) => {
+			// 	state.send("POINTER_UP", { x: e.clientX, y: e.clientY })
+			// }}
+			// onMouseUp={(e) => {
+			// 	state.send("POINTER_DOWN", { x: e.clientX, y: e.clientY })
+			// }}
+			// onScroll={() => {
+			// 	state.send("SCROLLED_VIEWPORT", {
+			// 		x: window.scrollX,
+			// 		y: window.scrollY,
+			// 	})
+			// }}
 			className="w-screen h-screen relative bg-gray-200"
 			style={{ fontFamily: "Nunito, sans-serif" }}
 		>

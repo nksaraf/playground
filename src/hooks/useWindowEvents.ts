@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMachine } from "./useMachine"
+import { useMachine } from "../state"
 
 export default function useWindowEvents() {
 	const state = useMachine()

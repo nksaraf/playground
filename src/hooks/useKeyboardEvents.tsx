@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import { useMachine } from "./useMachine"
+import { Actions } from "../state"
+import { useMachine } from "../state"
 
 // export function handleKeyPress(e: KeyboardEvent) {
 // 	if (e.key === " ")
@@ -14,10 +15,10 @@ export default function useKeyboardEvents() {
 		const pressedKeys = {} as Record<string, boolean>
 
 		const keyDownActions = {
-			Escape: "CANCELLED",
+			Escape: "ESCAPE",
 			Alt: "ENTERED_ALT_MODE",
 			" ": "ENTERED_SPACE_MODE",
-			Backspace: "DELETED_SELECTED",
+			Backspace: "BACKSPACE",
 			Shift: "ENTERED_SHIFT_MODE",
 			Control: "ENTERED_CONTROL_MODE",
 			Meta: "ENTERED_META_MODE",
@@ -26,7 +27,7 @@ export default function useKeyboardEvents() {
 			// r: "INVERTED_ARROWS",
 			// t: "FLIPPED_ARROWS",
 			// a: "STARTED_PICKING_ARROW",
-		}
+		} as const
 
 		const keyUpActions = {
 			Alt: "EXITED_ALT_MODE",
@@ -38,10 +39,10 @@ export default function useKeyboardEvents() {
 			// r: "INVERTED_ARROWS",
 			// t: "FLIPPED_ARROWS",
 			// a: "STARTED_PICKING_ARROW",
-		}
+		} as const
 
-		function testKeyCombo(event: string, ...keys: string[]) {
-			if (keys.every((key) => pressedKeys[key])) state.send(event as any)
+		function testKeyCombo(event: Actions["type"], ...keys: string[]) {
+			if (keys.every((key) => pressedKeys[key])) state.send(event)
 		}
 
 		function handleKeyDown(e: KeyboardEvent) {

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMachine } from "../../hooks/useMachine"
+import { useMachine } from "../../state"
 import { useAtom } from "../../atom"
 import { activeState, selector } from "../../state"
 import { IBrush } from "../../../types"
@@ -11,9 +11,9 @@ export function SelectionBrush() {
 
 	console.log(active)
 	React.useEffect(() => {
-		if (active.includes("recentlyPointed")) {
+		if (active.includes("waitingForDoublePress")) {
 			const i = setTimeout(() => {
-				state.send("RESET_POINTED", null)
+				state.send("STOP_WAITING_FOR_DOUBLE_PRESS", null)
 			}, 400)
 			return () => {
 				clearTimeout(i)

@@ -1,0 +1,332 @@
+import * as React from "react"
+import { useMachine } from "../../state"
+import {
+	atom,
+	atomFamily,
+	useAtom,
+	useAtom as _useAtom,
+	useUpdateAtom,
+} from "../../atom"
+import { createContext } from "create-hook-context"
+import { graph } from "../../state/graph"
+import { selector } from "../../state"
+import useResizeObserver from "use-resize-observer"
+import { styled } from "../../theme"
+import { useContext } from "react"
+
+const NodeBody = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+})
+
+export let getNodeAtoms = (id: string) => ({
+	position: graph.getNodePosition(id),
+	inputIDs: graph.getNodeInputIDs(id),
+	outputIDs: graph.getNodeOutputIDs(id),
+	size: graph.getNodeSize(id),
+	isSelected: selector.isNodeSelected(id),
+	connectionIDs: graph.getNodeConnectionIDs(id),
+	metadata: graph.getNodeMetadata(id),
+	id,
+})
+
+export type NodeAtoms = ReturnType<typeof getNodeAtoms>
+
+const [NodeProvider, useNode] = createContext(
+	({ node }: { node: NodeAtoms }) => {
+		return node
+	}
+)
+
+export { NodeProvider, useNode }
+
+export const Node = React.memo(
+	({ node, useAtom }: { node: NodeAtoms; useAtom: typeof _useAtom; send }) => {
+		return (
+			<NodeContainer>
+				<NodeHeader />
+				<NodeBody>
+					<NodeInputs />
+					<div className={"w-24"} />
+					<NodeOutputs />
+				</NodeBody>
+			</NodeContainer>
+		)
+	}
+)
+
+function NodeContainer({
+	children,
+	onMouseDown = () => {},
+	className = "",
+	style = {},
+	...props
+}) {
+	const node = useNode()
+	const [position, setNodePosition] = useAtom(node.position)
+	const [nodeSize, setNodeSize] = useAtom(node.size)
+	const { ref } = useResizeObserver({
+		onResize: setNodeSize,
+	})
+
+	const [isSelected, setIsSelected] = useAtom(node.isSelected)
+	const machine = useMachine()
+
+	return (
+		<section
+			className={`absolute ${
+				isSelected ? "bg-gray-800" : "bg-white"
+			} rounded-xl shadow-xl pb-3 ${className}`}
+			ref={ref}
+			onMouseDown={(e) => {
+				e.preventDefault()
+				e.stopPropagation()
+				onMouseDown?.()
+				machine.send("POINTER_DOWN_ON_BOX", { id: node.id })
+			}}
+			style={{
+				transform: `translateX(${position.x}px) translateY(${position.y}px)`,
+				...style,
+			}}
+			{...props}
+		>
+			{children}
+		</section>
+	)
+}
+
+function NodeHeader({ ...props }) {
+	const node = useNode()
+	const [meta] = useAtom(graph.getNodeMetadata(node.id))
+	const [isSelected, setIsSelected] = useAtom(node.isSelected)
+
+	return (
+		<header className={"py-3 px-4 flex flex-col items-center"} {...props}>
+			{meta.category && (
+				<div className={"text-xs text-gray-500 font-normal uppercase"}>
+					{meta.category}
+				</div>
+			)}
+			{meta.title && (
+				<div
+					className={`text-lg ${
+						isSelected ? "text-gray-400" : "text-gray-600"
+					} font-semibold`}
+				>
+					{meta.title}
+				</div>
+			)}
+		</header>
+	)
+}
+
+function NodeInputs() {
+	const node = useNode()
+	const [inputs] = useAtom(node.inputIDs)
+
+	return (
+		<div className="flex flex-col gap-2">
+			{inputs.map((id) => (
+				<NodeInput inputID={id} key={id} />
+			))}
+		</div>
+	)
+}
+
+function NodeOutputs() {
+	const node = useNode()
+	const [outputs] = useAtom(node.outputIDs)
+	return (
+		<div className="flex flex-col gap-2 items-end">
+			{outputs.map((id) => (
+				<NodeOutput outputID={id} key={id} />
+			))}
+		</div>
+	)
+}
+
+const getPinHasConnections = atomFamily((id: string) => (get) => {
+	return get(graph.getPinConnectionIDs(id)).length > 0
+})
+
+const getPinIsAcceptingConnections = atomFamily((id: string) => (get) => {
+	const fromPin = get(graph.addingConnectorFromPinID)
+	if (fromPin === null) {
+		return true
+	} else {
+		if (fromPin === id) {
+			return false
+		} else if (
+			get(graph.getPinMetadata(fromPin)).parentNode ===
+				get(graph.getPinMetadata(id)).parentNode ||
+			get(graph.getPinMetadata(fromPin)).type ===
+				get(graph.getPinMetadata(id)).type
+		) {
+			return false
+		}
+		return true
+	}
+})
+
+const getPinAddingNewConnection = atomFamily((id: string) => (get) => {
+	return get(graph.addingConnectorFromPinID) === id
+})
+
+function NodeInput({ inputID }) {
+	const [input] = useAtom(graph.getPinMetadata(inputID))
+	const ref = usePinRef(inputID)
+	const [hasConnections] = useAtom(getPinHasConnections(inputID))
+	const [isAcceptingConnection] = useAtom(getPinIsAcceptingConnections(inputID))
+	const machine = useMachine()
+	const [isHovered, setIsHovered] = React.useState(false)
+	const [isAddingNewConnection] = useAtom(getPinAddingNewConnection(inputID))
+
+	const isActive =
+		hasConnections ||
+		(isAcceptingConnection && isHovered) ||
+		isAddingNewConnection
+
+	return (
+		<div>
+			<div
+				className="flex items-center gap-1"
+				onMouseEnter={(e) => {
+					setIsHovered(true)
+				}}
+				onMouseLeave={(e) => {
+					setIsHovered(false)
+				}}
+				onMouseUp={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					machine.send("POINTER_UP_ON_PIN", { pinID: inputID })
+				}}
+			>
+				<div
+					ref={ref}
+					onMouseDown={(e) => {
+						e.preventDefault()
+						e.stopPropagation()
+						console.log("heree")
+						machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
+					}}
+				>
+					<svg
+						viewBox="0 0 24 24"
+						style={{
+							cursor: !isAcceptingConnection ? "not-allowed" : "pointer",
+							transform: `translateX(-6px) scale(${isHovered ? 1.1 : 1.0})`,
+						}}
+						className={`h-3 w-3 ${
+							isActive ? "text-blue-500" : "text-gray-500"
+						}`}
+					>
+						<circle
+							cx={12}
+							cy={12}
+							r={9}
+							strokeWidth={3}
+							fill="transparent"
+							className="stroke-current"
+						/>
+						{isActive && (
+							<circle cx={12} cy={12} r={6} className="fill-current" />
+						)}
+					</svg>
+				</div>
+				<div className="text-gray-500 text-xs">{input.name}</div>
+			</div>
+		</div>
+	)
+}
+
+function NodeOutput({ outputID }) {
+	const [output] = useAtom(graph.getPinMetadata(outputID))
+	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
+	const machine = useMachine()
+	const ref = usePinRef(outputID)
+
+	const [hasConnections] = useAtom(getPinHasConnections(outputID))
+	const [isAddingNewConnection] = useAtom(getPinAddingNewConnection(outputID))
+	const [isAcceptingConnection] = useAtom(
+		getPinIsAcceptingConnections(outputID)
+	)
+	const [isHovered, setIsHovered] = React.useState(false)
+
+	const isActive =
+		hasConnections ||
+		(isAcceptingConnection && isHovered) ||
+		isAddingNewConnection
+
+	return (
+		<div>
+			<div
+				className="flex items-center gap-1"
+				onMouseEnter={(e) => {
+					setIsHovered(true)
+				}}
+				onMouseLeave={(e) => {
+					setIsHovered(false)
+				}}
+				onMouseUp={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
+				}}
+			>
+				<div className="text-gray-500 text-xs">{output.name}</div>
+				<div
+					ref={ref}
+					onMouseDown={(e) => {
+						e.preventDefault()
+						e.stopPropagation()
+						console.log("heree")
+						machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
+					}}
+				>
+					<svg
+						viewBox="0 0 24 24"
+						style={{
+							cursor: !isAcceptingConnection ? "not-allowed" : "pointer",
+							transform: `translateX(6px) scale(${isHovered ? 1.1 : 1.0})`,
+						}}
+						className={`h-3 w-3 ${
+							isActive ? "text-blue-500" : "text-gray-500"
+						}`}
+					>
+						<circle
+							cx={12}
+							cy={12}
+							r={9}
+							strokeWidth={3}
+							fill="transparent"
+							className="stroke-current"
+						/>
+						{isActive && (
+							<circle cx={12} cy={12} r={6} className="fill-current" />
+						)}
+					</svg>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+function usePinRef(portID) {
+	const setOffset = useUpdateAtom(graph.getPinOffset(portID))
+	const ref = React.useRef<HTMLDivElement>()
+
+	React.useLayoutEffect(() => {
+		setOffset({
+			x: ref.current?.offsetLeft + ref.current?.offsetWidth / 2,
+			y: ref.current?.offsetTop + ref.current?.offsetHeight / 2,
+		})
+	}, [
+		ref.current?.offsetLeft,
+		ref.current?.offsetTop,
+		ref.current?.offsetWidth,
+		ref.current?.offsetHeight,
+	])
+
+	return ref
+}
