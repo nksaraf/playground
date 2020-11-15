@@ -7,53 +7,36 @@ import {
 	useAtom as _useAtom,
 	useUpdateAtom,
 } from "../../atom"
-import { createContext } from "create-hook-context"
 import { graph } from "../../state/graph"
-import { selector } from "../../state"
 import useResizeObserver from "use-resize-observer"
 import { styled } from "../../theme"
-import { useContext } from "react"
+import { useNode } from "../Node"
 
 const NodeBody = styled("div", {
 	display: "flex",
 	justifyContent: "center",
 })
 
-export let getNodeAtoms = (id: string) => ({
-	position: graph.getNodePosition(id),
-	inputIDs: graph.getNodeInputIDs(id),
-	outputIDs: graph.getNodeOutputIDs(id),
-	size: graph.getNodeSize(id),
-	isSelected: selector.isNodeSelected(id),
-	connectionIDs: graph.getNodeConnectionIDs(id),
-	metadata: graph.getNodeMetadata(id),
-	id,
+export const Node = React.memo(() => {
+	return (
+		<DataFlowNode>
+			<div className={"w-24"} />
+		</DataFlowNode>
+	)
 })
 
-export type NodeAtoms = ReturnType<typeof getNodeAtoms>
-
-const [NodeProvider, useNode] = createContext(
-	({ node }: { node: NodeAtoms }) => {
-		return node
-	}
-)
-
-export { NodeProvider, useNode }
-
-export const Node = React.memo(
-	({ node, useAtom }: { node: NodeAtoms; useAtom: typeof _useAtom; send }) => {
-		return (
-			<NodeContainer>
-				<NodeHeader />
-				<NodeBody>
-					<NodeInputs />
-					<div className={"w-24"} />
-					<NodeOutputs />
-				</NodeBody>
-			</NodeContainer>
-		)
-	}
-)
+function DataFlowNode({ children }) {
+	return (
+		<NodeContainer>
+			<NodeHeader />
+			<NodeBody>
+				<NodeInputs />
+				{children}
+				<NodeOutputs />
+			</NodeBody>
+		</NodeContainer>
+	)
+}
 
 function NodeContainer({
 	children,
@@ -280,7 +263,6 @@ function NodeOutput({ outputID }) {
 					onMouseDown={(e) => {
 						e.preventDefault()
 						e.stopPropagation()
-						console.log("heree")
 						machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
 					}}
 				>

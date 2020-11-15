@@ -241,7 +241,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_UP_ON_PIN": {
-					set(completeInsertingConnector, null)
+					set(completeInsertingConnector, action.payload)
 					return
 				}
 			}

@@ -5,7 +5,7 @@ import { SelectionBrush } from "./SelectionBrush"
 import { atom, useAtom } from "../../atom"
 import { Connection, Spline } from "./Connection"
 import { activeState, graph, scene, selector } from "../../state"
-import { Node } from "./Node"
+import { Node } from "../Node"
 import useWindowEvents from "../../hooks/useWindowEvents"
 
 export function useWheel() {

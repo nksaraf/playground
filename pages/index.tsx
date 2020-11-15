@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic"
 import React from "react"
-import { RecoilRoot } from "recoil"
+import Head from "next/head"
 
 const App = dynamic(() => import("../src/app"), {
 	ssr: false,
@@ -8,8 +8,11 @@ const App = dynamic(() => import("../src/app"), {
 
 export default function Home() {
 	return (
-		<RecoilRoot>
+		<>
+			<Head>
+				<title>Tavern</title>
+			</Head>
 			<App />
-		</RecoilRoot>
+		</>
 	)
 }

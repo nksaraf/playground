@@ -10,51 +10,49 @@ import { Positions } from "./components/overlays/positions"
 import { exampleGraph, writeGraph } from "./lib/graph-io"
 import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/canvas/Canvas"
-import { useMachine } from "./state"
+import { RecoilRoot } from "recoil"
 
-export default function Tavern() {
+export default function App() {
+	return (
+		<RecoilRoot>
+			<Tavern />
+		</RecoilRoot>
+	)
+}
+
+function Tavern() {
 	useKeyboardEvents()
-
 	const write = useUpdateAtom(writeGraph)
+
 	React.useEffect(() => {
 		write(exampleGraph)
 	}, [write])
 
 	return (
-		<Container>
+		<FullScreenContainer>
 			<Canvas />
 			<Positions />
 			<ZoomIndicator />
 			<Toolbar />
-		</Container>
+		</FullScreenContainer>
 	)
 }
 
-function Container({ children }) {
+function FullScreenContainer({
+	children,
+	className = "",
+	style = {},
+	...props
+}) {
 	const { ref } = useViewBox()
 	useWindowEvents()
-	const state = useMachine()
 
 	return (
 		<div
 			ref={ref}
-			// onMouseMove={(e) => {
-			// 	state.send("POINTER_MOVE", { x: e.clientX, y: e.clientY })
-			// }}
-			// onMouseDown={(e) => {
-			// 	state.send("POINTER_UP", { x: e.clientX, y: e.clientY })
-			// }}
-			// onMouseUp={(e) => {
-			// 	state.send("POINTER_DOWN", { x: e.clientX, y: e.clientY })
-			// }}
-			// onScroll={() => {
-			// 	state.send("SCROLLED_VIEWPORT", {
-			// 		x: window.scrollX,
-			// 		y: window.scrollY,
-			// 	})
-			// }}
-			className="w-screen h-screen relative bg-gray-200"
-			style={{ fontFamily: "Nunito, sans-serif" }}
+			className={`w-screen h-screen relative bg-gray-200 ${className}`}
+			style={{ fontFamily: "Nunito, sans-serif", ...style }}
+			{...props}
 		>
 			{children}
 		</div>
