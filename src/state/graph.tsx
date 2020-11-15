@@ -9,8 +9,8 @@ const nodeIDs = atom([])
 const connectionIDs = atom([])
 
 const getConnectionParams = atomFamily((id: string) => ({
-	from: { node: "", port: "" },
-	to: { node: "", port: "" },
+	from: "null",
+	to: "null",
 }))
 
 const getConnectionMetadata = atomFamily((id: string) => ({
@@ -18,10 +18,14 @@ const getConnectionMetadata = atomFamily((id: string) => ({
 	id: id,
 }))
 
-const getNodeMetadata = atomFamily((id: string) => ({
-	type: "",
-	id: id,
-}))
+const getNodeMetadata = atomFamily(
+	(id: string) =>
+		({
+			type: "component",
+			componentID: "-1",
+			id: id,
+		} as { id: string } & { type: "component"; componentID: string })
+)
 
 const getPinMetadata = atomFamily((id: string) => ({
 	type: "",
@@ -51,7 +55,9 @@ const getNodePortIDs = atomFamily<string[]>(
 
 const getPinConnectionIDs = atomFamily((id: string) => (get) =>
 	get(connectionIDs).filter(
-		(connID) => get(getConnectionParams(connID)).from.port === id
+		(connID) =>
+			get(getConnectionParams(connID)).from === id ||
+			get(getConnectionParams(connID)).to === id
 	)
 )
 
@@ -75,8 +81,8 @@ const getConnectionPosition = atomFamily((id: string) => (get) => {
 	const params = get(getConnectionParams(id))
 
 	return {
-		start: get(getPinPosition(params.from.port)),
-		end: get(getPinPosition(params.to.port)),
+		start: get(getPinPosition(params.from)),
+		end: get(getPinPosition(params.to)),
 	}
 })
 
@@ -147,24 +153,17 @@ const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
 	const pointer = get(scene.documentPointer)
 	set(getNodeMetadata(id), {
 		type: "component",
-		// componentID,
+		componentID,
 		id,
 	})
 	set(getNodePosition(id), { ...pointer })
 })
 
-const insertNewConnector = atom(null, (get, set, { fromPin, toPin }) => {
-	set(nodeIDs, (ids) => [...ids, id])
-	const pointer = get(scene.documentPointer)
-	set(getNodeMetadata(id), {
-		type: "component",
-		// componentID,
-		id,
-	})
+const insertNewDataConnector = atom(null, (get, set, { fromPin, toPin }) => {
 	const connID = `${fromPin}->${toPin}`
-
+	set(connectionIDs, (ids) => [...ids, connID])
+	set(getConnectionParams(connID), { from: fromPin, to: toPin })
 	set(getConnectionMetadata(connID), { id: connID, type: "data" })
-	set(getNodePosition(id), { ...pointer })
 })
 
 const addingComponentWithID = atom(null as string | null)
@@ -237,10 +236,25 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_UP_ON_PIN": {
+					console.log(action.payload)
+					const fromPin = get(addingConnectorFromPinID)
+					if (
+						fromPin === action.payload.pinID ||
+						get(getPinMetadata(fromPin)).parentNode ===
+							get(getPinMetadata(action.payload.pinID)).parentNode ||
+						get(getPinMetadata(fromPin)).type ===
+							get(getPinMetadata(action.payload.pinID)).type
+					) {
+					} else {
+						set(insertNewDataConnector, {
+							fromPin,
+							toPin: action.payload.pinID,
+						})
+					}
 					set(insertToolState, "insertIdle")
 					set(addingConnectorFromPinID, null)
 					set(toolState, "selectTool")
-					console.log(action.payload)
+
 					return
 				}
 			}

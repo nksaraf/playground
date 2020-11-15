@@ -4,6 +4,12 @@ import { atom, atomFamily, useAtom, useUpdateAtom } from "../atom"
 import { graph } from "../state/graph"
 import { selector } from "../state"
 import useResizeObserver from "use-resize-observer"
+import { styled } from "../theme"
+
+const NodeBody = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+})
 
 export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [isSelected, setIsSelected] = useAtom(selector.isNodeSelected(nodeID))
@@ -31,11 +37,11 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 			}}
 		>
 			<NodeHeader nodeID={nodeID} />
-			<div className={"flex justify-between"}>
+			<NodeBody>
 				<NodeInputs items={inputs} />
 				<div className={"w-24"} />
 				<NodeOutputs items={outputs} />
-			</div>
+			</NodeBody>
 		</section>
 	)
 })
@@ -46,7 +52,9 @@ function NodeHeader({ nodeID }) {
 	return (
 		<header className={"py-3 px-4 flex flex-col items-center"}>
 			<div className={"text-xs text-gray-500 font-normal uppercase"}>Setup</div>
-			<div className={"text-lg text-gray-600 font-semibold"}>{meta.type}</div>
+			<div className={"text-lg text-gray-600 font-semibold"}>
+				{meta.componentID}
+			</div>
 		</header>
 	)
 }

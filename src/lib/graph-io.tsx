@@ -170,7 +170,11 @@ import { graph } from "../state/graph"
 export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 	val.nodes.map((node) => {
 		const nodeId = `${node.nid}`
-		set(graph.getNodeMetadata(nodeId), { type: node.type, id: nodeId })
+		set(graph.getNodeMetadata(nodeId), {
+			type: "component",
+			componentID: node.type,
+			id: nodeId,
+		})
 		set(graph.getNodePosition(nodeId), { x: node.x, y: node.y })
 		set(graph.getNodePortIDs(nodeId), (old) => [
 			...old,
@@ -241,14 +245,8 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		)}/${conn.to}`
 
 		set(graph.getConnectionParams(connId), {
-			from: {
-				node: conn.from_node.toString(),
-				port: fromfieldId,
-			},
-			to: {
-				port: toFieldId,
-				node: conn.to_node.toString(),
-			},
+			from: fromfieldId,
+			to: toFieldId,
 		})
 	})
 

@@ -8,7 +8,6 @@
 		"start": "next start"
 	},
 	"dependencies": {
-		"@state-designer/react": "^1.2.31",
 		"@stitches/react": "^0.0.2",
 		"@types/lodash": "^4.14.165",
 		"@types/rbush": "^3.0.0",
