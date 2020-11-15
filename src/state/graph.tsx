@@ -156,6 +156,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 				case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
 					set(insertToolState, "inserting")
 					set(addingComponentWithID, action.payload.componentID)
+					return
 				}
 			}
 		}
@@ -165,7 +166,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(toolState, "selectTool")
 					return
 				}
-				case "POINTER_UP": {
+				case "POINTER_DOWN": {
 					const id = getId()
 					set(toolState, "selectTool")
 					set(insertNewComponent, {
@@ -173,6 +174,22 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 						id,
 					})
 					set(selector.selectedNodeIDs, [id])
+					return
+				}
+
+				case "POINTER_UP": {
+					const { screenPointer } = get(scene.lastPointState)
+					const { x, y } = get(scene.screenPointer)
+					const dist = Math.hypot(x - screenPointer.x, y - screenPointer.y)
+					if (dist > 20) {
+						const id = getId()
+						set(toolState, "selectTool")
+						set(insertNewComponent, {
+							componentID: get(addingComponentWithID),
+							id,
+						})
+						set(selector.selectedNodeIDs, [id])
+					}
 					return
 				}
 			}
@@ -201,6 +218,5 @@ export const graph = {
 	getPortOffset,
 	getPortPosition,
 	getConnectionPosition,
-
 	insertToolState,
 }

@@ -11,16 +11,13 @@ type IconButtonProps = {
 } & React.HTMLProps<HTMLButtonElement>
 
 export default function IconButton({
-	// event = "",
 	isActive = false,
 	src,
 	shortcut,
 	children,
-	onClick,
 	...props
 }: IconButtonProps) {
 	const Icon = Icons[src]
-	const state = useMachine()
 
 	return (
 		<ButtonWrapper>
@@ -28,7 +25,7 @@ export default function IconButton({
 				disabled={props.disabled}
 				status={isActive ? "active" : ""}
 				type="button"
-				onClick={onClick}
+				{...(props as any)}
 			>
 				<Icon />
 			</Button>

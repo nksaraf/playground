@@ -27,11 +27,12 @@ export default function Toolbar() {
 				/> */}
 				<IconButton
 					src="Box"
-					// isActive={local.isIn("selectTool")}
 					isActive={false}
-					onClick={() =>
+					onMouseDown={(e) => {
+						e.preventDefault()
+						e.stopPropagation()
 						machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: 1 })
-					}
+					}}
 				/>
 				{/* <IconButton
 					src="Box"
