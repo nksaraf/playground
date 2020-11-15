@@ -38,7 +38,14 @@ export function Canvas() {
 	return (
 		<div
 			className="relative overflow-x-hidden overflow-y-hidden"
-			style={{ height, width, userSelect: "none" }}
+			style={{
+				height,
+				width,
+				userSelect: "none",
+				backgroundSize: "40px 40px",
+				backgroundImage:
+					"linear-gradient(to right, #f2f4f7 2px, transparent 1px), linear-gradient(to bottom, #f2f4f7 2px, transparent 1px)",
+			}}
 			onMouseDown={(e) => {
 				machine.send("POINTER_DOWN_ON_CANVAS", {
 					x: e.clientX,
