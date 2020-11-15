@@ -2,7 +2,6 @@ import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
-import { CanvasBackground } from "./CanvasBackground"
 import { useAtom } from "../atom"
 import { Connection } from "./Connection"
 import { activeState, graph, scene, selector } from "../state"
@@ -31,9 +30,10 @@ export function useWheel() {
 	)
 }
 
-export function Canvas({ width, height }) {
+export function Canvas() {
 	const handleWheel = useWheel()
 	const machine = useMachine()
+	const [{ width, height }] = useAtom(scene.viewBoxSize)
 
 	return (
 		<div
@@ -58,6 +58,25 @@ export function Canvas({ width, height }) {
 			<CanvasBackground height={height} width={width}>
 				<Nodes />
 			</CanvasBackground>
+		</div>
+	)
+}
+
+export function CanvasBackground({ children, height, width }) {
+	const [{ x, y, zoom }] = useAtom(scene.camera)
+	return (
+		<div
+			className="absolute"
+			style={{
+				transform: `scale(${zoom}) translateX(${-x / zoom}px) translateY(${
+					-y / zoom
+				}px)`,
+				transformOrigin: "0px 0px",
+				height,
+				width,
+			}}
+		>
+			<div className="relative">{children} </div>
 		</div>
 	)
 }

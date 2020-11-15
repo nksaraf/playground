@@ -1,7 +1,19 @@
 import * as React from "react"
 import { useAtom } from "../atom"
 import { scene } from "../state/scene"
-import { Camera } from "./Camera"
+
+export function Camera({ children }) {
+	const [{ x, y, zoom }] = useAtom(scene.camera)
+
+	return (
+		<g
+			transform={`scale(${zoom}) translate(${-x / zoom} ${-y / zoom})`}
+			strokeWidth={1 / zoom}
+		>
+			{children}
+		</g>
+	)
+}
 
 export function SvgCanvas({ children, height, width }) {
 	const [viewBoxSize] = useAtom(scene.viewBoxSize)

@@ -1,7 +1,5 @@
 import React, { useState } from "react"
 
-import { TrashIcon } from "./TrashIcon"
-
 export function Spline({
 	onClick = () => {},
 	onRemove = (_) => {},
