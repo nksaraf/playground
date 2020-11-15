@@ -49,7 +49,11 @@ const getNodePortIDs = atomFamily<string[]>(
 		set(getNodePortIDMap(id), Object.fromEntries(update.map((u) => [u, true])))
 )
 
-const getPinConnectionIDs = atomFamily((id: string) => [])
+const getPinConnectionIDs = atomFamily((id: string) => (get) =>
+	get(connectionIDs).filter(
+		(connID) => get(getConnectionParams(connID)).from.port === id
+	)
+)
 
 const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	...get(getNodeSize(id)),
@@ -149,8 +153,22 @@ const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
 	set(getNodePosition(id), { ...pointer })
 })
 
+const insertNewConnector = atom(null, (get, set, { fromPin, toPin }) => {
+	set(nodeIDs, (ids) => [...ids, id])
+	const pointer = get(scene.documentPointer)
+	set(getNodeMetadata(id), {
+		type: "component",
+		// componentID,
+		id,
+	})
+	const connID = `${fromPin}->${toPin}`
+
+	set(getConnectionMetadata(connID), { id: connID, type: "data" })
+	set(getNodePosition(id), { ...pointer })
+})
+
 const addingComponentWithID = atom(null as string | null)
-const addingConnectorFromPin = atom(null as string | null)
+const addingConnectorFromPinID = atom(null as string | null)
 
 export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(insertToolState)) {
@@ -162,7 +180,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_DOWN_ON_PIN": {
-					set(addingConnectorFromPin, action.payload.pinID)
+					set(addingConnectorFromPinID, action.payload.pinID)
 					set(insertToolState, "insertingConnector")
 					console.log(action.payload)
 				}
@@ -214,24 +232,13 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 			switch (action.type) {
 				case "CANCELLED": {
 					set(insertToolState, "insertIdle")
-					set(addingConnectorFromPin, null)
+					set(addingConnectorFromPinID, null)
 					set(toolState, "selectTool")
 					return
 				}
-				// case "POINTER_DOWN_ON_PIN": {
-				// 	const id = getId()
-				// 	set(toolState, "selectTool")
-				// 	set(insertNewComponent, {
-				// 		componentID: get(addingComponentWithID),
-				// 		id,
-				// 	})
-				// 	set(selector.selectedNodeIDs, [id])
-				// 	return
-				// }
-
 				case "POINTER_UP_ON_PIN": {
 					set(insertToolState, "insertIdle")
-					set(addingConnectorFromPin, null)
+					set(addingConnectorFromPinID, null)
 					set(toolState, "selectTool")
 					console.log(action.payload)
 					return
@@ -260,7 +267,7 @@ export const graph = {
 	getNodeOutputIDs,
 	snapshot,
 	addingComponentWithID,
-	addingConnectorFromPin,
+	addingConnectorFromPinID,
 	getPinOffset,
 	getPinPosition,
 	getConnectionPosition,

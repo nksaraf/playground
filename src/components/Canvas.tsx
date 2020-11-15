@@ -91,19 +91,30 @@ function InsertingNodeGhost() {
 	) : null
 }
 
-const addingConnectorFromPinPosition = atom((get) => {
-	return get(graph.getPinPosition(get(graph.addingConnectorFromPin)))
+const addingConnectorFromPin = atom((get) => {
+	return {
+		position: get(graph.getPinPosition(get(graph.addingConnectorFromPinID))),
+		metadata: get(graph.getPinMetadata(get(graph.addingConnectorFromPinID))),
+	}
 })
-
-
 
 function InsertingConnectortGhost() {
 	const [state] = useAtom(activeState)
-	const [pos] = useAtom(addingConnectorFromPinPosition)
+	const [connectorPin] = useAtom(addingConnectorFromPin)
 	const [pointer] = useAtom(scene.documentPointer)
 
 	return state.includes("insertingConnector") ? (
-		<Spline start={pos} end={pointer} className="connector" />
+		<Spline
+			start={
+				connectorPin.metadata.type === "output"
+					? connectorPin.position
+					: pointer
+			}
+			end={
+				connectorPin.metadata.type === "input" ? connectorPin.position : pointer
+			}
+			className="connector"
+		/>
 	) : null
 }
 

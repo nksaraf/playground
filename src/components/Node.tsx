@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
-import { atomFamily, useAtom, useUpdateAtom } from "../atom"
+import { atom, atomFamily, useAtom, useUpdateAtom } from "../atom"
 import { graph } from "../state/graph"
 import { selector } from "../state"
 import useResizeObserver from "use-resize-observer"
@@ -10,7 +10,6 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [position, setNodePosition] = useAtom(graph.getNodePosition(nodeID))
 	const [inputs] = useAtom(graph.getNodeInputIDs(nodeID))
 	const [outputs] = useAtom(graph.getNodeOutputIDs(nodeID))
-	const [meta] = useAtom(graph.getNodeMetadata(nodeID))
 	const [nodeSize, setNodeSize] = useAtom(graph.getNodeSize(nodeID))
 	const machine = useMachine()
 
@@ -31,12 +30,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 				transform: `translateX(${position.x}px) translateY(${position.y}px)`,
 			}}
 		>
-			<header className={"py-3 px-4 flex flex-col items-center"}>
-				<div className={"text-xs text-gray-500 font-normal uppercase"}>
-					Setup
-				</div>
-				<div className={"text-lg text-gray-600 font-semibold"}>{meta.type}</div>
-			</header>
+			<NodeHeader nodeID={nodeID} />
 			<div className={"flex justify-between"}>
 				<NodeInputs items={inputs} />
 				<div className={"w-24"} />
@@ -45,6 +39,17 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 		</section>
 	)
 })
+
+function NodeHeader({ nodeID }) {
+	const [meta] = useAtom(graph.getNodeMetadata(nodeID))
+
+	return (
+		<header className={"py-3 px-4 flex flex-col items-center"}>
+			<div className={"text-xs text-gray-500 font-normal uppercase"}>Setup</div>
+			<div className={"text-lg text-gray-600 font-semibold"}>{meta.type}</div>
+		</header>
+	)
+}
 
 function NodeInputs({ items }) {
 	return (
@@ -56,37 +61,58 @@ function NodeInputs({ items }) {
 	)
 }
 
+function NodeOutputs({ items }) {
+	return (
+		<div className="flex flex-col gap-2 items-end">
+			{items.map((id) => (
+				<NodeOutput outputID={id} key={id} />
+			))}
+		</div>
+	)
+}
+
 const getIsAddingConnectorToPin = atomFamily((id: string) => (get) => {
-	return get(graph.addingConnectorFromPin) === id
+	return get(graph.addingConnectorFromPinID) === id
 })
 
 function NodeInput({ inputID }) {
 	const [input] = useAtom(graph.getPinMetadata(inputID))
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(inputID))
 	const ref = usePortRef(inputID)
-	const [isAddingConnector] = useAtom(getIsAddingConnectorToPin(inputID))
+	const [addingConnectorFromPin] = useAtom(graph.addingConnectorFromPinID)
 	const machine = useMachine()
+	const [isHovered, setIsHovered] = React.useState(false)
 
 	return (
 		<div>
-			<div className="flex items-center gap-1">
+			<div
+				className="flex items-center gap-1"
+				onMouseEnter={(e) => {
+					setIsHovered(true)
+				}}
+				onMouseLeave={(e) => {
+					setIsHovered(false)
+				}}
+				onMouseDown={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					console.log("heree")
+					machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
+				}}
+				onMouseUp={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					machine.send("POINTER_UP_ON_PIN", { pinID: inputID })
+				}}
+			>
 				<div ref={ref}>
 					<svg
-						onMouseDown={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-							console.log("heree")
-							machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
-						}}
-						onMouseUp={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-							machine.send("POINTER_UP_ON_PIN", { pinID: inputID })
-						}}
 						viewBox="0 0 24 24"
 						style={{ transform: "translateX(-4px)" }}
 						className={`h-3 w-3 ${
-							connIDs.length > 0 || isAddingConnector
+							connIDs.length > 0 ||
+							addingConnectorFromPin === inputID ||
+							isHovered
 								? "text-blue-500"
 								: "text-gray-300"
 						}`}
@@ -104,16 +130,6 @@ function NodeInput({ inputID }) {
 				</div>
 				<div className="text-gray-500 text-xs">{input.name}</div>
 			</div>
-		</div>
-	)
-}
-
-function NodeOutputs({ items }) {
-	return (
-		<div className="flex flex-col gap-2 items-end">
-			{items.map((id) => (
-				<NodeOutput outputID={id} key={id} />
-			))}
 		</div>
 	)
 }
@@ -137,33 +153,49 @@ function usePortRef(portID) {
 	return ref
 }
 
+const addingConnectorToPin = atom(null as null | string)
+
+const handleMouseEnter = atom(null, (get, set) => {})
+const handleMouseLeave = atom(null, (get, set) => {})
+
 function NodeOutput({ outputID }) {
 	const [output] = useAtom(graph.getPinMetadata(outputID))
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
 	const machine = useMachine()
+	const onMouseEnter = useUpdateAtom(handleMouseEnter)
+	const onMouseLeave = useUpdateAtom(handleMouseLeave)
 	const ref = usePortRef(outputID)
-	const [isAddingConnector] = useAtom(getIsAddingConnectorToPin(outputID))
+	const [addingConnectorFromPin] = useAtom(graph.addingConnectorFromPinID)
+	const [connectorToPin] = useAtom(addingConnectorToPin)
+
+	const [isHovered, setIsHovered] = React.useState(false)
 
 	return (
 		<div>
-			<div className="flex items-center gap-1">
+			<div
+				className="flex items-center gap-1"
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
+				onMouseDown={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
+				}}
+				onMouseUp={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
+				}}
+			>
 				<div className="text-gray-500 text-xs">{output.name}</div>
 				<div ref={ref}>
 					<svg
-						onMouseDown={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-							machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
-						}}
-						onMouseUp={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-							machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
-						}}
 						viewBox="0 0 24 24"
 						style={{ transform: "translateX(+4px)" }}
 						className={`h-3 w-3 ${
-							connIDs.length > 0 || isAddingConnector
+							connIDs.length > 0 ||
+							addingConnectorFromPin === outputID ||
+							connectorToPin === outputID
 								? "text-blue-500"
 								: "text-gray-300"
 						}`}

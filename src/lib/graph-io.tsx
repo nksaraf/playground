@@ -246,16 +246,10 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 				port: fromfieldId,
 			},
 			to: {
-				port: `${toNode.nid}/input/${computePinIdxfromLabel(
-					toNode.fields.in,
-					conn.to
-				)}/${conn.to}`,
+				port: toFieldId,
 				node: conn.to_node.toString(),
 			},
 		})
-
-		set(graph.getPinConnectionIDs(fromfieldId), (prev) => [...prev, connId])
-		set(graph.getPinConnectionIDs(toFieldId), (prev) => [...prev, connId])
 	})
 
 	set(
