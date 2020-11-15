@@ -20,7 +20,8 @@ export const Connection = React.memo(
 			<Spline
 				start={start}
 				end={end}
-				className="connector fill-none stroke-2 shadow-xl"
+				fill="none"
+				className="stroke-2"
 				stroke="#4299e1"
 			/>
 		)
