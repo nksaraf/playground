@@ -27,12 +27,12 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 				machine.send("POINTER_DOWN_ON_BOX", { id: nodeID })
 			}}
 			style={{
-				zIndex: 10000,
 				transform: `translateX(${position.x}px) translateY(${position.y}px)`,
 			}}
 		>
-			<header className={"node-header"}>
-				<span className={"node-title"}>Comp</span>
+			<header className={""}>
+				<div className={"text-sm"}>Setup</div>
+				<div className={"text-lg"}>Copy Files</div>
 			</header>
 			<div className={"node-content flex justify-between"}>
 				<NodeInputs items={inputs} />

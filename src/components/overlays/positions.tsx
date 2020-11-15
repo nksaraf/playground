@@ -56,8 +56,6 @@ function PointerPositions() {
 }
 
 export default function Positions() {
-	const [viewBox] = useAtom(scene.viewBox)
-
 	return (
 		<div
 			style={{
