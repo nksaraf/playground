@@ -2,7 +2,7 @@ import * as React from "react"
 import Positions from "./positions"
 
 export default function Overlays() {
-	const [showPositions, setShowPositions] = React.useState(true)
+	const [showPositions, setShowPositions] = React.useState(false)
 
 	return (
 		<>
