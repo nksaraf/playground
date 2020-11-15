@@ -153,7 +153,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(insertToolState)) {
 		case "insertIdle": {
 			switch (action.type) {
-				case "INSERT_NEW_COMPONENT": {
+				case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
 					set(insertToolState, "inserting")
 					set(addingComponentWithID, action.payload.componentID)
 				}
@@ -165,7 +165,7 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(toolState, "selectTool")
 					return
 				}
-				case "STOPPED_POINTING": {
+				case "POINTER_UP": {
 					const id = getId()
 					set(toolState, "selectTool")
 					set(insertNewComponent, {

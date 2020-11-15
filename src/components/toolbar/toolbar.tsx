@@ -30,7 +30,7 @@ export default function Toolbar() {
 					// isActive={local.isIn("selectTool")}
 					isActive={false}
 					onClick={() =>
-						machine.send("INSERT_NEW_COMPONENT", { componentID: 1 })
+						machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: 1 })
 					}
 				/>
 				{/* <IconButton

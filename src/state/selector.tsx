@@ -170,14 +170,14 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(undo.actions.saveUndoState, null)
 					return
 				}
-				case "STARTED_POINTING_CANVAS": {
+				case "POINTER_DOWN_ON_CANVAS": {
 					set(selectToolState, "pointingCanvas")
 					const i = setTimeout(() => {
 						set(resetTouch, null)
 					}, 100)
 					return
 				}
-				case "STARTED_POINTING_BOX": {
+				case "POINTER_DOWN_ON_BOX": {
 					console.log(get(selector.isNodeSelected(action.payload.id)))
 					if (!get(selector.isNodeSelected(action.payload.id))) {
 						set(selector.selectedNodeIDs, [action.payload.id])
@@ -185,7 +185,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(selectToolState, "dragging")
 					return
 				}
-				case "STARTED_POINTING_BOUNDS": {
+				case "POINTER_DOWN_ON_BOUNDS": {
 					set(selectToolState, "dragging")
 
 					return
@@ -195,12 +195,12 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 		case "dragging": {
 			switch (action.type) {
-				case "MOVED_POINTER": {
+				case "POINTER_MOVE": {
 					set(moveDraggingBoxes)
 					// set(selectToolState, "dragActive")
 					return
 				}
-				case "STOPPED_POINTING": {
+				case "POINTER_UP": {
 					set(selectToolState, "selectingIdle")
 					return
 				}
@@ -210,7 +210,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 
 		case "pointingCanvas": {
 			switch (action.type) {
-				case "MOVED_POINTER": {
+				case "POINTER_MOVE": {
 					const { screenPointer: initial, camera } = get(scene.lastPointState)
 					const pointer = get(scene.screenPointerPosition)
 
@@ -231,7 +231,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					// return
 					return
 				}
-				case "STOPPED_POINTING": {
+				case "POINTER_UP": {
 					set(selector.actions.clearSelection, null)
 					set(selectToolState, "recentlyPointed")
 					return
@@ -241,7 +241,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 		case "recentlyPointed": {
 			switch (action.type) {
-				case "STARTED_POINTING_CANVAS": {
+				case "POINTER_DOWN_ON_CANVAS": {
 					set(selectToolState, "brushSelecting")
 					set(selector.actions.clearSelection, null)
 					set(selector.actions.startBrushWithWorker, null)
@@ -257,12 +257,12 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 		case "brushSelecting": {
 			switch (action.type) {
-				case "MOVED_POINTER": {
+				case "POINTER_MOVE": {
 					set(selector.actions.moveBrush, null)
 					set(selector.actions.setSelectedIdsFromWorker, null)
 					return
 				}
-				case "STOPPED_POINTING": {
+				case "POINTER_UP": {
 					set(selector.actions.completeBrush, null)
 					set(selectToolState, "selectingIdle")
 					return

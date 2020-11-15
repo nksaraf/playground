@@ -17,14 +17,14 @@ export function useWheel() {
 			if (e.ctrlKey) {
 				// Zooming
 				state.send("ZOOMED", deltaY / 100)
-				state.send("MOVED_POINTER")
+				state.send("POINTER_MOVE")
 			} else {
 				// Panning
 				state.send("PANNED", {
 					x: deltaX,
 					y: deltaY,
 				})
-				state.send("MOVED_POINTER")
+				state.send("POINTER_MOVE")
 			}
 		},
 		[state.send]
@@ -40,13 +40,13 @@ export function Canvas({ width, height }) {
 			className="relative overflow-x-hidden overflow-y-hidden"
 			style={{ height, width, userSelect: "none" }}
 			onMouseDown={(e) => {
-				machine.send("STARTED_POINTING_CANVAS", {
+				machine.send("POINTER_DOWN_ON_CANVAS", {
 					x: e.clientX,
 					y: e.clientY,
 				})
 			}}
 			onMouseUp={(e) =>
-				machine.send("STOPPED_POINTING", { x: e.clientX, y: e.clientY })
+				machine.send("POINTER_UP", { x: e.clientX, y: e.clientY })
 			}
 			onWheel={handleWheel}
 		>

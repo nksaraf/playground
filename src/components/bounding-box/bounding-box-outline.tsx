@@ -64,7 +64,7 @@ export default function BoundingBox({
 					y2={y2}
 					zoom={zoom}
 					direction={i % 2}
-					onPointerDown={() => state.send("STARTED_POINTING_BOUNDS_EDGE", i)}
+					onPointerDown={() => state.send("POINTER_DOWN_ON_BOUNDS_EDGE", i)}
 				/>
 			))}
 			{corners.map(([cx, cy], i) => (
@@ -74,7 +74,7 @@ export default function BoundingBox({
 					y={cy}
 					zoom={zoom}
 					direction={i % 2}
-					onPointerDown={() => state.send("STARTED_POINTING_BOUNDS_CORNER", i)}
+					onPointerDown={() => state.send("POINTER_DOWN_ON_BOUNDS_CORNER", i)}
 				/>
 			))}
 		</g>

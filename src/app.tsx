@@ -12,8 +12,6 @@ import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/Canvas"
 
 export default function App() {
-	const { ref, width, height } = useViewBox()
-
 	useWindowEvents()
 	useKeyboardEvents()
 
@@ -23,11 +21,21 @@ export default function App() {
 	}, [write])
 
 	return (
-		<div ref={ref} className="w-screen h-screen absolue t-0 l-0">
-			<Canvas width={width} height={height} />
+		<Container>
+			<Canvas />
 			<Overlays />
 			<ZoomIndicator />
 			<Toolbar />
+		</Container>
+	)
+}
+
+function Container({ children }) {
+	const { ref, width, height } = useViewBox()
+
+	return (
+		<div ref={ref} className="w-screen h-screen absolue t-0 l-0">
+			{children}
 		</div>
 	)
 }

@@ -5,15 +5,15 @@ export default function useWindowEvents() {
 	const state = useMachine()
 	React.useEffect(() => {
 		function handlePointerMove(e: PointerEvent) {
-			state.send("MOVED_POINTER", { x: e.clientX, y: e.clientY })
+			state.send("POINTER_MOVE", { x: e.clientX, y: e.clientY })
 		}
 
 		function handlePointerUp(e: PointerEvent) {
-			state.send("STOPPED_POINTING", { x: e.clientX, y: e.clientY })
+			state.send("POINTER_UP", { x: e.clientX, y: e.clientY })
 		}
 
 		function handlePointerDown(e: PointerEvent) {
-			state.send("STARTED_POINTING", { x: e.clientX, y: e.clientY })
+			state.send("POINTER_DOWN", { x: e.clientX, y: e.clientY })
 		}
 
 		function handleScroll() {

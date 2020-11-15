@@ -1,6 +1,5 @@
-import { IPoint } from "pixi.js"
 import { atom } from "../atom"
-import { IFrame } from "../../types"
+import { IFrame, IPoint } from "../../types"
 import { selector, selectToolDispatch } from "./selector"
 import { undo } from "./undo"
 import { scene } from "./scene"
@@ -20,19 +19,16 @@ export const globalDispatch = atom(null, (get, set, action: Actions) => {
 		case "REDO": {
 			return set(undo.actions.loadRedoState, null)
 		}
-		case "STARTED_POINTING": {
+		case "POINTER_DOWN": {
 			return set(scene.actions.savePointer, action.payload)
 		}
-		case "INSERT_NEW_COMPONENT": {
+		case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
 			set(toolState, "insertTool")
 			set(insertToolDispatch, action)
 			return
 		}
-		case "MOVED_POINTER":
-			return set(
-				scene.actions.updatePointerOnPointerMove,
-				action.payload as IPoint
-			)
+		case "POINTER_MOVE":
+			return set(scene.actions.updatePointerOnPointerMove, action.payload)
 		case "ZOOMED":
 			return set(scene.actions.updateCameraZoom, action.payload)
 		case "PANNED": {
@@ -60,7 +56,7 @@ export const activeState = atom((get) => {
 })
 
 export const dispatch = atom(null, (get, set, action: Actions) => {
-	// action.type !== "MOVED_POINTER" && console.log(action)
+	// action.type !== "POINTER_MOVE" && console.log(action)
 	set(globalDispatch, action)
 	switch (get(toolState)) {
 		case "selectTool": {
@@ -81,21 +77,21 @@ export type Action<S, T = undefined> = {
 
 export type Actions =
 	| Action<"UPDATED_VIEWBOX", IFrame>
-	| Action<"MOVED_POINTER", IPoint | undefined>
+	| Action<"POINTER_MOVE", IPoint | undefined>
 	| Action<"CANCELLED">
 	| Action<"DELETED_SELECTED">
-	| Action<"INSERT_NEW_COMPONENT", { componentID: string }>
-	// | Action<"STARTED_POINTING_BOUNDS_EDGE">
-	// | Action<"STARTED_POINTING_BOUNDS_CORNER">
-	| Action<"STARTED_POINTING_CANVAS">
-	| Action<"STARTED_POINTING_BOX", { id: string }>
-	| Action<"STARTED_POINTING_BOUNDS">
-	| Action<"STOPPED_POINTING">
+	| Action<"POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: string }>
+	// | Action<"POINTER_DOWN_ON_BOUNDS_EDGE">
+	// | Action<"POINTER_DOWN_ON_BOUNDS_CORNER">
+	| Action<"POINTER_DOWN_ON_CANVAS">
+	| Action<"POINTER_DOWN_ON_BOX", { id: string }>
+	| Action<"POINTER_DOWN_ON_BOUNDS">
+	| Action<"POINTER_UP">
 	| Action<"FORCED_IDS">
 	| Action<"RESET_POINTED">
 	| Action<"UNDO">
 	| Action<"REDO">
-	| Action<"STARTED_POINTING">
+	| Action<"POINTER_DOWN">
 	| Action<"DOUBLE_TAPPED_CANVAS">
 	| Action<"ZOOMED", number>
 	| Action<"PANNED", IPoint>

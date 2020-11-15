@@ -17,7 +17,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 		<ControlledNode
 			onResize={setNodeSize}
 			isSelected={isSelected}
-			onClick={() => machine.send("STARTED_POINTING_BOX", { id: nodeID })}
+			onClick={() => machine.send("POINTER_DOWN_ON_BOX", { id: nodeID })}
 			nodeId={nodeID}
 			position={nodePosition}
 			size={nodeSize}
