@@ -25,7 +25,9 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 
 	return (
 		<section
-			className={`absolute bg-white rounded-xl shadow-xl pb-3`}
+			className={`absolute ${
+				isSelected ? "bg-gray-800" : "bg-white"
+			} rounded-xl shadow-xl pb-3`}
 			ref={ref}
 			onMouseDown={(e) => {
 				e.preventDefault()
@@ -48,11 +50,16 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 
 function NodeHeader({ nodeID }) {
 	const [meta] = useAtom(graph.getNodeMetadata(nodeID))
+	const [isSelected, setIsSelected] = useAtom(selector.isNodeSelected(nodeID))
 
 	return (
 		<header className={"py-3 px-4 flex flex-col items-center"}>
 			<div className={"text-xs text-gray-500 font-normal uppercase"}>Setup</div>
-			<div className={"text-lg text-gray-600 font-semibold"}>
+			<div
+				className={`text-lg ${
+					isSelected ? "text-gray-400" : "text-gray-600"
+				} font-semibold`}
+			>
 				{meta.componentID}
 			</div>
 		</header>
