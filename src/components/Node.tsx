@@ -122,7 +122,7 @@ function NodeInput({ inputID }) {
 							addingConnectorFromPin === inputID ||
 							isHovered
 								? "text-blue-500"
-								: "text-gray-300"
+								: "text-gray-400"
 						}`}
 					>
 						<circle
@@ -205,7 +205,7 @@ function NodeOutput({ outputID }) {
 							addingConnectorFromPin === outputID ||
 							connectorToPin === outputID
 								? "text-blue-500"
-								: "text-gray-300"
+								: "text-gray-400"
 						}`}
 					>
 						<circle

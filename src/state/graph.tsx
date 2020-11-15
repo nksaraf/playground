@@ -196,14 +196,14 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 				case "POINTER_DOWN": {
 					const id = getId()
 					const componentID = get(addingComponentWithID)
-					set(insertToolState, "insertIdle")
-					set(addingComponentWithID, null)
-					set(toolState, "selectTool")
 					set(insertNewComponent, {
 						componentID,
 						id,
 					})
 					set(selector.selectedNodeIDs, [id])
+					set(insertToolState, "insertIdle")
+					set(addingComponentWithID, null)
+					set(toolState, "selectTool")
 					return
 				}
 
@@ -214,14 +214,14 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					if (dist > 20) {
 						const id = getId()
 						const componentID = get(addingComponentWithID)
-						set(addingComponentWithID, null)
-						set(insertToolState, "insertIdle")
-						set(toolState, "selectTool")
 						set(insertNewComponent, {
 							componentID,
 							id,
 						})
 						set(selector.selectedNodeIDs, [id])
+						set(addingComponentWithID, null)
+						set(insertToolState, "insertIdle")
+						set(toolState, "selectTool")
 					}
 					return
 				}
@@ -236,24 +236,31 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_UP_ON_PIN": {
-					console.log(action.payload)
 					const fromPin = get(addingConnectorFromPinID)
-					if (
-						fromPin === action.payload.pinID ||
+					if (fromPin === action.payload.pinID) {
+					} else if (
 						get(getPinMetadata(fromPin)).parentNode ===
 							get(getPinMetadata(action.payload.pinID)).parentNode ||
 						get(getPinMetadata(fromPin)).type ===
 							get(getPinMetadata(action.payload.pinID)).type
 					) {
 					} else {
-						set(insertNewDataConnector, {
-							fromPin,
-							toPin: action.payload.pinID,
-						})
+						set(
+							insertNewDataConnector,
+							get(getPinMetadata(fromPin)).type === "output"
+								? {
+										fromPin,
+										toPin: action.payload.pinID,
+								  }
+								: {
+										toPin: fromPin,
+										fromPin: action.payload.pinID,
+								  }
+						)
+						set(insertToolState, "insertIdle")
+						set(addingConnectorFromPinID, null)
+						set(toolState, "selectTool")
 					}
-					set(insertToolState, "insertIdle")
-					set(addingConnectorFromPinID, null)
-					set(toolState, "selectTool")
 
 					return
 				}
