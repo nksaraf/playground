@@ -81,6 +81,7 @@ export type Actions =
 	| Action<"CANCELLED">
 	| Action<"DELETED_SELECTED">
 	| Action<"POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: string }>
+	| Action<"POINTER_DOWN_ON_PIN", { pinID: string }>
 	// | Action<"POINTER_DOWN_ON_BOUNDS_EDGE">
 	// | Action<"POINTER_DOWN_ON_BOUNDS_CORNER">
 	| Action<"POINTER_DOWN_ON_CANVAS">

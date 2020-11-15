@@ -7,7 +7,7 @@ export function useMachine() {
 	const send = useUpdateAtom(dispatch)
 	return {
 		send: React.useCallback(
-			(type: Actions["type"], payload?: any) => {
+			(type: Actions["type"], payload?: Actions["payload"]) => {
 				send({ type, payload } as any)
 			},
 			[send]

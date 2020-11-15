@@ -1,56 +1,58 @@
-import { IPoint, IBox } from "../../types"
-import RBush from "rbush"
+export {}
 
-class Bush extends RBush<{
-	id: string
-	minX: number
-	minY: number
-	maxX: number
-	maxY: number
-}> {}
+// import { IPoint, IBox } from "../../types"
+// import RBush from "rbush"
 
-const tree = new Bush()
+// class Bush extends RBush<{
+// 	id: string
+// 	minX: number
+// 	minY: number
+// 	maxX: number
+// 	maxY: number
+// }> {}
 
-export function getBoxSelecter(initialBoxes: IBox[], origin: IPoint) {
-	let x0: number, y0: number, x1: number, y1: number, t: number
-	const { x: ox, y: oy } = origin
+// const tree = new Bush()
 
-	tree.clear()
+// export function getBoxSelecter(initialBoxes: IBox[], origin: IPoint) {
+// 	let x0: number, y0: number, x1: number, y1: number, t: number
+// 	const { x: ox, y: oy } = origin
 
-	tree.load(
-		initialBoxes.map((box) => ({
-			id: box.id,
-			minX: box.x,
-			minY: box.y,
-			maxX: box.x + box.width,
-			maxY: box.y + box.height,
-		}))
-	)
+// 	tree.clear()
 
-	return function select(point: IPoint) {
-		x0 = ox
-		y0 = oy
-		x1 = point.x
-		y1 = point.y
+// 	tree.load(
+// 		initialBoxes.map((box) => ({
+// 			id: box.id,
+// 			minX: box.x,
+// 			minY: box.y,
+// 			maxX: box.x + box.width,
+// 			maxY: box.y + box.height,
+// 		}))
+// 	)
 
-		if (x1 < x0) {
-			t = x0
-			x0 = x1
-			x1 = t
-		}
+// 	return function select(point: IPoint) {
+// 		x0 = ox
+// 		y0 = oy
+// 		x1 = point.x
+// 		y1 = point.y
 
-		if (y1 < y0) {
-			t = y0
-			y0 = y1
-			y1 = t
-		}
+// 		if (x1 < x0) {
+// 			t = x0
+// 			x0 = x1
+// 			x1 = t
+// 		}
 
-		const results = tree
-			.search({ minX: x0, minY: y0, maxX: x1, maxY: y1 })
-			.map((b) => b.id)
+// 		if (y1 < y0) {
+// 			t = y0
+// 			y0 = y1
+// 			y1 = t
+// 		}
 
-		return results
-	}
-}
+// 		const results = tree
+// 			.search({ minX: x0, minY: y0, maxX: x1, maxY: y1 })
+// 			.map((b) => b.id)
 
-export type BoxSelecter = ReturnType<typeof getBoxSelecter>
+// 		return results
+// 	}
+// }
+
+// export type BoxSelecter = ReturnType<typeof getBoxSelecter>

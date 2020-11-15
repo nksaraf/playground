@@ -15,5 +15,5 @@
 		"jsx": "preserve"
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-	"exclude": ["node_modules", "archive/canvas-html5", "src/canvas-pixi"]
+	"exclude": ["node_modules", "components"]
 }

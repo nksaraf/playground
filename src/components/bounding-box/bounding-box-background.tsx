@@ -1,5 +1,5 @@
 import * as React from "react"
-import state from "../../../components/state"
+// import state from "../../../components/state"
 import { IFrame } from "../../../types"
 
 export default function BoundingBox({ x, y, height, width }: IFrame) {
@@ -12,7 +12,7 @@ export default function BoundingBox({ x, y, height, width }: IFrame) {
 			height={height + 2}
 			fill="transparent"
 			stroke="none"
-			onPointerDown={() => state.send("STARTED_DRAGGING_BOUNDS")}
+			// onPointerDown={() => state.send("STARTED_DRAGGING_BOUNDS")}
 			cursor="grab"
 		/>
 	)

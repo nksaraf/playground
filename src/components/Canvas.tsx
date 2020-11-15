@@ -52,7 +52,7 @@ export function Canvas() {
 		>
 			<SvgCanvas height={height} width={width}>
 				<SelectionBrush />
-				<NewComponentGhost />
+				<InsertingComponentGhost />
 				<Connections />
 			</SvgCanvas>
 			<CanvasBackground height={height} width={width}>
@@ -81,21 +81,27 @@ export function CanvasBackground({ children, height, width }) {
 	)
 }
 
-function NewComponentGhost() {
+function InsertingComponentGhost() {
 	const [state] = useAtom(activeState)
 	const [pointer] = useAtom(scene.documentPointer)
 
 	return state.includes("inserting") ? (
+		<ComponentGhost x={pointer.x} y={pointer.y} />
+	) : null
+}
+
+function ComponentGhost({ x, y }) {
+	return (
 		<rect
-			x={pointer.x}
-			y={pointer.y}
+			x={x}
+			y={y}
 			width={20}
 			height={20}
 			fill="rgba(0,0,100, .1)"
 			stroke="rgba(0,0,100, .2)"
 			strokeWidth={1}
 		/>
-	) : null
+	)
 }
 
 export const Connections = React.memo(() => {

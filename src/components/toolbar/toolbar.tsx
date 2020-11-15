@@ -31,7 +31,9 @@ export default function Toolbar() {
 					onMouseDown={(e) => {
 						e.preventDefault()
 						e.stopPropagation()
-						machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: 1 })
+						machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
+							componentID: "1",
+						})
 					}}
 				/>
 				{/* <IconButton

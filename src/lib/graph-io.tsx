@@ -182,7 +182,7 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 			),
 		])
 		node.fields.in.forEach((field, index) => {
-			set(graph.getPortMetadata(`${nodeId}/input/${index}/${field.name}`), {
+			set(graph.getPinMetadata(`${nodeId}/input/${index}/${field.name}`), {
 				name: field.name,
 				parentNode: nodeId,
 				index,
@@ -192,7 +192,7 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 		})
 
 		node.fields.out.forEach((field, index) => {
-			set(graph.getPortMetadata(`${nodeId}/output/${index}/${field.name}`), {
+			set(graph.getPinMetadata(`${nodeId}/output/${index}/${field.name}`), {
 				name: field.name,
 				parentNode: nodeId,
 				index,
@@ -254,8 +254,8 @@ export const writeGraph = atom(null, (get, set, val: typeof exampleGraph) => {
 			},
 		})
 
-		set(graph.getPortConnectionIDs(fromfieldId), (prev) => [...prev, connId])
-		set(graph.getPortConnectionIDs(toFieldId), (prev) => [...prev, connId])
+		set(graph.getPinConnectionIDs(fromfieldId), (prev) => [...prev, connId])
+		set(graph.getPinConnectionIDs(toFieldId), (prev) => [...prev, connId])
 	})
 
 	set(

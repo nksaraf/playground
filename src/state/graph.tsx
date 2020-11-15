@@ -23,7 +23,7 @@ const getNodeMetadata = atomFamily((id: string) => ({
 	id: id,
 }))
 
-const getPortMetadata = atomFamily((id: string) => ({
+const getPinMetadata = atomFamily((id: string) => ({
 	type: "",
 	id: id,
 	name: "input",
@@ -49,7 +49,7 @@ const getNodePortIDs = atomFamily<string[]>(
 		set(getNodePortIDMap(id), Object.fromEntries(update.map((u) => [u, true])))
 )
 
-const getPortConnectionIDs = atomFamily((id: string) => [])
+const getPinConnectionIDs = atomFamily((id: string) => [])
 
 const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	...get(getNodeSize(id)),
@@ -57,12 +57,12 @@ const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	id,
 }))
 
-const getPortOffset = atomFamily((id: string) => ({ x: 0, y: 0 }))
+const getPinOffset = atomFamily((id: string) => ({ x: 0, y: 0 }))
 
-const getPortPosition = atomFamily((id: string) => (get) => {
-	const port = get(getPortMetadata(id))
+const getPinPosition = atomFamily((id: string) => (get) => {
+	const port = get(getPinMetadata(id))
 	const nodePos = get(getNodePosition(port.parentNode))
-	const portOffset = get(getPortOffset(id))
+	const portOffset = get(getPinOffset(id))
 
 	return { x: nodePos.x + portOffset.x, y: nodePos.y + portOffset.y }
 })
@@ -71,8 +71,8 @@ const getConnectionPosition = atomFamily((id: string) => (get) => {
 	const params = get(getConnectionParams(id))
 
 	return {
-		start: get(getPortPosition(params.from.port)),
-		end: get(getPortPosition(params.to.port)),
+		start: get(getPinPosition(params.from.port)),
+		end: get(getPinPosition(params.to.port)),
 	}
 })
 
@@ -81,8 +81,8 @@ const nodes = atom((get) =>
 		...get(getNodeMetadata(id)),
 		...get(getNodeBox(id)),
 		ports: get(getNodePortIDs(id)).map((inp) => ({
-			...get(getPortMetadata(inp)),
-			connections: get(getPortConnectionIDs(inp)),
+			...get(getPinMetadata(inp)),
+			connections: get(getPinConnectionIDs(inp)),
 			id: inp,
 		})),
 	}))
@@ -91,7 +91,7 @@ const nodes = atom((get) =>
 const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
 	return flatten(
 		get(getNodePortIDs(id)).map((outputID) =>
-			get(getPortConnectionIDs(outputID))
+			get(getPinConnectionIDs(outputID))
 		)
 	)
 })
@@ -105,7 +105,7 @@ const connections = atom((get) =>
 
 const getNodeInputIDs = atomFamily((id: string) => (get) => {
 	const nodePorts = get(getNodePortIDs(id))
-		.map((pid) => get(getPortMetadata(pid)))
+		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "input")
 
 	return nodePorts.map((np) => np.id)
@@ -113,7 +113,7 @@ const getNodeInputIDs = atomFamily((id: string) => (get) => {
 
 const getNodeOutputIDs = atomFamily((id: string) => (get) => {
 	const nodePorts = get(getNodePortIDs(id))
-		.map((pid) => get(getPortMetadata(pid)))
+		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "output")
 
 	return nodePorts.map((np) => np.id)
@@ -124,7 +124,9 @@ const snapshot = atom((get) => ({
 	connections: get(connections),
 }))
 
-const insertToolState = atom("insertIdle")
+const insertToolState = atom(
+	"insertIdle" as "insertIdle" | "insertingComponent" | "insertingConnector"
+)
 
 import uniqueId from "lodash/uniqueId"
 import { v4 as uuid } from "uuid"
@@ -154,13 +156,13 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 		case "insertIdle": {
 			switch (action.type) {
 				case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
-					set(insertToolState, "inserting")
+					set(insertToolState, "insertingComponent")
 					set(addingComponentWithID, action.payload.componentID)
 					return
 				}
 			}
 		}
-		case "inserting": {
+		case "insertingComponent": {
 			switch (action.type) {
 				case "CANCELLED": {
 					set(toolState, "selectTool")
@@ -209,14 +211,14 @@ export const graph = {
 	getNodeBox,
 	getNodePortIDs,
 	getNodeConnectionIDs,
-	getPortMetadata,
-	getPortConnectionIDs,
+	getPinMetadata,
+	getPinConnectionIDs,
 	getNodeSize,
 	getNodeInputIDs,
 	getNodeOutputIDs,
 	snapshot,
-	getPortOffset,
-	getPortPosition,
+	getPinOffset,
+	getPinPosition,
 	getConnectionPosition,
 	insertToolState,
 }

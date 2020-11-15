@@ -11,7 +11,7 @@ import { exampleGraph, writeGraph } from "./lib/graph-io"
 import { useUpdateAtom } from "./atom"
 import { Canvas } from "./components/Canvas"
 
-export default function App() {
+export default function Tavern() {
 	useWindowEvents()
 	useKeyboardEvents()
 
@@ -30,11 +30,26 @@ export default function App() {
 	)
 }
 
+// body {
+// 	font-family: Nunito, sans-serif;
+// 	color: #323232;
+// 	line-height: 20px;
+// 	font-size: 14px;
+// 	font-weight: 600;
+// 	text-rendering: optimizeLegibility;
+// 	-webkit-font-smoothing: antialiased;
+// 	-moz-font-smoothing: antialiased;
+// }
+
 function Container({ children }) {
-	const { ref, width, height } = useViewBox()
+	const { ref } = useViewBox()
 
 	return (
-		<div ref={ref} className="w-screen h-screen absolue t-0 l-0">
+		<div
+			ref={ref}
+			className="w-screen h-screen relative bg-gray-200"
+			style={{ fontFamily: "Nunito, sans-serif" }}
+		>
 			{children}
 		</div>
 	)
