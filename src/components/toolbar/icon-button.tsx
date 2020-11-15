@@ -1,11 +1,8 @@
 import * as React from "react"
 import { ButtonWrapper, ShortcutHint, Button } from "./styled"
-import * as Icons from "./icons/svgr"
 
 type IconButtonProps = {
-	// event: string
 	isActive?: boolean
-	src: string
 	shortcut?: string
 } & React.HTMLProps<HTMLButtonElement>
 
@@ -16,8 +13,6 @@ export default function IconButton({
 	children,
 	...props
 }: IconButtonProps) {
-	const Icon = Icons[src]
-
 	return (
 		<ButtonWrapper>
 			<Button
@@ -26,7 +21,7 @@ export default function IconButton({
 				type="button"
 				{...(props as any)}
 			>
-				<Icon />
+				{children}
 			</Button>
 			{shortcut && <ShortcutHint>{shortcut}</ShortcutHint>}
 		</ButtonWrapper>

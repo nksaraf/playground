@@ -1,5 +1,5 @@
-import { useAtom } from "../atom"
-import { graph } from "../state/graph"
+import { useAtom } from "../../atom"
+import { graph } from "../../state/graph"
 import React, { useState } from "react"
 
 // .connector {

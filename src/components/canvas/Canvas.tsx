@@ -1,10 +1,10 @@
 import * as React from "react"
-import { useMachine } from "../hooks/useMachine"
+import { useMachine } from "../../hooks/useMachine"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
-import { atom, useAtom } from "../atom"
+import { atom, useAtom } from "../../atom"
 import { Connection, Spline } from "./Connection"
-import { activeState, graph, scene, selector } from "../state"
+import { activeState, graph, scene, selector } from "../../state"
 import { Node } from "./Node"
 
 export function useWheel() {

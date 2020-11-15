@@ -4,12 +4,12 @@ import useKeyboardEvents from "./hooks/useKeyboardEvents"
 import useWindowEvents from "./hooks/useWindowEvents"
 import useViewBox from "./hooks/useViewBox"
 
-import Toolbar from "./components/toolbar/toolbar"
-import ZoomIndicator from "./components/overlays/zoom-indicator"
-import Overlays from "./components/overlays/overlays"
+import { Toolbar } from "./components/toolbar/toolbar"
+import { ZoomIndicator } from "./components/overlays/zoom-indicator"
+import { Positions } from "./components/overlays/positions"
 import { exampleGraph, writeGraph } from "./lib/graph-io"
 import { useUpdateAtom } from "./atom"
-import { Canvas } from "./components/Canvas"
+import { Canvas } from "./components/canvas/Canvas"
 
 export default function Tavern() {
 	useWindowEvents()
@@ -23,7 +23,7 @@ export default function Tavern() {
 	return (
 		<Container>
 			<Canvas />
-			<Overlays />
+			<Positions />
 			<ZoomIndicator />
 			<Toolbar />
 		</Container>

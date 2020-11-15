@@ -1,10 +1,10 @@
 import * as React from "react"
-import { useMachine } from "../hooks/useMachine"
-import { atom, atomFamily, useAtom, useUpdateAtom } from "../atom"
-import { graph } from "../state/graph"
-import { selector } from "../state"
+import { useMachine } from "../../hooks/useMachine"
+import { atom, atomFamily, useAtom, useUpdateAtom } from "../../atom"
+import { graph } from "../../state/graph"
+import { selector } from "../../state"
 import useResizeObserver from "use-resize-observer"
-import { styled } from "../theme"
+import { styled } from "../../theme"
 
 const NodeBody = styled("div", {
 	display: "flex",

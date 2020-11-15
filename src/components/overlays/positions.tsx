@@ -4,6 +4,47 @@ import { useAtom } from "../../atom"
 import { scene } from "../../state/scene"
 import { selector } from "../../state"
 
+export function Positions() {
+	const [showPositions, setShowPositions] = React.useState(false)
+
+	return (
+		<>
+			<div
+				style={{
+					position: "absolute",
+					userSelect: "none",
+					pointerEvents: "none",
+					bottom: 8,
+					left: 8,
+				}}
+			>
+				{showPositions && (
+					<div
+						style={{
+							display: "grid",
+							alignItems: "baseline",
+							gridTemplateColumns: "64px 64px 80px auto",
+							pointerEvents: "none",
+							gap: "8px",
+							padding: "2px 0",
+							textAlign: "left",
+						}}
+					>
+						<Scene />
+						<PointerPositions />
+					</div>
+				)}
+				<button
+					style={{ marginTop: 8, pointerEvents: "all" }}
+					onClick={() => setShowPositions(!showPositions)}
+				>
+					{showPositions ? "Hide" : "Show"}
+				</button>
+			</div>
+		</>
+	)
+}
+
 function Scene() {
 	const [camera] = useAtom(scene.camera)
 	const [viewBox] = useAtom(scene.viewBox)
@@ -52,24 +93,5 @@ function PointerPositions() {
 				label="Brush end (Document)"
 			/>
 		</>
-	)
-}
-
-export default function Positions() {
-	return (
-		<div
-			style={{
-				display: "grid",
-				alignItems: "baseline",
-				gridTemplateColumns: "64px 64px 80px auto",
-				pointerEvents: "none",
-				gap: "8px",
-				padding: "2px 0",
-				textAlign: "left",
-			}}
-		>
-			<Scene />
-			<PointerPositions />
-		</div>
 	)
 }

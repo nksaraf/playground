@@ -2,7 +2,7 @@ import * as React from "react"
 import { scene } from "../../state/scene"
 import { useRecoilState } from "recoil"
 
-export default function Model() {
+export function Model() {
 	const [camera, _] = useRecoilState(scene.camera)
 
 	return (

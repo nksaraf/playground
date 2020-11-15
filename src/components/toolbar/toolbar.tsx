@@ -4,8 +4,9 @@ import IconButton from "./icon-button"
 import { graph } from "../../state/graph"
 import { useAtom } from "../../atom"
 import { useMachine } from "../../state"
+import * as Icons from "./icons/svgr"
 
-export default function Toolbar() {
+export function Toolbar() {
 	const machine = useMachine()
 	// const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
 	// const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
@@ -26,7 +27,6 @@ export default function Toolbar() {
 					shortcut="V"
 				/> */}
 				<IconButton
-					src="Box"
 					isActive={false}
 					onMouseDown={(e) => {
 						e.preventDefault()
@@ -35,7 +35,9 @@ export default function Toolbar() {
 							componentID: "1",
 						})
 					}}
-				/>
+				>
+					<Icons.Box />
+				</IconButton>
 				{/* <IconButton
 					src="Box"
 					isActive={local.isIn("boxTool")}
