@@ -2,8 +2,8 @@ import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
-import { useAtom } from "../atom"
-import { Connection } from "./Connection"
+import { atom, useAtom } from "../atom"
+import { Connection, Spline } from "./Connection"
 import { activeState, graph, scene, selector } from "../state"
 import { Node } from "./Node"
 
@@ -52,7 +52,8 @@ export function Canvas() {
 		>
 			<SvgCanvas height={height} width={width}>
 				<SelectionBrush />
-				<InsertingComponentGhost />
+				<InsertingNodeGhost />
+				<InsertingConnectortGhost />
 				<Connections />
 			</SvgCanvas>
 			<CanvasBackground height={height} width={width}>
@@ -81,12 +82,28 @@ export function CanvasBackground({ children, height, width }) {
 	)
 }
 
-function InsertingComponentGhost() {
+function InsertingNodeGhost() {
 	const [state] = useAtom(activeState)
 	const [pointer] = useAtom(scene.documentPointer)
 
-	return state.includes("inserting") ? (
+	return state.includes("insertingComponent") ? (
 		<ComponentGhost x={pointer.x} y={pointer.y} />
+	) : null
+}
+
+const addingConnectorFromPinPosition = atom((get) => {
+	return get(graph.getPinPosition(get(graph.addingConnectorFromPin)))
+})
+
+
+
+function InsertingConnectortGhost() {
+	const [state] = useAtom(activeState)
+	const [pos] = useAtom(addingConnectorFromPinPosition)
+	const [pointer] = useAtom(scene.documentPointer)
+
+	return state.includes("insertingConnector") ? (
+		<Spline start={pos} end={pointer} className="connector" />
 	) : null
 }
 

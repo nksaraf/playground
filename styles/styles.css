@@ -23,7 +23,7 @@
 	-webkit-filter: drop-shadow(-5px -5px 5px #000);
 	filter: drop-shadow(-5px -5px 5px #000);
 }
-
+/* 
 .connector-click-area {
 	cursor: pointer;
 	fill: none;
@@ -39,4 +39,4 @@
 
 .connector.selected {
 	stroke: #337ab7;
-}
+} */

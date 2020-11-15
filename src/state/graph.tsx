@@ -150,29 +150,40 @@ const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
 })
 
 const addingComponentWithID = atom(null as string | null)
+const addingConnectorFromPin = atom(null as string | null)
 
 export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(insertToolState)) {
 		case "insertIdle": {
 			switch (action.type) {
 				case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
-					set(insertToolState, "insertingComponent")
 					set(addingComponentWithID, action.payload.componentID)
+					set(insertToolState, "insertingComponent")
 					return
+				}
+				case "POINTER_DOWN_ON_PIN": {
+					set(addingConnectorFromPin, action.payload.pinID)
+					set(insertToolState, "insertingConnector")
+					console.log(action.payload)
 				}
 			}
 		}
 		case "insertingComponent": {
 			switch (action.type) {
 				case "CANCELLED": {
+					set(insertToolState, "insertIdle")
+					set(addingComponentWithID, null)
 					set(toolState, "selectTool")
 					return
 				}
 				case "POINTER_DOWN": {
 					const id = getId()
+					const componentID = get(addingComponentWithID)
+					set(insertToolState, "insertIdle")
+					set(addingComponentWithID, null)
 					set(toolState, "selectTool")
 					set(insertNewComponent, {
-						componentID: get(addingComponentWithID),
+						componentID,
 						id,
 					})
 					set(selector.selectedNodeIDs, [id])
@@ -185,13 +196,44 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					const dist = Math.hypot(x - screenPointer.x, y - screenPointer.y)
 					if (dist > 20) {
 						const id = getId()
+						const componentID = get(addingComponentWithID)
+						set(addingComponentWithID, null)
+						set(insertToolState, "insertIdle")
 						set(toolState, "selectTool")
 						set(insertNewComponent, {
-							componentID: get(addingComponentWithID),
+							componentID,
 							id,
 						})
 						set(selector.selectedNodeIDs, [id])
 					}
+					return
+				}
+			}
+		}
+		case "insertingConnector": {
+			switch (action.type) {
+				case "CANCELLED": {
+					set(insertToolState, "insertIdle")
+					set(addingConnectorFromPin, null)
+					set(toolState, "selectTool")
+					return
+				}
+				// case "POINTER_DOWN_ON_PIN": {
+				// 	const id = getId()
+				// 	set(toolState, "selectTool")
+				// 	set(insertNewComponent, {
+				// 		componentID: get(addingComponentWithID),
+				// 		id,
+				// 	})
+				// 	set(selector.selectedNodeIDs, [id])
+				// 	return
+				// }
+
+				case "POINTER_UP_ON_PIN": {
+					set(insertToolState, "insertIdle")
+					set(addingConnectorFromPin, null)
+					set(toolState, "selectTool")
+					console.log(action.payload)
 					return
 				}
 			}
@@ -217,6 +259,8 @@ export const graph = {
 	getNodeInputIDs,
 	getNodeOutputIDs,
 	snapshot,
+	addingComponentWithID,
+	addingConnectorFromPin,
 	getPinOffset,
 	getPinPosition,
 	getConnectionPosition,

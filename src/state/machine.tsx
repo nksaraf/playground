@@ -27,6 +27,16 @@ export const globalDispatch = atom(null, (get, set, action: Actions) => {
 			set(insertToolDispatch, action)
 			return
 		}
+		case "POINTER_DOWN_ON_PIN": {
+			set(toolState, "insertTool")
+			set(insertToolDispatch, action)
+			return
+		}
+		// case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
+		// 	set(toolState, "insertTool")
+		// 	set(insertToolDispatch, action)
+		// 	return
+		// }
 		case "POINTER_MOVE":
 			return set(scene.actions.updatePointerOnPointerMove, action.payload)
 		case "ZOOMED":
@@ -82,6 +92,7 @@ export type Actions =
 	| Action<"DELETED_SELECTED">
 	| Action<"POINTER_DOWN_ON_COMPONENT_BUTTON", { componentID: string }>
 	| Action<"POINTER_DOWN_ON_PIN", { pinID: string }>
+	| Action<"POINTER_UP_ON_PIN", { pinID: string }>
 	// | Action<"POINTER_DOWN_ON_BOUNDS_EDGE">
 	// | Action<"POINTER_DOWN_ON_BOUNDS_CORNER">
 	| Action<"POINTER_DOWN_ON_CANVAS">

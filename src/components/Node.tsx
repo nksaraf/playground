@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMachine } from "../hooks/useMachine"
-import { useAtom, useUpdateAtom } from "../atom"
+import { atomFamily, useAtom, useUpdateAtom } from "../atom"
 import { graph } from "../state/graph"
 import { selector } from "../state"
 import useResizeObserver from "use-resize-observer"
@@ -10,6 +10,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [position, setNodePosition] = useAtom(graph.getNodePosition(nodeID))
 	const [inputs] = useAtom(graph.getNodeInputIDs(nodeID))
 	const [outputs] = useAtom(graph.getNodeOutputIDs(nodeID))
+	const [meta] = useAtom(graph.getNodeMetadata(nodeID))
 	const [nodeSize, setNodeSize] = useAtom(graph.getNodeSize(nodeID))
 	const machine = useMachine()
 
@@ -34,7 +35,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 				<div className={"text-xs text-gray-500 font-normal uppercase"}>
 					Setup
 				</div>
-				<div className={"text-lg text-gray-600 font-semibold"}>Copy Files</div>
+				<div className={"text-lg text-gray-600 font-semibold"}>{meta.type}</div>
 			</header>
 			<div className={"flex justify-between"}>
 				<NodeInputs items={inputs} />
@@ -55,10 +56,15 @@ function NodeInputs({ items }) {
 	)
 }
 
+const getIsAddingConnectorToPin = atomFamily((id: string) => (get) => {
+	return get(graph.addingConnectorFromPin) === id
+})
+
 function NodeInput({ inputID }) {
 	const [input] = useAtom(graph.getPinMetadata(inputID))
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(inputID))
 	const ref = usePortRef(inputID)
+	const [isAddingConnector] = useAtom(getIsAddingConnectorToPin(inputID))
 	const machine = useMachine()
 
 	return (
@@ -69,12 +75,20 @@ function NodeInput({ inputID }) {
 						onMouseDown={(e) => {
 							e.preventDefault()
 							e.stopPropagation()
+							console.log("heree")
 							machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
+						}}
+						onMouseUp={(e) => {
+							e.preventDefault()
+							e.stopPropagation()
+							machine.send("POINTER_UP_ON_PIN", { pinID: inputID })
 						}}
 						viewBox="0 0 24 24"
 						style={{ transform: "translateX(-4px)" }}
 						className={`h-3 w-3 ${
-							connIDs.length > 0 ? "text-blue-500" : "text-gray-300"
+							connIDs.length > 0 || isAddingConnector
+								? "text-blue-500"
+								: "text-gray-300"
 						}`}
 					>
 						<circle
@@ -128,6 +142,7 @@ function NodeOutput({ outputID }) {
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
 	const machine = useMachine()
 	const ref = usePortRef(outputID)
+	const [isAddingConnector] = useAtom(getIsAddingConnectorToPin(outputID))
 
 	return (
 		<div>
@@ -140,10 +155,17 @@ function NodeOutput({ outputID }) {
 							e.stopPropagation()
 							machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
 						}}
+						onMouseUp={(e) => {
+							e.preventDefault()
+							e.stopPropagation()
+							machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
+						}}
 						viewBox="0 0 24 24"
 						style={{ transform: "translateX(+4px)" }}
 						className={`h-3 w-3 ${
-							connIDs.length > 0 ? "text-blue-500" : "text-gray-300"
+							connIDs.length > 0 || isAddingConnector
+								? "text-blue-500"
+								: "text-gray-300"
 						}`}
 					>
 						<circle
