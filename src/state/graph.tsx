@@ -24,7 +24,10 @@ const getNodeMetadata = atomFamily(
 			type: "component",
 			componentID: "-1",
 			id: id,
-		} as { id: string } & { type: "component"; componentID: string })
+		} as { id: string } & {
+			type: "component"
+			componentID: string
+		})
 )
 
 const getPinMetadata = atomFamily((id: string) => ({
