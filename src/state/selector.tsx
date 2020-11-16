@@ -22,10 +22,16 @@ const selectionBrushEnd = atom(null as null | IPoint)
 const selectedNodeIDs = atom([])
 const selectedConnectionIDs = atom([])
 
-const selected = atom((get) => ({
-	nodesIDs: get(selectedNodeIDs),
-	connectionIDs: get(selectedConnectionIDs),
-}))
+const selected = atom(
+	(get) => ({
+		nodeIDs: get(selectedNodeIDs),
+		connectionIDs: get(selectedConnectionIDs),
+	}),
+	(get, set, update) => {
+		set(selectedNodeIDs, update.nodeIDs)
+		set(selectedConnectionIDs, update.connectionIDs)
+	}
+)
 
 const selectionBounds = atom((get) => {
 	const ids = get(selectedNodeIDs)
@@ -65,13 +71,14 @@ const clearSelection = atom(null, (get, set) => {
 const deleteSelected = atom(null, (get, set) => {
 	const selectedIDs = get(selectedNodeIDs)
 	const connectionIDs = flatten([
-		...selectedIDs.map((id) => graph.getNodeConnectionIDs(id)),
+		...selectedIDs.map((id) => get(graph.getNodeConnectionIDs(id))),
 		get(selectedConnectionIDs),
 	])
 
 	set(clearSelection, null)
 
 	set(graph.nodeIDs, (ids) => ids.filter((id) => !selectedIDs.includes(id)))
+
 	set(graph.connectionIDs, (ids) =>
 		ids.filter((id) => !connectionIDs.includes(id))
 	)
@@ -167,7 +174,6 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_DOWN_ON_BOX": {
-					console.log(get(selector.isNodeSelected(action.payload.id)))
 					if (!get(selector.isNodeSelected(action.payload.id))) {
 						set(selector.selectedNodeIDs, [action.payload.id])
 					}

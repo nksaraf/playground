@@ -4,9 +4,21 @@ import flatten from "lodash/flatten"
 import { Actions } from "./machine"
 import { scene, selector, toolState } from "."
 
-const nodeIDs = atom([])
+const nodeIDMap = atom<any>({})
 
-const connectionIDs = atom([])
+const nodeIDs = atom<string[]>(
+	(get) => Object.keys(get(nodeIDMap)),
+	(get, set, update) =>
+		set(nodeIDMap, Object.fromEntries(update.map((u) => [u, true])))
+)
+
+const connectionIDMap = atom<any>({})
+
+const connectionIDs = atom<string[]>(
+	(get) => Object.keys(get(connectionIDMap)),
+	(get, set, update) =>
+		set(connectionIDMap, Object.fromEntries(update.map((u) => [u, true])))
+)
 
 const getConnectionParams = atomFamily((id: string) => ({
 	from: "null",
@@ -52,7 +64,7 @@ const getNodeSize = atomFamily<ISize>((id: string) => ({
 
 const getNodePortIDMap = atomFamily<any>((id: string) => ({}))
 
-const getNodePortIDs = atomFamily<string[]>(
+const getNodePinIDs = atomFamily<string[]>(
 	(id: string) => (get) => Object.keys(get(getNodePortIDMap(id))),
 	(id: string) => (get, set, update) =>
 		set(getNodePortIDMap(id), Object.fromEntries(update.map((u) => [u, true])))
@@ -91,35 +103,69 @@ const getConnectionPosition = atomFamily((id: string) => (get) => {
 	}
 })
 
-const nodes = atom((get) =>
-	get(nodeIDs).map((id) => ({
-		...get(getNodeMetadata(id)),
-		...get(getNodeBox(id)),
-		ports: get(getNodePortIDs(id)).map((inp) => ({
-			...get(getPinMetadata(inp)),
-			connections: get(getPinConnectionIDs(inp)),
-			id: inp,
+const nodes = atom(
+	(get) =>
+		get(nodeIDs).map((id) => ({
+			metadata: get(getNodeMetadata(id)),
+			size: get(getNodeSize(id)),
+			position: get(getNodePosition(id)),
+			id,
+			ports: get(getNodePinIDs(id)).map((inp) => ({
+				metadata: get(getPinMetadata(inp)),
+				offset: get(getPinOffset(inp)),
+				id: inp,
+			})),
 		})),
-	}))
+	(get, set, update) => {
+		set(
+			nodeIDs,
+			update.map((node) => node.id)
+		)
+		update.forEach((node) => {
+			set(getNodeMetadata(node.id), node.metadata)
+			set(getNodeSize(node.id), node.size)
+			set(getNodePosition(node.id), node.position)
+			set(getNodePosition(node.id), node.position)
+			set(
+				getNodePinIDs(node.id),
+				node.ports.map((port) => port.id)
+			)
+			node.ports.forEach((port) => {
+				set(getPinMetadata(port.id), port.metadata)
+				set(getPinOffset(port.id), port.offset)
+			})
+		})
+	}
 )
 
 const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
 	return flatten(
-		get(getNodePortIDs(id)).map((outputID) =>
-			get(getPinConnectionIDs(outputID))
-		)
+		get(getNodePinIDs(id)).map((outputID) => get(getPinConnectionIDs(outputID)))
 	)
 })
 
-const connections = atom((get) =>
-	get(connectionIDs).map((id) => ({
-		...get(getConnectionParams(id)),
-		...get(getConnectionMetadata(id)),
-	}))
+const connections = atom(
+	(get) =>
+		get(connectionIDs).map((id) => ({
+			params: get(getConnectionParams(id)),
+			metadata: get(getConnectionMetadata(id)),
+			id,
+		})),
+	(get, set, update) => {
+		set(
+			connectionIDs,
+			update.map((conn) => conn.id)
+		)
+
+		update.forEach((conn) => {
+			set(getConnectionParams(conn.id), conn.params)
+			set(getConnectionMetadata(conn.id), conn.metadata)
+		})
+	}
 )
 
 const getNodeInputIDs = atomFamily((id: string) => (get) => {
-	const nodePorts = get(getNodePortIDs(id))
+	const nodePorts = get(getNodePinIDs(id))
 		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "input")
 
@@ -127,41 +173,76 @@ const getNodeInputIDs = atomFamily((id: string) => (get) => {
 })
 
 const getNodeOutputIDs = atomFamily((id: string) => (get) => {
-	const nodePorts = get(getNodePortIDs(id))
+	const nodePorts = get(getNodePinIDs(id))
 		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "output")
 
 	return nodePorts.map((np) => np.id)
 })
 
-const snapshot = atom((get) => ({
-	nodes: get(nodes),
-	connections: get(connections),
-}))
+const snapshot = atom(
+	(get) => ({
+		nodes: get(nodes),
+		connections: get(connections),
+	}),
+	(get, set, update) => {
+		set(nodes, update["nodes"])
+		set(connections, update["connections"])
+	}
+)
+
+// const savedSnapshot = atom({}, undefined, [
+// 	({ node, trigger, setSelf, onSet, resetSelf }) => {
+// 		setSelf(JSON.parse(localStorage.getItem("tavern_state")))
+// 		onSet((newVal) => {
+// 			localStorage.setItem("tavern_state", JSON.stringify(newVal, null, 2))
+// 		})
+// 	},
+// ])
 
 const insertToolState = atom(
 	"insertIdle" as "insertIdle" | "insertingComponent" | "insertingConnector"
 )
 
-import uniqueId from "lodash/uniqueId"
-import { v4 as uuid } from "uuid"
+import { uid } from "uid"
+import { library } from "./libary"
 
 // let surface: Surface | undefined = undefined
-const id = uuid()
 
 function getUUID() {
-	return uniqueId(id)
+	return uid()
 }
 
 const addNewComponent = atom(null, (get, set, { componentID, id }) => {
-	set(nodeIDs, (ids) => [...ids, id])
 	const pointer = get(scene.documentPointer)
+	const { metadata, type, pins } = get(
+		library.getComponentMetadata(componentID)
+	)
+
+	pins.forEach((pin, index) => {
+		const i = `${id}/${pin.role}/${index}/${pin.name}`
+		set(getPinMetadata(i), {
+			...pin,
+			index,
+			id: i,
+			parentNode: id,
+			type: pin.role,
+		})
+	})
+
 	set(getNodeMetadata(id), {
-		type: "component",
+		type,
 		componentID,
+		...metadata,
 		id,
 	})
+
+	set(
+		getNodePinIDs(id),
+		pins.map((pin, index) => `${id}/${pin.role}/${index}/${pin.name}`)
+	)
 	set(getNodePosition(id), { ...pointer })
+	set(nodeIDs, (ids) => [...ids, id])
 })
 
 const addingComponentWithID = atom(null as string | null)
@@ -292,7 +373,7 @@ export const graph = {
 	getNodeMetadata,
 	getNodePosition,
 	getNodeBox,
-	getNodePortIDs,
+	getNodePortIDs: getNodePinIDs,
 	getNodeConnectionIDs,
 	getPinMetadata,
 	getPinConnectionIDs,

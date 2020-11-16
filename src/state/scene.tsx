@@ -12,10 +12,16 @@ const cameraPosition = atom({
 
 const cameraZoom = atom(1)
 
-const camera = atom((get) => ({
-	...get(cameraPosition),
-	zoom: get(cameraZoom),
-}))
+const camera = atom(
+	(get) => ({
+		...get(cameraPosition),
+		zoom: get(cameraZoom),
+	}),
+	(get, set, { x, y, zoom }) => {
+		set(cameraPosition, { x, y })
+		set(cameraZoom, zoom)
+	}
+)
 
 const viewBoxPosition = atom({
 	x: 0,

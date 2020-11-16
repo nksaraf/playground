@@ -4,6 +4,7 @@ import {
 	RecoilState,
 	useRecoilState,
 	useSetRecoilState,
+	AtomEffect,
 } from "recoil"
 
 var key = 0
@@ -38,10 +39,15 @@ export function atom<Value>(read: Function, write?: any): RecoilState<Value>
 
 export function atom<Value>(
 	initialValue: Value,
-	write?: any
+	write?: any,
+	effects?: ReadonlyArray<AtomEffect<Value>>
 ): RecoilState<Value>
 
-export function atom<Value>(read: any, write: any): RecoilState<Value> {
+export function atom<Value>(
+	read: any,
+	write?: any,
+	effects?: ReadonlyArray<AtomEffect<Value>>
+): RecoilState<Value> {
 	if (write || typeof read === "function") {
 		var k = key++
 		return selector({
@@ -53,10 +59,13 @@ export function atom<Value>(read: any, write: any): RecoilState<Value> {
 		var k = key++
 		return recoilAtom({
 			key: k.toString(),
+			effects_UNSTABLE: effects ?? [],
 			default: read,
 		})
 	}
 }
+
+const savedSnapshot = atom({})
 
 export function atomFamily<Value>(
 	read: (id: string) => (get: Getter) => Value | Promise<Value>,

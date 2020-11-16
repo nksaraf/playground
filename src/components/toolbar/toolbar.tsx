@@ -5,9 +5,13 @@ import { graph } from "../../state/graph"
 import { useAtom } from "../../atom"
 import { useMachine } from "../../state"
 import * as Icons from "./icons/svgr"
+import { components } from "../../state/libary"
 
 export function Toolbar() {
 	const machine = useMachine()
+	const [lib] = useAtom(components)
+
+	console.log(lib)
 	// const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
 	// const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
 
@@ -26,18 +30,21 @@ export function Toolbar() {
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
 				/> */}
-				<IconButton
-					isActive={false}
-					onMouseDown={(e) => {
-						e.preventDefault()
-						e.stopPropagation()
-						machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
-							componentID: "1",
-						})
-					}}
-				>
-					<Icons.Box />
-				</IconButton>
+				{lib.map((l) => (
+					<IconButton
+						key={l.id}
+						isActive={false}
+						onMouseDown={(e) => {
+							e.preventDefault()
+							e.stopPropagation()
+							machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
+								componentID: l.id,
+							})
+						}}
+					>
+						<Icons.Box />
+					</IconButton>
+				))}
 				{/* <IconButton
 					src="Box"
 					isActive={local.isIn("boxTool")}
