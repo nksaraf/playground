@@ -149,11 +149,11 @@ import { v4 as uuid } from "uuid"
 // let surface: Surface | undefined = undefined
 const id = uuid()
 
-function getId() {
+function getUUID() {
 	return uniqueId(id)
 }
 
-const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
+const addNewComponent = atom(null, (get, set, { componentID, id }) => {
 	set(nodeIDs, (ids) => [...ids, id])
 	const pointer = get(scene.documentPointer)
 	set(getNodeMetadata(id), {
@@ -164,15 +164,38 @@ const insertNewComponent = atom(null, (get, set, { componentID, id }) => {
 	set(getNodePosition(id), { ...pointer })
 })
 
-const insertNewDataConnector = atom(null, (get, set, { fromPin, toPin }) => {
+const addingComponentWithID = atom(null as string | null)
+const addingConnectorFromPinID = atom(null as string | null)
+
+const addNewDataConnector = atom(null, (get, set, { fromPin, toPin }) => {
 	const connID = `${fromPin}->${toPin}`
 	set(connectionIDs, (ids) => [...ids, connID])
 	set(getConnectionParams(connID), { from: fromPin, to: toPin })
 	set(getConnectionMetadata(connID), { id: connID, type: "data" })
 })
 
-const addingComponentWithID = atom(null as string | null)
-const addingConnectorFromPinID = atom(null as string | null)
+const completeInsertingConnector = atom(
+	null,
+	(get, set, { pinID }: { pinID: string }) => {
+		const fromPin = get(addingConnectorFromPinID)
+
+		set(
+			addNewDataConnector,
+			get(getPinMetadata(fromPin)).type === "output"
+				? {
+						fromPin,
+						toPin: pinID,
+				  }
+				: {
+						toPin: fromPin,
+						fromPin: pinID,
+				  }
+		)
+		set(insertToolState, "insertIdle")
+		set(addingConnectorFromPinID, null)
+		set(toolState, "selectTool")
+	}
+)
 
 export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(insertToolState)) {
@@ -199,9 +222,9 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_DOWN": {
-					const id = getId()
+					const id = getUUID()
 					const componentID = get(addingComponentWithID)
-					set(insertNewComponent, {
+					set(addNewComponent, {
 						componentID,
 						id,
 					})
@@ -217,9 +240,9 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					const { x, y } = get(scene.screenPointer)
 					const dist = Math.hypot(x - screenPointer.x, y - screenPointer.y)
 					if (dist > 20) {
-						const id = getId()
+						const id = getUUID()
 						const componentID = get(addingComponentWithID)
-						set(insertNewComponent, {
+						set(addNewComponent, {
 							componentID,
 							id,
 						})
@@ -241,43 +264,23 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_UP_ON_PIN": {
-					set(completeInsertingConnector, action.payload)
+					const fromPin = get(addingConnectorFromPinID)
+					if (fromPin === action.payload.pinID) {
+					} else if (
+						get(getPinMetadata(fromPin)).parentNode ===
+							get(getPinMetadata(action.payload.pinID)).parentNode ||
+						get(getPinMetadata(fromPin)).type ===
+							get(getPinMetadata(action.payload.pinID)).type
+					) {
+					} else {
+						set(completeInsertingConnector, action.payload)
+					}
 					return
 				}
 			}
 		}
 	}
 })
-
-const completeInsertingConnector = atom(
-	null,
-	(get, set, { pinID }: { pinID: string }) => {
-		const fromPin = get(addingConnectorFromPinID)
-		if (fromPin === pinID) {
-		} else if (
-			get(getPinMetadata(fromPin)).parentNode ===
-				get(getPinMetadata(pinID)).parentNode ||
-			get(getPinMetadata(fromPin)).type === get(getPinMetadata(pinID)).type
-		) {
-		} else {
-			set(
-				insertNewDataConnector,
-				get(getPinMetadata(fromPin)).type === "output"
-					? {
-							fromPin,
-							toPin: pinID,
-					  }
-					: {
-							toPin: fromPin,
-							fromPin: pinID,
-					  }
-			)
-			set(insertToolState, "insertIdle")
-			set(addingConnectorFromPinID, null)
-			set(toolState, "selectTool")
-		}
-	}
-)
 
 export const graph = {
 	nodeIDs,
