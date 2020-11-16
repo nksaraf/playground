@@ -78,13 +78,16 @@ function NodeContainer({
 	)
 }
 
-function NodeHeader({ ...props }) {
+function NodeHeader({ className = "", ...props }) {
 	const node = useNode()
 	const [meta] = useAtom(graph.getNodeMetadata(node.id))
 	const [isSelected, setIsSelected] = useAtom(node.isSelected)
 
 	return (
-		<header className={"py-3 px-4 flex flex-col items-center"} {...props}>
+		<header
+			className={`py-3 px-4 flex flex-col items-center ${className}`}
+			{...props}
+		>
 			{meta.category && (
 				<div className={"text-xs text-gray-500 font-normal uppercase"}>
 					{meta.category}
@@ -151,7 +154,7 @@ const getPinIsAcceptingConnections = atomFamily((id: string) => (get) => {
 	}
 })
 
-const getPinAddingNewConnection = atomFamily((id: string) => (get) => {
+const getPinIsAddingNewConnection = atomFamily((id: string) => (get) => {
 	return get(graph.addingConnectorFromPinID) === id
 })
 
@@ -162,7 +165,7 @@ function NodeInput({ inputID }) {
 	const [isAcceptingConnection] = useAtom(getPinIsAcceptingConnections(inputID))
 	const machine = useMachine()
 	const [isHovered, setIsHovered] = React.useState(false)
-	const [isAddingNewConnection] = useAtom(getPinAddingNewConnection(inputID))
+	const [isAddingNewConnection] = useAtom(getPinIsAddingNewConnection(inputID))
 
 	const isActive =
 		hasConnections ||
@@ -190,19 +193,17 @@ function NodeInput({ inputID }) {
 					onMouseDown={(e) => {
 						e.preventDefault()
 						e.stopPropagation()
-						console.log("heree")
 						machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
 					}}
 				>
 					<svg
 						viewBox="0 0 24 24"
 						style={{
-							cursor: !isAcceptingConnection ? "not-allowed" : "pointer",
 							transform: `translateX(-6px) scale(${isHovered ? 1.1 : 1.0})`,
 						}}
 						className={`h-3 w-3 ${
-							isActive ? "text-blue-500" : "text-gray-500"
-						}`}
+							!isAcceptingConnection ? "cursor-not-allowed" : "cursor-pointer"
+						} ${isActive ? "text-blue-500" : "text-gray-500"}`}
 					>
 						<circle
 							cx={12}
@@ -230,7 +231,7 @@ function NodeOutput({ outputID }) {
 	const ref = usePinRef(outputID)
 
 	const [hasConnections] = useAtom(getPinHasConnections(outputID))
-	const [isAddingNewConnection] = useAtom(getPinAddingNewConnection(outputID))
+	const [isAddingNewConnection] = useAtom(getPinIsAddingNewConnection(outputID))
 	const [isAcceptingConnection] = useAtom(
 		getPinIsAcceptingConnections(outputID)
 	)
