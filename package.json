@@ -8,6 +8,7 @@
 		"start": "next start"
 	},
 	"dependencies": {
+		"@reach/slider": "^0.11.2",
 		"@stitches/react": "^0.0.2",
 		"@types/lodash": "^4.14.165",
 		"@types/rbush": "^3.0.0",
@@ -18,6 +19,7 @@
 		"framer-motion": "^2.7.9",
 		"lodash": "^4.17.20",
 		"next": "^10.0.1",
+		"ololog": "^1.1.164",
 		"perfect-arrows": "^0.3.3",
 		"postcss-flexbugs-fixes": "^5.0.1",
 		"postcss-preset-env": "^6.7.0",

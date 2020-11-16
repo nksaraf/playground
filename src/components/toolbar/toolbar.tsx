@@ -42,7 +42,7 @@ export function Toolbar() {
 							})
 						}}
 					>
-						<Icons.Box />
+						<span className="text-black text-sm underline">{l.id}</span>
 					</IconButton>
 				))}
 				{/* <IconButton

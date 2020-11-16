@@ -1,7 +1,13 @@
 import { atom, atomFamily } from "../atom"
 import { Node } from "../components/nodes/Node"
 
-const createCompute = ({ render, id, inputs, outputs, ...props }) => ({
+const createCompute = ({
+	render,
+	id,
+	inputs = {},
+	outputs = {},
+	...props
+}) => ({
 	render,
 	id,
 	metadata: props,
@@ -21,10 +27,47 @@ const createCompute = ({ render, id, inputs, outputs, ...props }) => ({
 })
 
 const core = {
+	number: createCompute({
+		render: Node,
+		id: "number",
+		title: "Number",
+		outputs: {
+			value: {
+				config: {
+					type: "number",
+				},
+			},
+		},
+		inputs: {},
+	}),
 	"math.sum": createCompute({
 		render: Node,
 		id: "math.sum",
 		title: "Sum",
+		inputs: {
+			a: {
+				config: {
+					type: "number",
+				},
+			},
+			b: {
+				config: {
+					type: "number",
+				},
+			},
+		},
+		outputs: {
+			sum: {
+				config: {
+					type: "number",
+				},
+			},
+		},
+	}),
+	"math.product": createCompute({
+		render: Node,
+		id: "math.product",
+		title: "Product",
 		inputs: {
 			a: {
 				config: {

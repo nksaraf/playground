@@ -48,7 +48,6 @@ export const ButtonWrapper = styled.div({
 
 export const Button = styled.button({
 	height: 40,
-	width: 32,
 	p: 0,
 	outline: "none",
 	cursor: "pointer",
