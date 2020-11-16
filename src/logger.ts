@@ -1,4 +1,6 @@
-import log from "ololog"
+// import log from "./ololog"
+
+import flatten from "lodash/flatten"
 
 class Grid {
 	rows = []
@@ -65,21 +67,24 @@ class Grid {
 
 	render() {
 		console.clear()
-		log(
+		let styles = []
+
+		console.log(
 			this.rows
 				.map((row) =>
 					row
 						.map((cell) =>
 							cell
 								? cell.node?.state.active
-									? // ? `\x1b[0;37m${cell.char}\x1b[0m`
-									  cell.char
-									: `\x1b[0;37;2m${cell.char}\x1b[0m`
+									? // ? // ? `\x1b[0;37m${cell.char}\x1b[0m`
+									  styles.push("color: darkblue;") && `%c${cell.char}`
+									: styles.push("color: lightgray;") && `%c${cell.char}`
 								: " "
 						)
 						.join("")
 				)
-				.join("\n")
+				.join("\n"),
+			...styles
 		)
 	}
 
@@ -180,12 +185,13 @@ class TNode {
 				child.height + (child.type === "leaf" ? 0 : 1)
 			)
 
-			// if (offsetX < 1) {
-			// 	offsetX += child.width + (child.type === "leaf" ? 1 : 2)
-			// } else {
-			offsetX = 0
-			offsetY += maxHeight
-			// }
+			if (offsetX < 1 && child.type === "branch") {
+				offsetX += child.width + 2
+				// (child.type === "leaf" ? 1 : 2)
+			} else {
+				offsetX = 0
+				offsetY += maxHeight
+			}
 		}
 	}
 }
@@ -193,5 +199,4 @@ class TNode {
 export function renderState(state) {
 	const tree = new TNode(state.stateTree)
 	grid.init(tree)
-	grid.render()
 }
