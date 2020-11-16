@@ -11,7 +11,6 @@ export function Toolbar() {
 	const machine = useMachine()
 	const [lib] = useAtom(components)
 
-	console.log(lib)
 	// const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
 	// const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
 

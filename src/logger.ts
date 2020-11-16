@@ -45,8 +45,8 @@ class Grid {
 		}
 	}
 
-	drawNode(node) {
-		const { x, y, width, height, type, state, name } = node
+	drawNode(node: TNode) {
+		const { left: x, top: y, width, height, type, state, name } = node
 		const style =
 			type === "root" ? "root" : state.active ? "active" : "inactive"
 		if (node.hasChildren) {
@@ -58,7 +58,7 @@ class Grid {
 			this.drawText(name, x, y, node)
 		}
 
-		for (let child of node.children) {
+		for (let child of node.childStates) {
 			this.drawNode(child)
 		}
 	}
@@ -72,7 +72,8 @@ class Grid {
 						.map((cell) =>
 							cell
 								? cell.node?.state.active
-									? `\x1b[0;37m${cell.char}\x1b[0m`
+									? // ? `\x1b[0;37m${cell.char}\x1b[0m`
+									  cell.char
 									: `\x1b[0;37;2m${cell.char}\x1b[0m`
 								: " "
 						)
@@ -82,7 +83,7 @@ class Grid {
 		)
 	}
 
-	init(node) {
+	init(node: TNode) {
 		node.moveTo(0, 0)
 		this.setSize(node.width, node.height)
 		this.drawNode(node)
@@ -92,27 +93,35 @@ class Grid {
 
 const grid = new Grid()
 
-class TNode {
-	x = 0
-	y = 0
-	children: any
-	name: any
-	state: any
-	parent: any
+export type StateTreeNode = {
+	name: string
+	active: boolean
+	states: { [key: string]: StateTreeNode }
+}
 
-	constructor(state, parent?: any) {
+class TNode {
+	left = 0
+	top = 0
+	childStates: TNode[]
+	name: string
+	state: StateTreeNode
+	parent: TNode
+
+	constructor(state: StateTreeNode, parent?: any) {
 		this.state = state
 		this.name = state.name
 		this.parent = parent
-		this.children = Object.values(state.states).map((s) => new TNode(s, this))
+		this.childStates = Object.values(state.states).map(
+			(s) => new TNode(s, this)
+		)
 	}
 
-	get maxX() {
-		return this.x + this.width
+	get right() {
+		return this.left + this.width
 	}
 
-	get maxY() {
-		return this.y + this.height
+	get bottom() {
+		return this.top + this.height
 	}
 
 	get width() {
@@ -120,16 +129,16 @@ class TNode {
 			return this.name.length
 		}
 
-		let cx = Math.max(
-			this.x + this.name.length + 5,
-			...this.children.map((c) => c.maxX)
+		let right = Math.max(
+			this.left + this.name.length + 5,
+			...this.childStates.map((c) => c.right)
 		)
 
-		if (this.children.find((c) => c.type === "branch")) cx++
+		if (this.childStates.find((c) => c.type === "branch")) right++
 
-		cx++
+		right++
 
-		return cx - this.x
+		return right - this.left
 	}
 
 	get height() {
@@ -137,50 +146,52 @@ class TNode {
 			return 1
 		}
 
-		let cy = Math.max(...this.children.map((c) => c.maxY))
-		if (cy > this.y + 2) cy++
+		let bottom = Math.max(...this.childStates.map((c) => c.bottom))
+		if (bottom > this.top + 2) bottom++
 
-		return cy - this.y
+		return bottom - this.top
 	}
 
 	get hasChildren() {
-		return this.children.length > 0
+		return this.childStates.length > 0
 	}
 
 	get type() {
 		if (!this.parent) return "root"
-		if (this.children.length === 0) return "leaf"
+		if (this.childStates.length === 0) return "leaf"
 		return "branch"
 	}
 
-	moveTo(x, y) {
-		this.x = x
-		this.y = y
+	moveTo(left, top) {
+		this.left = left
+		this.top = top
 
-		let cw = 0
-		let ch = 0
-		let sy = 1
+		let offsetX = 0
+		let maxHeight = 0
+		let offsetY = 1
 
-		for (let i = 0; i < this.children.length; i++) {
-			const child = this.children[i]
+		for (let i = 0; i < this.childStates.length; i++) {
+			const child = this.childStates[i]
 
-			child.moveTo(x + 2 + cw, y + sy)
+			child.moveTo(left + 2 + offsetX, top + offsetY)
 
-			ch = Math.max(ch, child.height + (child.type === "leaf" ? 0 : 1))
+			maxHeight = Math.max(
+				maxHeight,
+				child.height + (child.type === "leaf" ? 0 : 1)
+			)
 
-			if (cw < 32) {
-				cw += child.width + (child.type === "leaf" ? 1 : 2)
-			} else {
-				cw = 0
-				sy += ch
-			}
+			// if (offsetX < 1) {
+			// 	offsetX += child.width + (child.type === "leaf" ? 1 : 2)
+			// } else {
+			offsetX = 0
+			offsetY += maxHeight
+			// }
 		}
 	}
 }
 
-export default function renderState(state) {
+export function renderState(state) {
 	const tree = new TNode(state.stateTree)
 	grid.init(tree)
 	grid.render()
-	return state.onUpdate(() => grid.render())
 }

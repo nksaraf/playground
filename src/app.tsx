@@ -15,7 +15,7 @@ import {
 	useRecoilCallback,
 	useRecoilTransactionObserver_UNSTABLE,
 } from "recoil"
-import { graph, scene, selector } from "./state"
+import { graph, scene, selector, stateTree } from "./state"
 
 export default function App() {
 	return (
@@ -45,6 +45,7 @@ export default function App() {
 				<Toolbar />
 				<GraphDevtools />
 				<SelectedStateDevtools />
+				<StateDevtools />
 			</FullScreenContainer>
 		</RecoilRoot>
 	)
@@ -80,6 +81,19 @@ function SelectedStateDevtools() {
 	React.useEffect(() => {
 		saver()
 	})
+
+	return null
+}
+
+import { renderState } from "./logger"
+
+function StateDevtools() {
+	const [at] = useAtom(stateTree)
+
+	React.useEffect(() => {
+		console.log(at)
+		renderState({ stateTree: at })
+	}, [at])
 
 	return null
 }

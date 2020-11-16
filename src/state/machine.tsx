@@ -67,8 +67,105 @@ export const activeState = atom((get) => {
 	return `${get(toolState)}.${get(states[get(toolState)])}`
 })
 
+export const stateTree = atom<StateTreeNode>((get) => {
+	return {
+		name: "root",
+		active: true,
+		states: {
+			selectTool: {
+				name: "selectTool",
+				active: get(toolState) === "selectTool",
+				states: {
+					selectingIdle: {
+						name: "selectingIdle",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "selectingIdle",
+						states: {},
+					},
+					dragging: {
+						name: "dragging",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "dragging",
+						states: {},
+					},
+					inserting: {
+						name: "inserting",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "inserting",
+						states: {},
+					},
+					edgeResizing: {
+						name: "edgeResizing",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "edgeResizing",
+						states: {},
+					},
+					cornerResizing: {
+						name: "cornerResizing",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "cornerResizing",
+						states: {},
+					},
+					pointingCanvas: {
+						name: "pointingCanvas",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "pointingCanvas",
+						states: {},
+					},
+					brushSelecting: {
+						name: "brushSelecting",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "brushSelecting",
+						states: {},
+					},
+					waitingForDoublePress: {
+						name: "waitingForDoublePress",
+						active:
+							get(toolState) === "selectTool" &&
+							get(selector.selectToolState) === "waitingForDoublePress",
+						states: {},
+					},
+				},
+			},
+			insertTool: {
+				name: "insertTool",
+				active: get(toolState) === "insertTool",
+				states: {
+					insertIdle: {
+						name: "insertIdle",
+						active:
+							get(toolState) === "insertTool" &&
+							get(graph.insertToolState) === "insertIdle",
+						states: {},
+					},
+					insertingConnector: {
+						name: "insertingConnector",
+						active:
+							get(toolState) === "insertTool" &&
+							get(graph.insertToolState) === "insertingConnector",
+						states: {},
+					},
+					insertingComponent: {
+						name: "insertingComponent",
+						active:
+							get(toolState) === "insertTool" &&
+							get(graph.insertToolState) === "insertingComponent",
+						states: {},
+					},
+				},
+			},
+		},
+	}
+})
+
 export const dispatch = atom(null, (get, set, action: Actions) => {
-	// action.type !== "POINTER_MOVE" && console.log(action)
 	set(globalDispatch, action)
 	switch (get(toolState)) {
 		case "selectTool": {
@@ -126,6 +223,7 @@ export type Actions =
 
 import * as React from "react"
 import { useUpdateAtom } from "../atom"
+import { StateTreeNode } from "../logger"
 
 export function useMachine() {
 	const send = useUpdateAtom(dispatch)

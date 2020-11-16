@@ -9,7 +9,6 @@ export function SelectionBrush() {
 	const state = useMachine()
 	const [active] = useAtom(activeState)
 
-	console.log(active)
 	React.useEffect(() => {
 		if (active.includes("waitingForDoublePress")) {
 			const i = setTimeout(() => {

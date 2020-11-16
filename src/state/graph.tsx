@@ -191,15 +191,6 @@ const snapshot = atom(
 	}
 )
 
-// const savedSnapshot = atom({}, undefined, [
-// 	({ node, trigger, setSelf, onSet, resetSelf }) => {
-// 		setSelf(JSON.parse(localStorage.getItem("tavern_state")))
-// 		onSet((newVal) => {
-// 			localStorage.setItem("tavern_state", JSON.stringify(newVal, null, 2))
-// 		})
-// 	},
-// ])
-
 const insertToolState = atom(
 	"insertIdle" as "insertIdle" | "insertingComponent" | "insertingConnector"
 )
@@ -290,7 +281,6 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 				case "POINTER_DOWN_ON_PIN": {
 					set(addingConnectorFromPinID, action.payload.pinID)
 					set(insertToolState, "insertingConnector")
-					console.log(action.payload)
 				}
 			}
 		}

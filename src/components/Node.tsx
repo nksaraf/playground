@@ -29,7 +29,6 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const [metadata] = useAtom(graph.getNodeMetadata(nodeID))
 	const [component] = useAtom(getComponentMetadata(metadata.componentID))
 	const Component = component.render
-	console.log(metadata, component, Component)
 
 	const node = getNodeAtoms(nodeID)
 	return (
