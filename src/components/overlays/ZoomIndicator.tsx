@@ -11,7 +11,6 @@ export function ZoomIndicator() {
 				position: "absolute",
 				bottom: 8,
 				right: 8,
-				padding: "4px 12px",
 				textAlign: "right",
 			}}
 		>

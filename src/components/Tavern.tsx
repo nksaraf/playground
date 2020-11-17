@@ -5,11 +5,7 @@ import useWindowEvents from "../hooks/useWindowEvents"
 import useViewBox from "../hooks/useViewBox"
 
 import { Toolbar } from "./toolbar/toolbar"
-import { useAtom } from "../lib/atom"
 import { Canvas } from "./canvas/Canvas"
-import { stateTree } from "../state"
-import { renderState } from "../lib/logger"
-import { snapshot } from "../state/snapshot"
 import { TavernRoot } from "../state/storage"
 import { Overlays } from "./overlays/Overlays"
 

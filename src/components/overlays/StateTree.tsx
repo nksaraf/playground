@@ -5,10 +5,10 @@ function State({ state }) {
 	const hasChildren = Object.keys(state.states).length > 0
 	return (
 		<>
-			<div className={`${hasChildren ? "border p-2 rounded-md" : ""}`}>
+			<div className={`${hasChildren ? "border-2 p-2 rounded-md" : ""}`}>
 				<div
 					className={`${hasChildren ? "mb-2 font-bold" : ""} ${
-						state.active ? "text-black" : "text-gray-500"
+						state.active ? "text-gray-800" : "text-gray-500"
 					} ${!hasChildren && state.active ? "underline" : ""}`}
 				>
 					{state.name}
@@ -17,7 +17,7 @@ function State({ state }) {
 					Object.keys(state.states).map((st) => (
 						<div
 							className={`${
-								state.states[st].active ? "text-black" : "text-gray-500"
+								state.states[st].active ? "text-gray-800" : "text-gray-500"
 							}`}
 						>
 							<State state={state.states[st]} />
@@ -33,7 +33,7 @@ export function StateTree() {
 
 	return (
 		<div
-			className="absolute font-mono text-xs bg-white rounded-xl p-3"
+			className="absolute font-mono text-xs rounded-xl"
 			style={{
 				minWidth: 240,
 				bottom: 36,

@@ -13,13 +13,13 @@ export function SelectedNodes() {
 	return (
 		nodeAtoms.length > 0 && (
 			<div
-				className="absolute font-mono text-xs bg-white rounded-xl p-3"
+				className="absolute font-mono text-xs bg-gray-400 rounded-xl p-3"
 				style={{
 					minWidth: 240,
 					top: 48,
 					right: 8,
 					//@ts-ignore
-					"--bg-opacity": 0.45,
+					"--bg-opacity": 0.25,
 				}}
 			>
 				<JsonOutput

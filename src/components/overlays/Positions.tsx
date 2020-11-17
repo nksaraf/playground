@@ -14,15 +14,14 @@ export function Value({
 }) {
 	return (
 		<div
+			className="bg-gray-500 font-mono text-xs py-1 px-2"
 			style={{
-				fontFamily: "monospace",
 				textAlign: "right",
 				overflow: "hidden",
 				position: "relative",
-				backgroundColor: "rgba(0,0,0,.1)",
-				padding: "0px 4px",
 				borderRadius: 4,
-				fontSize: 12,
+				//@ts-ignore
+				"--bg-opacity": 0.25,
 				...style,
 			}}
 		>
