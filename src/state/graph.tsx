@@ -113,19 +113,19 @@ const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
 })
 
 const getNodeInputIDs = atomFamily((id: string) => (get) => {
-	const nodePorts = get(getNodePinIDs(id))
+	const nodePins = get(getNodePinIDs(id))
 		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "input")
 
-	return nodePorts.map((np) => np.id)
+	return nodePins.map((np) => np.id)
 })
 
 const getNodeOutputIDs = atomFamily((id: string) => (get) => {
-	const nodePorts = get(getNodePinIDs(id))
+	const nodePins = get(getNodePinIDs(id))
 		.map((pid) => get(getPinMetadata(pid)))
 		.filter((port) => port.type === "output")
 
-	return nodePorts.map((np) => np.id)
+	return nodePins.map((np) => np.id)
 })
 
 const insertToolState = atom(
@@ -309,5 +309,3 @@ export const graph = {
 	getConnectionPosition,
 	insertToolState,
 }
-
-

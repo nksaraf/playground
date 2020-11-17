@@ -8,7 +8,7 @@ const getNodeSnapshot = atomFamily(
 		size: get(graph.getNodeSize(id)),
 		position: get(graph.getNodePosition(id)),
 		id,
-		ports: get(graph.getNodePortIDs(id)).map((inp) => ({
+		pins: get(graph.getNodePortIDs(id)).map((inp) => ({
 			metadata: get(graph.getPinMetadata(inp)),
 			offset: get(graph.getPinOffset(inp)),
 			value: get(getPinValue(inp)),
@@ -21,9 +21,9 @@ const getNodeSnapshot = atomFamily(
 		set(graph.getNodePosition(node.id), node.position)
 		set(
 			graph.getNodePortIDs(node.id),
-			node.ports.map((port) => port.id)
+			node.pins.map((port) => port.id)
 		)
-		node.ports.forEach((port) => {
+		node.pins.forEach((port) => {
 			set(graph.getPinMetadata(port.id), port.metadata)
 			set(graph.getPinOffset(port.id), port.offset)
 		})
