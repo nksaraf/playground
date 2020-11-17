@@ -14,7 +14,7 @@ export function Value({
 }) {
 	return (
 		<div
-			className="bg-gray-500 font-mono text-xs py-1 px-2"
+			className="bg-gray-400 text-gray-700 font-mono text-xs py-1 px-2"
 			style={{
 				textAlign: "right",
 				overflow: "hidden",
@@ -81,15 +81,19 @@ function Scene() {
 			<Value label="x">{Math.trunc(camera.x)}</Value>
 			<Value label="y">{Math.trunc(camera.y)}</Value>
 			<Value label="zoom">{camera.zoom.toFixed(2)}</Value>
-			<div>Camera</div>
+			<div className="text-gray-600 text-sm">Camera</div>
 
 			<Value label="w">{Math.trunc(viewBox.size.width)}</Value>
 			<Value label="h">{Math.trunc(viewBox.size.height)}</Value>
-			<div style={{ gridColumn: "span 2" }}>View Box</div>
+			<div className="text-gray-600 text-sm" style={{ gridColumn: "span 2" }}>
+				View Box
+			</div>
 
 			<Value label="w">{Math.trunc(viewBox.size.width / camera.zoom)}</Value>
 			<Value label="h">{Math.trunc(viewBox.size.height / camera.zoom)}</Value>
-			<div style={{ gridColumn: "span 2" }}>Camera Frame</div>
+			<div className="text-gray-600 text-sm" style={{ gridColumn: "span 2" }}>
+				Camera Frame
+			</div>
 		</>
 	)
 }
@@ -101,7 +105,9 @@ function Position({ atom, label }) {
 		<>
 			<Value label="x">{document ? Math.trunc(document.x) : "-"}</Value>
 			<Value label="y">{document ? Math.trunc(document.y) : "-"}</Value>
-			<div style={{ gridColumn: "span 2" }}>{label}</div>
+			<div className="text-gray-600 text-sm" style={{ gridColumn: "span 2" }}>
+				{label}
+			</div>
 		</>
 	)
 }
