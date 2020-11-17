@@ -1,19 +1,19 @@
-import React, { Component, Fragment } from "react"
+import React from "react"
 
 function ObjectValue({ value }) {
 	function renderValue(value) {
 		let formattedValue = <span className="null">(null)</span>
 
 		if (typeof value === "string") {
-			formattedValue = <span className="text">"{value}"</span>
+			formattedValue = <span className="text-green-600">"{value}"</span>
 		} else if (typeof value === "number") {
-			formattedValue = <span className="number">{value}</span>
+			formattedValue = <span className="text-blue-600">{value}</span>
 		}
 
 		return formattedValue
 	}
 
-	return <Fragment>{renderValue(value)}</Fragment>
+	return <>{renderValue(value)}</>
 }
 
 export default ObjectValue

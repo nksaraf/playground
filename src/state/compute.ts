@@ -23,6 +23,8 @@ export const getPinValue = atomFamily(
 	}
 )
 
+export const getNodeState = atomFamily((id) => ({} as any))
+
 const getNodeInputValues = atomFamily((id: string) => (get) =>
 	Object.fromEntries(
 		get(graph.getNodeInputIDs(id)).map((id) => [
@@ -36,4 +38,5 @@ export const compute = {
 	getPinValue,
 	getPinRawValue,
 	getNodeInputValues,
+	getNodeState,
 }

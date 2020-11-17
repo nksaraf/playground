@@ -66,6 +66,7 @@ const moveDraggingBoxes = atom(null, (get, set) => {
 const clearSelection = atom(null, (get, set) => {
 	set(selectedConnectionIDs, [])
 	set(selectedNodeIDs, [])
+	set(focusedNode, null)
 })
 
 const deleteSelected = atom(null, (get, set) => {
@@ -118,8 +119,14 @@ const setSelectedIdsFromWorker = atom(null, (get, set) => {
 	})
 })
 
-const isNodeSelected = atomFamily((id: string) => (get) =>
+const getNodeIsSelected = atomFamily((id: string) => (get) =>
 	get(selectedNodeIDs).includes(id)
+)
+
+const focusedNode = atom(null as string | null)
+
+const getNodeIsFocused = atomFamily((id: string) => (get) =>
+	get(focusedNode) === id
 )
 
 const selectToolState = atom(
@@ -140,9 +147,11 @@ export const selector = {
 	selectionBrush,
 	selectedSnapshot,
 	selectToolState,
-	isNodeSelected,
+	getNodeIsSelected,
 	selectedNodeIDs,
 	selectedConnectionIDs,
+	focusedNode,
+	getNodeIsFocused,
 	selectionBounds,
 	actions: {
 		clearSelection,
@@ -165,7 +174,9 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 				}
 				case "BACKSPACE": {
 					set(undo.actions.saveUndoState)
-					set(selector.actions.deleteSelected)
+					if (get(selector.focusedNode) === null) {
+						set(selector.actions.deleteSelected)
+					}
 					set(undo.actions.saveUndoState)
 					return
 				}
@@ -174,7 +185,7 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 					return
 				}
 				case "POINTER_DOWN_ON_BOX": {
-					if (!get(selector.isNodeSelected(action.payload.id))) {
+					if (!get(selector.getNodeIsSelected(action.payload.id))) {
 						set(selector.selectedNodeIDs, [action.payload.id])
 					}
 					set(selectToolState, "dragging")

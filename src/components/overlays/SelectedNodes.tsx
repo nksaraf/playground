@@ -13,10 +13,11 @@ export function SelectedNodes() {
 	return (
 		nodeAtoms.length > 0 && (
 			<div
-				className="absolute font-mono text-xs bg-gray-400 rounded-xl p-3"
+				className="absolute overflow-scroll font-mono text-xs text-gray-500 bg-gray-300 rounded-xl p-3"
 				style={{
-					minWidth: 240,
+					width: 280,
 					top: 48,
+					height: 320,
 					right: 8,
 					//@ts-ignore
 					"--bg-opacity": 0.25,

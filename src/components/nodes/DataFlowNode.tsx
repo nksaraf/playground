@@ -1,5 +1,5 @@
 import * as React from "react"
-import { compute, useMachine } from "../../state"
+import { compute, selector, useMachine } from "../../state"
 import {
 	atom,
 	atomFamily,
@@ -18,13 +18,23 @@ export const NodeBody = styled("div", {
 	justifyContent: "space-between",
 })
 
-export function DataFlowNode({ children }) {
+export function ComputeNode({ children }) {
+	const focus = useUpdateAtom(selector.focusedNode)
+	const ndooe = useNode()
 	return (
 		<NodeContainer>
 			<NodeHeader />
 			<NodeBody>
 				<NodeInputs />
-				{children}
+				<div
+					className="mx-3"
+					onMouseDown={(e) => {
+						e.stopPropagation()
+						focus(ndooe.id)
+					}}
+				>
+					{children}
+				</div>
 				<NodeOutputs />
 			</NodeBody>
 		</NodeContainer>
@@ -41,8 +51,12 @@ export function NodeContainer({
 	const node = useNode()
 	const [position, setNodePosition] = useAtom(node.position)
 	const [nodeSize, setNodeSize] = useAtom(node.size)
+	const setResseter = useUpdateAtom(resetter)
 	const { ref } = useResizeObserver({
-		onResize: setNodeSize,
+		onResize: (s) => {
+			setNodeSize(s)
+			setResseter((r) => r + 1)
+		},
 	})
 
 	const [isSelected, setIsSelected] = useAtom(node.isSelected)
@@ -50,8 +64,8 @@ export function NodeContainer({
 
 	return (
 		<section
-			className={`absolute ${
-				isSelected ? "bg-gray-800" : "bg-white"
+			className={`absolute bg-white border-2 ${
+				isSelected ? "border-blue-500" : "border-gray-100"
 			} rounded-xl shadow-xl pb-3 ${className}`}
 			ref={ref}
 			onMouseDown={(e) => {
@@ -87,11 +101,7 @@ export function NodeHeader({ className = "", ...props }) {
 				</div>
 			)}
 			{meta.title && (
-				<div
-					className={`text-lg ${
-						isSelected ? "text-gray-400" : "text-gray-600"
-					} font-semibold`}
-				>
+				<div className={`text-lg text-gray-600 font-semibold`}>
 					{meta.title}
 				</div>
 			)}
@@ -105,9 +115,11 @@ export function NodeInputs() {
 
 	return (
 		<div className="flex flex-col gap-2">
-			{inputs.map((id) => (
-				<NodeInput inputID={id} key={id} />
-			))}
+			{inputs.length ? (
+				inputs.map((id) => <NodeInput inputID={id} key={id} />)
+			) : (
+				<div></div>
+			)}
 		</div>
 	)
 }
@@ -192,33 +204,37 @@ export function NodeInput({ inputID }) {
 						machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
 					}}
 				>
-					<svg
-						viewBox="0 0 24 24"
+					<Pin
+						isActive={isActive}
 						style={{
-							transform: `translateX(-6px) scale(${isHovered ? 1.1 : 1.0})`,
+							transform: `translateX(-6px) scale(${isHovered ? 1.2 : 1.0})`,
 						}}
 						className={`h-3 w-3 ${
 							!isAcceptingConnection ? "cursor-not-allowed" : "cursor-pointer"
 						} ${isActive ? "text-blue-500" : "text-gray-500"}`}
-					>
-						<circle
-							cx={12}
-							cy={12}
-							r={9}
-							strokeWidth={3}
-							fill="transparent"
-							className="stroke-current"
-						/>
-						{isActive && (
-							<circle cx={12} cy={12} r={6} className="fill-current" />
-						)}
-					</svg>
+					/>
 				</div>
-				<div className="text-gray-500 text-xs">
-					{input.name} {val}
+				<div className="text-gray-700 text-xs">
+					{input.name} <span className="text-gray-500 text-xs">{val}</span>
 				</div>
 			</div>
 		</div>
+	)
+}
+
+function Pin({ isActive, ...props }) {
+	return (
+		<svg viewBox="0 0 24 24" {...props}>
+			<circle
+				cx={12}
+				cy={12}
+				r={9}
+				strokeWidth={3}
+				fill="transparent"
+				className="stroke-current"
+			/>
+			{isActive && <circle cx={12} cy={12} r={6} className="fill-current" />}
+		</svg>
 	)
 }
 
@@ -296,9 +312,12 @@ export function NodeOutput({ outputID }) {
 	)
 }
 
+const resetter = atom(0)
+
 export function usePinRef(portID) {
 	const setOffset = useUpdateAtom(graph.getPinOffset(portID))
 	const ref = React.useRef<HTMLDivElement>()
+	useAtom(resetter)
 
 	React.useLayoutEffect(() => {
 		setOffset({

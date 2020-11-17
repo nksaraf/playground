@@ -2,7 +2,7 @@ import { multiply, sum } from "lodash"
 import React from "react"
 import { useRecoilCallback } from "recoil"
 import { NodeAtoms, useNode } from "../components/Node"
-import { DataFlowNode } from "../components/nodes/DataFlowNode"
+import { ComputeNode } from "../components/nodes/DataFlowNode"
 import { atomFamily, useAtom } from "../lib/atom"
 import { graph } from "../state"
 import { compute, getPinValue } from "../state/compute"
@@ -40,16 +40,22 @@ function useCompute(fn) {
 export function NumberValue() {
 	const node = useNode()
 	const update = useUpdate(node)
-	const [val, setVal] = React.useState(10)
+	const [{ value = 0 }, setVal] = useAtom(compute.getNodeState(node.id))
 
 	React.useEffect(() => {
-		update("value", val)
-	}, [update, val])
+		update("value", value)
+	}, [update, value])
 
 	return (
-		<DataFlowNode>
-			<div>{val}</div>
-		</DataFlowNode>
+		<ComputeNode>
+			<input
+				value={value}
+				className="pr-1"
+				style={{ width: 72 }}
+				type="number"
+				onChange={(e) => setVal({ value: Number(e.currentTarget.value) })}
+			/>
+		</ComputeNode>
 	)
 }
 
@@ -71,15 +77,15 @@ export function SumNumbers() {
 		return { sum: sum(Object.values(inputs).map((i) => (i === null ? 0 : i))) }
 	})
 	return (
-		<DataFlowNode>
-			<div className="w-12" />
-		</DataFlowNode>
+		<ComputeNode>
+			<div className="w-5" />
+		</ComputeNode>
 	)
 }
 
 SumNumbers.config = {
 	id: "math.sum",
-	title: "Sum",
+	title: "+ Sum",
 	inputs: {
 		a: {
 			config: {
@@ -108,9 +114,9 @@ export function ProductNumbers() {
 		}
 	})
 	return (
-		<DataFlowNode>
+		<ComputeNode>
 			<div className="w-12" />
-		</DataFlowNode>
+		</ComputeNode>
 	)
 }
 

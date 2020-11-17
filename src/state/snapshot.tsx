@@ -1,11 +1,12 @@
 import { atom, atomFamily } from "../lib/atom"
-import { getPinValue } from "./compute"
+import { compute, getPinValue } from "./compute"
 import { graph } from "./graph"
 
 const getNodeSnapshot = atomFamily(
 	(id: string) => (get) => ({
 		metadata: get(graph.getNodeMetadata(id)),
 		size: get(graph.getNodeSize(id)),
+		state: get(compute.getNodeState(id)),
 		position: get(graph.getNodePosition(id)),
 		id,
 		pins: get(graph.getNodePortIDs(id)).map((inp) => ({
@@ -23,6 +24,7 @@ const getNodeSnapshot = atomFamily(
 			graph.getNodePortIDs(node.id),
 			node.pins.map((port) => port.id)
 		)
+		set(compute.getNodeState(id), node.state)
 		node.pins.forEach((port) => {
 			set(graph.getPinMetadata(port.id), port.metadata)
 			set(graph.getPinOffset(port.id), port.offset)

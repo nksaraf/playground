@@ -268,6 +268,12 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 					set(toolState, "selectTool")
 					return
 				}
+				case "POINTER_DOWN_ON_CANVAS": {
+					set(insertToolState, "insertIdle")
+					set(addingConnectorFromPinID, null)
+					set(toolState, "selectTool")
+					return
+				}
 				case "POINTER_UP_ON_PIN": {
 					const fromPin = get(addingConnectorFromPinID)
 					if (fromPin === action.payload.pinID) {
