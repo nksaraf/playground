@@ -84,12 +84,12 @@ function Scene() {
 			<Value label="zoom">{camera.zoom.toFixed(2)}</Value>
 			<div>Camera</div>
 
-			<Value label="w">{Math.trunc(viewBox.width)}</Value>
-			<Value label="h">{Math.trunc(viewBox.height)}</Value>
+			<Value label="w">{Math.trunc(viewBox.size.width)}</Value>
+			<Value label="h">{Math.trunc(viewBox.size.height)}</Value>
 			<div style={{ gridColumn: "span 2" }}>View Box</div>
 
-			<Value label="w">{Math.trunc(viewBox.width / camera.zoom)}</Value>
-			<Value label="h">{Math.trunc(viewBox.height / camera.zoom)}</Value>
+			<Value label="w">{Math.trunc(viewBox.size.width / camera.zoom)}</Value>
+			<Value label="h">{Math.trunc(viewBox.size.height / camera.zoom)}</Value>
 			<div style={{ gridColumn: "span 2" }}>Camera Frame</div>
 		</>
 	)

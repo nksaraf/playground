@@ -87,12 +87,18 @@ const documentViewBox = atom((get) => {
 	}
 })
 
-const viewBox = atom((get) => ({
-	...get(viewBoxPosition),
-	...get(viewBoxScroll),
-	...get(viewBoxSize),
-	document: get(documentViewBox),
-}))
+const viewBox = atom(
+	(get) => ({
+		position: get(viewBoxPosition),
+		scroll: get(viewBoxScroll),
+		size: get(viewBoxSize),
+	}),
+	(get, set, update) => {
+		set(viewBoxPosition, update.position)
+		set(viewBoxScroll, update.scroll)
+		set(viewBoxSize, update.size)
+	}
+)
 
 type ValueOf<T> = T extends RecoilState<infer U> ? U : null
 
@@ -145,12 +151,12 @@ const updateViewBoxOnScroll = atom(null, (get, set, point: IPoint) => {
 
 const updateCameraOnViewBoxChange = atom(null, (get, set, frame: IFrame) => {
 	const viewBox = get(viewBoxSize)
-	if (viewBox.width > 0) {
-		set(cameraPosition, (pos) => ({
-			x: pos.x + (viewBox.width - frame.width) / 2,
-			y: pos.y + (viewBox.height - frame.height) / 2,
-		}))
-	}
+	// if (viewBox.width > 0) {
+	// 	// set(cameraPosition, (pos) => ({
+	// 	// 	x: pos.x + (viewBox.width - frame.width) / 2,
+	// 	// 	y: pos.y + (viewBox.height - frame.height) / 2,
+	// 	// }))
+	// }
 })
 
 const updateViewBox = atom(null, (get, set, frame: IFrame) => {
@@ -180,6 +186,18 @@ const savePointer = atom(null, (get, set) => {
 	})
 })
 
+const sceneSnapshot = atom(
+	(get) => ({
+		camera: get(camera),
+		viewBox: get(viewBox),
+	}),
+	(get, set, update) => {
+		console.log(update.camera)
+		set(camera, update.camera)
+		set(viewBox, update.viewBox)
+	}
+)
+
 export const scene = {
 	cameraZoom,
 	cameraPosition,
@@ -189,6 +207,7 @@ export const scene = {
 	viewBoxPosition,
 	viewBoxSize,
 	viewBoxScroll,
+	sceneSnapshot,
 	documentViewBoxPosition,
 	documentViewBoxSize,
 	documentViewBox,

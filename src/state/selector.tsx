@@ -22,7 +22,7 @@ const selectionBrushEnd = atom(null as null | IPoint)
 const selectedNodeIDs = atom([])
 const selectedConnectionIDs = atom([])
 
-const selected = atom(
+const selectedSnapshot = atom(
 	(get) => ({
 		nodeIDs: get(selectedNodeIDs),
 		connectionIDs: get(selectedConnectionIDs),
@@ -138,7 +138,7 @@ export const selector = {
 	selectionBrushStart,
 	selectionBrushEnd,
 	selectionBrush,
-	selected,
+	selectedSnapshot,
 	selectToolState,
 	isNodeSelected,
 	selectedNodeIDs,

@@ -7,31 +7,82 @@ import useViewBox from "../hooks/useViewBox"
 import { Toolbar } from "./toolbar/toolbar"
 import { ZoomIndicator } from "./overlays/ZoomIndicator"
 import { Positions } from "./overlays/Positions"
-import { atom, useAtom, useUpdateAtom } from "../lib/atom"
+import { useAtom } from "../lib/atom"
 import { Canvas } from "./canvas/Canvas"
-import { RecoilRoot, useRecoilCallback } from "recoil"
-import { graph, scene, selector, stateTree } from "../state"
-import JsonOutput from "./devtools/JsonOutput"
+import {
+	MutableSnapshot,
+	RecoilRoot,
+	RecoilState,
+	useRecoilCallback,
+} from "recoil"
+import { scene, selector, stateTree } from "../state"
+import { renderState } from "../lib/logger"
+import { snapshot } from "../state/snapshot"
+import { SelectedNodes } from "./overlays/SelectedNodes"
+import { useSaveToStorage } from "../hooks/useSaveToStorage"
+
+const saveAtoms = (
+	...items: { key: string; defaultValue: any; atom: RecoilState<any> }[]
+) => {
+	const components = items.map((it) => {
+		return function SaverComponent() {
+			useSaveToStorage(it.key, it.atom)
+			return null
+		}
+	})
+	return [
+		(mutat: MutableSnapshot) => {
+			items.forEach((it) => {
+				mutat.set(
+					it.atom,
+					JSON.parse(
+						localStorage.getItem(it.key) ?? JSON.stringify(it.defaultValue)
+					)
+				)
+			})
+		},
+		function Saver() {
+			return (
+				<>
+					{components.map((SaverComp) => (
+						<SaverComp />
+					))}
+				</>
+			)
+		},
+	] as const
+}
+
+const [initilizer, SaveState] = saveAtoms(
+	{
+		key: "tavern_graph_snapshot",
+		defaultValue: { nodes: [], connections: [] },
+		atom: snapshot.graphSnapshot,
+	},
+	{
+		key: "tavern_scene",
+		defaultValue: {
+			camera: { x: 0, y: 0, zoom: 1 },
+			viewBox: {
+				size: { width: 0, height: 0 },
+				position: { x: 0, y: 0 },
+				scroll: { scrollX: 0, scrollY: 0 },
+			},
+		},
+		atom: scene.sceneSnapshot,
+	},
+	{
+		key: "tavern_selection",
+		defaultValue: { nodeIDs: [], connectionIDs: [] },
+		atom: selector.selectedSnapshot,
+	}
+)
 
 export default function App() {
 	return (
 		<RecoilRoot
 			initializeState={(mutable) => {
-				mutable.set(
-					snapshot.graphSnapshot,
-					JSON.parse(
-						localStorage.getItem("tavern_graph_snapshot") ??
-							`{ "nodes": [], "connections": []}`
-					)
-				)
-
-				mutable.set(
-					selector.selected,
-					JSON.parse(
-						localStorage.getItem("tavern_selection") ??
-							`{ "nodeIDs": [], "connectionIDs": []}`
-					)
-				)
+				initilizer(mutable)
 			}}
 		>
 			<FullScreenContainer>
@@ -39,80 +90,13 @@ export default function App() {
 				<Positions />
 				<ZoomIndicator />
 				<Toolbar />
-				<Storage />
+				<SelectedNodes />
+				<SaveState />
 				<StateDevtools />
 			</FullScreenContainer>
 		</RecoilRoot>
 	)
 }
-
-function Storage() {
-	return (
-		<>
-			<GraphDevtools />
-			<SelectedStateDevtools />
-		</>
-	)
-}
-
-function GraphDevtools() {
-	const saver = useRecoilCallback((cb) => async () => {
-		localStorage.setItem(
-			"tavern_graph_snapshot",
-			JSON.stringify(cb.snapshot.getLoadable(snapshot.graphSnapshot).contents)
-		)
-	})
-
-	useAtom(snapshot.graphSnapshot)
-
-	React.useEffect(() => {
-		saver()
-	})
-
-	return null
-}
-
-const selectedNodeSnapshots = atom((get) =>
-	get(selector.selectedNodeIDs).map((id) => get(snapshot.getNodeSnapshot(id)))
-)
-
-function SelectedStateDevtools() {
-	const saver = useRecoilCallback((cb) => async () => {
-		localStorage.setItem(
-			"tavern_selection",
-			JSON.stringify(cb.snapshot.getLoadable(selector.selected).contents)
-		)
-	})
-
-	const [nodeAtoms] = useAtom(selectedNodeSnapshots)
-
-	React.useEffect(() => {
-		saver()
-	})
-
-	return (
-		nodeAtoms.length > 0 && (
-			<div
-				className="absolute font-mono text-xs bg-white rounded-xl p-3"
-				style={{
-					minWidth: 240,
-					top: 48,
-					right: 8,
-					//@ts-ignore
-					"--bg-opacity": 0.45,
-				}}
-			>
-				<JsonOutput
-					value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
-					property={nodeAtoms.length > 1 ? "nodes" : nodeAtoms[0]?.id}
-				/>
-			</div>
-		)
-	)
-}
-
-import { renderState } from "../lib/logger"
-import { snapshot } from "../state/snapshot"
 
 function StateDevtools() {
 	const [activeStateTree] = useAtom(stateTree)
