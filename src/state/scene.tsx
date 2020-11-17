@@ -1,6 +1,5 @@
-import { atom } from "../lib/atom"
+import { atom, ValueOf } from "../lib/atom"
 import { IPoint } from "../../types"
-import { RecoilState } from "recoil"
 
 import { IFrame } from "../../types"
 import clamp from "lodash/clamp"
@@ -100,8 +99,6 @@ const viewBox = atom(
 	}
 )
 
-type ValueOf<T> = T extends RecoilState<infer U> ? U : null
-
 const lastPointState = atom(
 	null as {
 		screenPointer: IPoint
@@ -192,7 +189,6 @@ const sceneSnapshot = atom(
 		viewBox: get(viewBox),
 	}),
 	(get, set, update) => {
-		console.log(update.camera)
 		set(camera, update.camera)
 		set(viewBox, update.viewBox)
 	}

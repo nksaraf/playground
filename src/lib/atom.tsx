@@ -15,6 +15,8 @@ type Setter = <Value>(
 	val?: Value | ((old: Value) => Value)
 ) => void
 
+export type Atom<Value> = RecoilState<Value>
+
 export function atom<Value>(
 	read: (get: Getter) => Value | Promise<Value>,
 	write: (get: Getter, set: Setter, update: any) => void | Promise<void>
@@ -65,8 +67,6 @@ export function atom<Value>(
 	}
 }
 
-const savedSnapshot = atom({})
-
 export function atomFamily<Value>(
 	read: (id: string) => (get: Getter) => Value | Promise<Value>,
 	write?: (
@@ -115,3 +115,5 @@ export function useAtom<Value>(atom: RecoilState<Value>) {
 export function useUpdateAtom<Value>(atom: RecoilState<Value>) {
 	return useSetRecoilState(atom)
 }
+
+export type ValueOf<T> = T extends RecoilState<infer U> ? U : null
