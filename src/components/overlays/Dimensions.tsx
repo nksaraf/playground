@@ -1,8 +1,36 @@
 import * as React from "react"
-import Value from "./value"
 import { useAtom } from "../../lib/atom"
 import { scene } from "../../state/scene"
 import { selector } from "../../state"
+
+export function Value({
+	label,
+	children,
+	style = {},
+}: {
+	label: string
+	children: React.ReactNode
+	style?: React.CSSProperties
+}) {
+	return (
+		<div
+			style={{
+				fontFamily: "monospace",
+				textAlign: "right",
+				overflow: "hidden",
+				position: "relative",
+				backgroundColor: "rgba(0,0,0,.1)",
+				padding: "0px 4px",
+				borderRadius: 4,
+				fontSize: 12,
+				...style,
+			}}
+		>
+			{children}
+			<small> {label}</small>
+		</div>
+	)
+}
 
 export function Positions() {
 	const [showPositions, setShowPositions] = React.useState(false)

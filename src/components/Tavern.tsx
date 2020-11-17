@@ -5,8 +5,8 @@ import useWindowEvents from "../hooks/useWindowEvents"
 import useViewBox from "../hooks/useViewBox"
 
 import { Toolbar } from "./toolbar/toolbar"
-import { ZoomIndicator } from "./overlays/zoom-indicator"
-import { Positions } from "./overlays/positions"
+import { ZoomIndicator } from "./overlays/ZoomIndicator"
+import { Positions } from "./overlays/Dimensions"
 import { atom, useAtom, useUpdateAtom } from "../lib/atom"
 import { Canvas } from "./canvas/Canvas"
 import { RecoilRoot, useRecoilCallback } from "recoil"
@@ -39,11 +39,19 @@ export default function App() {
 				<Positions />
 				<ZoomIndicator />
 				<Toolbar />
-				<GraphDevtools />
-				<SelectedStateDevtools />
-				{/* <StateDevtools /> */}
+				<Storage />
+				<StateDevtools />
 			</FullScreenContainer>
 		</RecoilRoot>
+	)
+}
+
+function Storage() {
+	return (
+		<>
+			<GraphDevtools />
+			<SelectedStateDevtools />
+		</>
 	)
 }
 
