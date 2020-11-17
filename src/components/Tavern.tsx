@@ -6,7 +6,7 @@ import useViewBox from "../hooks/useViewBox"
 
 import { Toolbar } from "./toolbar/toolbar"
 import { ZoomIndicator } from "./overlays/ZoomIndicator"
-import { Positions } from "./overlays/Dimensions"
+import { Positions } from "./overlays/Positions"
 import { atom, useAtom, useUpdateAtom } from "../lib/atom"
 import { Canvas } from "./canvas/Canvas"
 import { RecoilRoot, useRecoilCallback } from "recoil"
