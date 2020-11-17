@@ -68,34 +68,34 @@ export function atom<Value>(
 }
 
 export function atomFamily<Value>(
-	read: (id: string) => (get: Getter) => Value | Promise<Value>,
+	read: (id: any) => (get: Getter) => Value | Promise<Value>,
 	write?: (
-		id: string
+		id: any
+	) => (get: Getter, set: Setter, update: any) => void | Promise<void>
+): (param: any) => RecoilState<Value>
+
+export function atomFamily<Value>(
+	read: (id: any) => Function,
+	write?: (
+		id: any
 	) => (get: Getter, set: Setter, update: any) => void | Promise<void>
 ): (param: string) => RecoilState<Value>
 
 export function atomFamily<Value>(
-	read: (id: string) => Function,
+	read: (id: any) => Value,
 	write?: (
-		id: string
+		id: any
 	) => (get: Getter, set: Setter, update: any) => void | Promise<void>
-): (param: string) => RecoilState<Value>
+): (param: any) => RecoilState<Value>
 
 export function atomFamily<Value>(
-	read: (id: string) => Value,
+	read: (id: any) => Value,
 	write?: (
-		id: string
+		id: any
 	) => (get: Getter, set: Setter, update: any) => void | Promise<void>
-): (param: string) => RecoilState<Value>
-
-export function atomFamily<Value>(
-	read: (id: string) => Value,
-	write?: (
-		id: string
-	) => (get: Getter, set: Setter, update: any) => void | Promise<void>
-): (param: string) => RecoilState<Value> {
+): (param: any) => RecoilState<Value> {
 	const cache = {}
-	return (id: string) => {
+	return (id: any) => {
 		if (cache[id]) {
 			return cache[id]
 		} else {

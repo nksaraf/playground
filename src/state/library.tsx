@@ -1,5 +1,5 @@
 import { atom, atomFamily } from "../lib/atom"
-import { NumberValue, SumNumbers } from "../plugins/math"
+import { NumberValue, ProductNumbers, SumNumbers } from "../plugins/math"
 
 const core = {}
 
@@ -27,6 +27,7 @@ function registerComp(Component) {
 
 registerComp(NumberValue)
 registerComp(SumNumbers)
+registerComp(ProductNumbers)
 
 export const componentIDs = atom(Object.keys(core))
 

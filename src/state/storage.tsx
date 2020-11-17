@@ -28,8 +28,8 @@ export const withAtomsFromLocalStorage = (
 	function Saver() {
 		return (
 			<>
-				{components.map((SaverComp) => (
-					<SaverComp />
+				{components.map((SaverComp, i) => (
+					<SaverComp key={i} />
 				))}
 			</>
 		)

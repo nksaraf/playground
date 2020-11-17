@@ -1,9 +1,9 @@
-import { sum } from "lodash"
+import { multiply, sum } from "lodash"
 import React from "react"
 import { useRecoilCallback } from "recoil"
 import { NodeAtoms, useNode } from "../components/Node"
 import { DataFlowNode } from "../components/nodes/DataFlowNode"
-import { useAtom } from "../lib/atom"
+import { atomFamily, useAtom } from "../lib/atom"
 import { graph } from "../state"
 import { compute, getPinValue } from "../state/compute"
 
@@ -24,17 +24,31 @@ function useUpdate(node: NodeAtoms) {
 	)
 }
 
+function useCompute(fn) {
+	const node = useNode()
+	const update = useUpdate(node)
+	const [inputs] = useAtom(compute.getNodeInputValues(node.id))
+
+	React.useEffect(() => {
+		const result = fn(inputs)
+		Object.keys(result).forEach((key) => {
+			update(key, result[key])
+		})
+	}, [...Object.values(inputs), update])
+}
+
 export function NumberValue() {
 	const node = useNode()
 	const update = useUpdate(node)
+	const [val, setVal] = React.useState(10)
 
 	React.useEffect(() => {
-		update("value", 10)
-	}, [update])
+		update("value", val)
+	}, [update, val])
 
 	return (
 		<DataFlowNode>
-			<div></div>
+			<div>{val}</div>
 		</DataFlowNode>
 	)
 }
@@ -50,19 +64,6 @@ NumberValue.config = {
 		},
 	},
 	inputs: {},
-}
-
-function useCompute(fn) {
-	const node = useNode()
-	const update = useUpdate(node)
-	const [inputs] = useAtom(compute.getNodeInputValues(node.id))
-
-	React.useEffect(() => {
-		const result = fn(inputs)
-		Object.keys(result).forEach((key) => {
-			update(key, result[key])
-		})
-	}, [...Object.values(inputs), update])
 }
 
 export function SumNumbers() {
@@ -93,6 +94,43 @@ SumNumbers.config = {
 	},
 	outputs: {
 		sum: {
+			config: {
+				type: "number",
+			},
+		},
+	},
+}
+
+export function ProductNumbers() {
+	useCompute(({ a, b }) => {
+		return {
+			product: (a ?? 0) * (b ?? 0),
+		}
+	})
+	return (
+		<DataFlowNode>
+			<div className="w-12" />
+		</DataFlowNode>
+	)
+}
+
+ProductNumbers.config = {
+	id: "math.product",
+	title: "Product",
+	inputs: {
+		a: {
+			config: {
+				type: "number",
+			},
+		},
+		b: {
+			config: {
+				type: "number",
+			},
+		},
+	},
+	outputs: {
+		product: {
 			config: {
 				type: "number",
 			},

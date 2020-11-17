@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMachine } from "../../state"
+import { compute, useMachine } from "../../state"
 import {
 	atom,
 	atomFamily,
@@ -158,6 +158,7 @@ export function NodeInput({ inputID }) {
 	const ref = usePinRef(inputID)
 	const [hasConnections] = useAtom(getPinHasConnections(inputID))
 	const [isAcceptingConnection] = useAtom(getPinIsAcceptingConnections(inputID))
+	const [val] = useAtom(compute.getPinValue(inputID))
 	const machine = useMachine()
 	const [isHovered, setIsHovered] = React.useState(false)
 	const [isAddingNewConnection] = useAtom(getPinIsAddingNewConnection(inputID))
@@ -213,7 +214,9 @@ export function NodeInput({ inputID }) {
 						)}
 					</svg>
 				</div>
-				<div className="text-gray-500 text-xs">{input.name}</div>
+				<div className="text-gray-500 text-xs">
+					{input.name} {val}
+				</div>
 			</div>
 		</div>
 	)
@@ -224,6 +227,7 @@ export function NodeOutput({ outputID }) {
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
 	const machine = useMachine()
 	const ref = usePinRef(outputID)
+	const [value] = useAtom(compute.getPinValue(outputID))
 
 	const [hasConnections] = useAtom(getPinHasConnections(outputID))
 	const [isAddingNewConnection] = useAtom(getPinIsAddingNewConnection(outputID))
@@ -253,7 +257,9 @@ export function NodeOutput({ outputID }) {
 					machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
 				}}
 			>
-				<div className="text-gray-500 text-xs">{output.name}</div>
+				<div className="text-gray-500 text-xs">
+					{value} {output.name}
+				</div>
 				<div
 					ref={ref}
 					onMouseDown={(e) => {

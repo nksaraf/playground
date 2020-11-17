@@ -5,24 +5,30 @@ function State({ state }) {
 	const hasChildren = Object.keys(state.states).length > 0
 	return (
 		<>
-			<div className={`${hasChildren ? "border-2 p-2 rounded-md" : ""}`}>
+			<div>
 				<div
-					className={`${hasChildren ? "mb-2 font-bold" : ""} ${
-						state.active ? "text-gray-800" : "text-gray-500"
-					} ${!hasChildren && state.active ? "underline" : ""}`}
+					className={`${hasChildren ? "mb-1 ml-3 font-bold" : ""} ${
+						state.active ? "text-gray-800" : "text-gray-400"
+					} 
+					`}
+					// ${!hasChildren && state.active ? "underline" : ""}
 				>
 					{state.name}
 				</div>
-				{hasChildren &&
-					Object.keys(state.states).map((st) => (
-						<div
-							className={`${
-								state.states[st].active ? "text-gray-800" : "text-gray-500"
-							}`}
-						>
-							<State state={state.states[st]} />
-						</div>
-					))}
+				{hasChildren && (
+					<div className={`${hasChildren ? "border-2 p-2 rounded-md" : ""}`}>
+						{Object.keys(state.states).map((st) => (
+							<div
+								key={state.states[st].name}
+								className={`${
+									state.states[st].active ? "text-gray-800" : "text-gray-400"
+								} `}
+							>
+								<State state={state.states[st]} />
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</>
 	)
@@ -44,7 +50,10 @@ export function StateTree() {
 		>
 			<div className="flex mt-3 gap-3">
 				{Object.keys(activeStateTree.states).map((st) => (
-					<State state={activeStateTree.states[st]} />
+					<State
+						key={activeStateTree.states[st].name}
+						state={activeStateTree.states[st]}
+					/>
 				))}
 			</div>
 		</div>
