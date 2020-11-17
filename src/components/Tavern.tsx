@@ -41,7 +41,7 @@ export default function App() {
 				<Toolbar />
 				<GraphDevtools />
 				<SelectedStateDevtools />
-				<StateDevtools />
+				{/* <StateDevtools /> */}
 			</FullScreenContainer>
 		</RecoilRoot>
 	)

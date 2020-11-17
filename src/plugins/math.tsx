@@ -67,7 +67,7 @@ function useCompute(fn) {
 
 export function SumNumbers() {
 	useCompute(({ ...inputs }) => {
-		return { sum: sum(Object.values(inputs).map((i) => (i === null ? 0 : 1))) }
+		return { sum: sum(Object.values(inputs).map((i) => (i === null ? 0 : i))) }
 	})
 	return (
 		<DataFlowNode>
