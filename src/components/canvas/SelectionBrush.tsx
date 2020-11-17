@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useMachine } from "../../state"
-import { useAtom } from "../../atom"
+import { useAtom } from "../../lib/atom"
 import { activeState, selector } from "../../state"
 import { IBrush } from "../../../types"
 

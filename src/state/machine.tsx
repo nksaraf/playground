@@ -1,4 +1,4 @@
-import { atom, atomFamily } from "../atom"
+import { atom, atomFamily } from "../lib/atom"
 import { IFrame, IPoint } from "../../types"
 import { selector, selectToolDispatch } from "./selector"
 import { undo } from "./undo"
@@ -222,8 +222,8 @@ export type Actions =
 	| Action<"COPIED">
 
 import * as React from "react"
-import { useUpdateAtom } from "../atom"
-import { StateTreeNode } from "../logger"
+import { useUpdateAtom } from "../lib/atom"
+import { StateTreeNode } from "../lib/logger"
 
 export function useMachine() {
 	const send = useUpdateAtom(dispatch)

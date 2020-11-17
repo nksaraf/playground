@@ -1,36 +1,31 @@
 import * as React from "react"
 
-import useKeyboardEvents from "./hooks/useKeyboardEvents"
-import useWindowEvents from "./hooks/useWindowEvents"
-import useViewBox from "./hooks/useViewBox"
+import useKeyboardEvents from "../hooks/useKeyboardEvents"
+import useWindowEvents from "../hooks/useWindowEvents"
+import useViewBox from "../hooks/useViewBox"
 
-import { Toolbar } from "./components/toolbar/toolbar"
-import { ZoomIndicator } from "./components/overlays/zoom-indicator"
-import { Positions } from "./components/overlays/positions"
-import { exampleGraph, writeGraph } from "./lib/graph-io"
-import { atom, useAtom, useUpdateAtom } from "./atom"
-import { Canvas } from "./components/canvas/Canvas"
-import {
-	RecoilRoot,
-	useRecoilCallback,
-	useRecoilTransactionObserver_UNSTABLE,
-} from "recoil"
-import { graph, scene, selector, stateTree } from "./state"
-import JsonOutput from "./components/devtools/JsonOutput"
+import { Toolbar } from "./toolbar/toolbar"
+import { ZoomIndicator } from "./overlays/zoom-indicator"
+import { Positions } from "./overlays/positions"
+import { atom, useAtom, useUpdateAtom } from "../lib/atom"
+import { Canvas } from "./canvas/Canvas"
+import { RecoilRoot, useRecoilCallback } from "recoil"
+import { graph, scene, selector, stateTree } from "../state"
+import JsonOutput from "./devtools/JsonOutput"
 
 export default function App() {
 	return (
 		<RecoilRoot
-			initializeState={(snapshot) => {
-				snapshot.set(
-					graph.snapshot,
+			initializeState={(mutable) => {
+				mutable.set(
+					snapshot.graphSnapshot,
 					JSON.parse(
 						localStorage.getItem("tavern_graph_snapshot") ??
 							`{ "nodes": [], "connections": []}`
 					)
 				)
 
-				snapshot.set(
+				mutable.set(
 					selector.selected,
 					JSON.parse(
 						localStorage.getItem("tavern_selection") ??
@@ -56,11 +51,11 @@ function GraphDevtools() {
 	const saver = useRecoilCallback((cb) => async () => {
 		localStorage.setItem(
 			"tavern_graph_snapshot",
-			JSON.stringify(cb.snapshot.getLoadable(graph.snapshot).contents)
+			JSON.stringify(cb.snapshot.getLoadable(snapshot.graphSnapshot).contents)
 		)
 	})
 
-	useAtom(graph.snapshot)
+	useAtom(snapshot.graphSnapshot)
 
 	React.useEffect(() => {
 		saver()
@@ -70,7 +65,7 @@ function GraphDevtools() {
 }
 
 const selectedNodeSnapshots = atom((get) =>
-	get(selector.selectedNodeIDs).map((id) => get(graph.getNodeSnapshot(id)))
+	get(selector.selectedNodeIDs).map((id) => get(snapshot.getNodeSnapshot(id)))
 )
 
 function SelectedStateDevtools() {
@@ -90,7 +85,13 @@ function SelectedStateDevtools() {
 	return (
 		<div
 			className="absolute font-mono text-xs bg-white rounded-xl p-3"
-			style={{ minWidth: 240, top: 48, right: 8, "--bg-opacity": 0.45 }}
+			style={{
+				minWidth: 240,
+				top: 48,
+				right: 8,
+				//@ts-ignore
+				"--bg-opacity": 0.45,
+			}}
 		>
 			<JsonOutput
 				value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
@@ -100,15 +101,16 @@ function SelectedStateDevtools() {
 	)
 }
 
-import { renderState } from "./logger"
+import { renderState } from "../lib/logger"
+import { snapshot } from "../state/snapshot"
 
 function StateDevtools() {
 	const [at] = useAtom(stateTree)
-	const [snapshot] = useAtom(graph.snapshot)
+	const [graphSnapshot] = useAtom(snapshot.graphSnapshot)
 
 	React.useEffect(() => {
 		renderState({ stateTree: at })
-		console.log(snapshot)
+		console.log(graphSnapshot)
 	}, [at])
 
 	return null

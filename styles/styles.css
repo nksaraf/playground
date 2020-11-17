@@ -40,3 +40,36 @@
 .connector.selected {
 	stroke: #337ab7;
 } */
+
+ul,
+li {
+	list-style-type: none;
+	margin: 0 0 0 8px;
+	padding: 0;
+	border: none;
+}
+
+li > button {
+	background: transparent;
+	border: none;
+	outline: none;
+	font-weight: bold;
+	margin: 0;
+}
+
+.number {
+	color: #1a01cc;
+}
+
+.text {
+	color: #0b7552;
+}
+
+.null {
+	color: lightgray;
+}
+
+.toggle-button {
+	margin-left: -12px;
+	position: absolute;
+}

@@ -1,12 +1,15 @@
-import { atom, atomFamily } from "../atom"
+import { atom, atomFamily } from "../lib/atom"
 import { IFrame, IPoint, ISize } from "../../types"
 import flatten from "lodash/flatten"
 import { Actions } from "./machine"
 import { scene, selector, toolState } from "."
 
+import { uid } from "uid"
+import { library } from "./libary"
+
 const nodeIDMap = atom<any>({})
 
-const nodeIDs = atom<string[]>(
+export const nodeIDs = atom<string[]>(
 	(get) => Object.keys(get(nodeIDMap)),
 	(get, set, update) =>
 		set(nodeIDMap, Object.fromEntries(update.map((u) => [u, true])))
@@ -14,23 +17,23 @@ const nodeIDs = atom<string[]>(
 
 const connectionIDMap = atom<any>({})
 
-const connectionIDs = atom<string[]>(
+export const connectionIDs = atom<string[]>(
 	(get) => Object.keys(get(connectionIDMap)),
 	(get, set, update) =>
 		set(connectionIDMap, Object.fromEntries(update.map((u) => [u, true])))
 )
 
-const getConnectionParams = atomFamily((id: string) => ({
+export const getConnectionParams = atomFamily((id: string) => ({
 	from: "null",
 	to: "null",
 }))
 
-const getConnectionMetadata = atomFamily((id: string) => ({
+export const getConnectionMetadata = atomFamily((id: string) => ({
 	type: "",
 	id: id,
 }))
 
-const getNodeMetadata = atomFamily(
+export const getNodeMetadata = atomFamily(
 	(id: string) =>
 		({
 			type: "component",
@@ -44,7 +47,7 @@ const getNodeMetadata = atomFamily(
 		})
 )
 
-const getPinMetadata = atomFamily((id: string) => ({
+export const getPinMetadata = atomFamily((id: string) => ({
 	type: "",
 	id: id,
 	name: "input",
@@ -52,19 +55,19 @@ const getPinMetadata = atomFamily((id: string) => ({
 	index: -1,
 }))
 
-const getNodePosition = atomFamily<IPoint>((id: string) => ({
+export const getNodePosition = atomFamily<IPoint>((id: string) => ({
 	x: 0,
 	y: 0,
 }))
 
-const getNodeSize = atomFamily<ISize>((id: string) => ({
+export const getNodeSize = atomFamily<ISize>((id: string) => ({
 	width: 0,
 	height: 0,
 }))
 
 const getNodePortIDMap = atomFamily<any>((id: string) => ({}))
 
-const getNodePinIDs = atomFamily<string[]>(
+export const getNodePinIDs = atomFamily<string[]>(
 	(id: string) => (get) => Object.keys(get(getNodePortIDMap(id))),
 	(id: string) => (get, set, update) =>
 		set(getNodePortIDMap(id), Object.fromEntries(update.map((u) => [u, true])))
@@ -84,7 +87,7 @@ const getNodeBox = atomFamily<IFrame>((id: string) => (get) => ({
 	id,
 }))
 
-const getPinOffset = atomFamily((id: string) => ({ x: 0, y: 0 }))
+export const getPinOffset = atomFamily((id: string) => ({ x: 0, y: 0 }))
 
 const getPinPosition = atomFamily((id: string) => (get) => {
 	const port = get(getPinMetadata(id))
@@ -103,66 +106,11 @@ const getConnectionPosition = atomFamily((id: string) => (get) => {
 	}
 })
 
-const nodes = atom(
-	(get) =>
-		get(nodeIDs).map((id) => ({
-			metadata: get(getNodeMetadata(id)),
-			size: get(getNodeSize(id)),
-			position: get(getNodePosition(id)),
-			id,
-			ports: get(getNodePinIDs(id)).map((inp) => ({
-				metadata: get(getPinMetadata(inp)),
-				offset: get(getPinOffset(inp)),
-				id: inp,
-			})),
-		})),
-	(get, set, update) => {
-		set(
-			nodeIDs,
-			update.map((node) => node.id)
-		)
-		update.forEach((node) => {
-			set(getNodeMetadata(node.id), node.metadata)
-			set(getNodeSize(node.id), node.size)
-			set(getNodePosition(node.id), node.position)
-			set(getNodePosition(node.id), node.position)
-			set(
-				getNodePinIDs(node.id),
-				node.ports.map((port) => port.id)
-			)
-			node.ports.forEach((port) => {
-				set(getPinMetadata(port.id), port.metadata)
-				set(getPinOffset(port.id), port.offset)
-			})
-		})
-	}
-)
-
 const getNodeConnectionIDs = atomFamily((id: string) => (get) => {
 	return flatten(
 		get(getNodePinIDs(id)).map((outputID) => get(getPinConnectionIDs(outputID)))
 	)
 })
-
-const connections = atom(
-	(get) =>
-		get(connectionIDs).map((id) => ({
-			params: get(getConnectionParams(id)),
-			metadata: get(getConnectionMetadata(id)),
-			id,
-		})),
-	(get, set, update) => {
-		set(
-			connectionIDs,
-			update.map((conn) => conn.id)
-		)
-
-		update.forEach((conn) => {
-			set(getConnectionParams(conn.id), conn.params)
-			set(getConnectionMetadata(conn.id), conn.metadata)
-		})
-	}
-)
 
 const getNodeInputIDs = atomFamily((id: string) => (get) => {
 	const nodePorts = get(getNodePinIDs(id))
@@ -180,23 +128,9 @@ const getNodeOutputIDs = atomFamily((id: string) => (get) => {
 	return nodePorts.map((np) => np.id)
 })
 
-const snapshot = atom(
-	(get) => ({
-		nodes: get(nodes),
-		connections: get(connections),
-	}),
-	(get, set, update) => {
-		set(nodes, update["nodes"])
-		set(connections, update["connections"])
-	}
-)
-
 const insertToolState = atom(
 	"insertIdle" as "insertIdle" | "insertingComponent" | "insertingConnector"
 )
-
-import { uid } from "uid"
-import { library } from "./libary"
 
 // let surface: Surface | undefined = undefined
 
@@ -355,8 +289,6 @@ export const insertToolDispatch = atom(null, (get, set, action: Actions) => {
 
 export const graph = {
 	nodeIDs,
-	nodes,
-	connections,
 	connectionIDs,
 	getConnectionParams,
 	getConnectionMetadata,
@@ -370,7 +302,6 @@ export const graph = {
 	getNodeSize,
 	getNodeInputIDs,
 	getNodeOutputIDs,
-	snapshot,
 	addingComponentWithID,
 	addingConnectorFromPinID,
 	getPinOffset,
@@ -378,3 +309,5 @@ export const graph = {
 	getConnectionPosition,
 	insertToolState,
 }
+
+

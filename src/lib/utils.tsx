@@ -1,6 +1,6 @@
 import { getBoxToBoxArrow, ArrowOptions } from "perfect-arrows"
 import uniqueId from "lodash/uniqueId"
-import { IPoint, IBounds, IFrame, IBox, IArrow } from "../types"
+import { IPoint, IBounds, IFrame, IBox, IArrow } from "../../types"
 
 export let scale = 1
 export const pressedKeys = {} as Record<string, boolean>

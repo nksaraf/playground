@@ -1,5 +1,6 @@
-import { atom, atomFamily } from "../atom"
+import { atom, atomFamily } from "../lib/atom"
 import { Node } from "../components/nodes/Node"
+import React from "react"
 
 const createCompute = ({
 	render,
@@ -28,7 +29,9 @@ const createCompute = ({
 
 const core = {
 	number: createCompute({
-		render: Node,
+		render: React.memo(function NumberValue() {
+			return <DataFlowNode></DataFlowNode>
+		}),
 		id: "number",
 		title: "Number",
 		outputs: {

@@ -1,6 +1,6 @@
 import * as React from "react"
 import Value from "./value"
-import { useAtom } from "../../atom"
+import { useAtom } from "../../lib/atom"
 import { scene } from "../../state/scene"
 import { selector } from "../../state"
 

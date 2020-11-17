@@ -1,4 +1,4 @@
-import { atom } from "../atom"
+import { atom } from "../lib/atom"
 import { IPoint } from "../../types"
 import { RecoilState } from "recoil"
 

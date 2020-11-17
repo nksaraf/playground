@@ -1,14 +1,14 @@
 import { IPoint } from "../../types"
-import { atom } from "../atom"
+import { atom } from "../lib/atom"
 import { graph } from "./graph"
 import { scene } from "./scene"
 import { undo } from "./undo"
 import * as Comlink from "comlink"
 
-import { atomFamily } from "../atom"
+import { atomFamily } from "../lib/atom"
 import flatten from "lodash/flatten"
 import { Actions } from "./index"
-import { getBoundingBox } from "../utils"
+import { getBoundingBox } from "../lib/utils"
 
 type GetFromWorker = (type: string, payload: any) => Promise<any>
 

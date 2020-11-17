@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useAtom } from "../../atom"
+import { useAtom } from "../../lib/atom"
 import { scene } from "../../state/scene"
 
 export function Camera({ children }) {

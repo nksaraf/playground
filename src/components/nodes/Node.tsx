@@ -6,13 +6,13 @@ import {
 	useAtom,
 	useAtom as _useAtom,
 	useUpdateAtom,
-} from "../../atom"
+} from "../../lib/atom"
 import { graph } from "../../state/graph"
 import useResizeObserver from "use-resize-observer"
-import { styled } from "../../theme"
+import { styled } from "../../lib/theme"
 import { useNode } from "../Node"
 
-const NodeBody = styled("div", {
+export const NodeBody = styled("div", {
 	display: "flex",
 	justifyContent: "center",
 })
@@ -25,7 +25,7 @@ export const Node = React.memo(() => {
 	)
 })
 
-function DataFlowNode({ children }) {
+export function DataFlowNode({ children }) {
 	return (
 		<NodeContainer>
 			<NodeHeader />
@@ -38,7 +38,7 @@ function DataFlowNode({ children }) {
 	)
 }
 
-function NodeContainer({
+export function NodeContainer({
 	children,
 	onMouseDown = () => {},
 	className = "",
@@ -78,7 +78,7 @@ function NodeContainer({
 	)
 }
 
-function NodeHeader({ className = "", ...props }) {
+export function NodeHeader({ className = "", ...props }) {
 	const node = useNode()
 	const [meta] = useAtom(graph.getNodeMetadata(node.id))
 	const [isSelected, setIsSelected] = useAtom(node.isSelected)
@@ -106,7 +106,7 @@ function NodeHeader({ className = "", ...props }) {
 	)
 }
 
-function NodeInputs() {
+export function NodeInputs() {
 	const node = useNode()
 	const [inputs] = useAtom(node.inputIDs)
 
@@ -119,7 +119,7 @@ function NodeInputs() {
 	)
 }
 
-function NodeOutputs() {
+export function NodeOutputs() {
 	const node = useNode()
 	const [outputs] = useAtom(node.outputIDs)
 	return (
@@ -131,34 +131,36 @@ function NodeOutputs() {
 	)
 }
 
-const getPinHasConnections = atomFamily((id: string) => (get) => {
+export const getPinHasConnections = atomFamily((id: string) => (get) => {
 	return get(graph.getPinConnectionIDs(id)).length > 0
 })
 
-const getPinIsAcceptingConnections = atomFamily((id: string) => (get) => {
-	const fromPin = get(graph.addingConnectorFromPinID)
-	if (fromPin === null) {
-		return true
-	} else {
-		if (fromPin === id) {
-			return false
-		} else if (
-			get(graph.getPinMetadata(fromPin)).parentNode ===
-				get(graph.getPinMetadata(id)).parentNode ||
-			get(graph.getPinMetadata(fromPin)).type ===
-				get(graph.getPinMetadata(id)).type
-		) {
-			return false
+export const getPinIsAcceptingConnections = atomFamily(
+	(id: string) => (get) => {
+		const fromPin = get(graph.addingConnectorFromPinID)
+		if (fromPin === null) {
+			return true
+		} else {
+			if (fromPin === id) {
+				return false
+			} else if (
+				get(graph.getPinMetadata(fromPin)).parentNode ===
+					get(graph.getPinMetadata(id)).parentNode ||
+				get(graph.getPinMetadata(fromPin)).type ===
+					get(graph.getPinMetadata(id)).type
+			) {
+				return false
+			}
+			return true
 		}
-		return true
 	}
-})
+)
 
-const getPinIsAddingNewConnection = atomFamily((id: string) => (get) => {
+export const getPinIsAddingNewConnection = atomFamily((id: string) => (get) => {
 	return get(graph.addingConnectorFromPinID) === id
 })
 
-function NodeInput({ inputID }) {
+export function NodeInput({ inputID }) {
 	const [input] = useAtom(graph.getPinMetadata(inputID))
 	const ref = usePinRef(inputID)
 	const [hasConnections] = useAtom(getPinHasConnections(inputID))
@@ -224,7 +226,7 @@ function NodeInput({ inputID }) {
 	)
 }
 
-function NodeOutput({ outputID }) {
+export function NodeOutput({ outputID }) {
 	const [output] = useAtom(graph.getPinMetadata(outputID))
 	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
 	const machine = useMachine()
@@ -295,7 +297,7 @@ function NodeOutput({ outputID }) {
 	)
 }
 
-function usePinRef(portID) {
+export function usePinRef(portID) {
 	const setOffset = useUpdateAtom(graph.getPinOffset(portID))
 	const ref = React.useRef<HTMLDivElement>()
 
