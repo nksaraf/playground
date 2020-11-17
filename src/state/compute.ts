@@ -23,7 +23,17 @@ export const getPinValue = atomFamily(
 	}
 )
 
+const getNodeInputValues = atomFamily((id: string) => (get) =>
+	Object.fromEntries(
+		get(graph.getNodeInputIDs(id)).map((id) => [
+			get(graph.getPinMetadata(id)).name,
+			getPinValue(id),
+		])
+	)
+)
+
 export const compute = {
 	getPinValue,
 	getPinRawValue,
+	getNodeInputValues,
 }

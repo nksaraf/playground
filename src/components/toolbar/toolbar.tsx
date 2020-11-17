@@ -5,7 +5,7 @@ import { graph } from "../../state/graph"
 import { useAtom } from "../../lib/atom"
 import { useMachine } from "../../state"
 import * as Icons from "./icons/svgr"
-import { components } from "../../state/libary"
+import { components } from "../../state/library"
 
 export function Toolbar() {
 	const machine = useMachine()

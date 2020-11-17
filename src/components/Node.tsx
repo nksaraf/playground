@@ -2,7 +2,7 @@ import { createContext } from "create-hook-context"
 import React from "react"
 import { useAtom } from "../lib/atom"
 import { graph, selector } from "../state"
-import { getComponentMetadata } from "../state/libary"
+import { getComponentMetadata } from "../state/library"
 
 const [NodeProvider, useNode] = createContext(
 	({ node }: { node: NodeAtoms }) => {
@@ -44,7 +44,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 	const node = getNodeAtoms(nodeID)
 	return (
 		<NodeProvider node={node}>
-			<Component />
+			<Component node={node} />
 		</NodeProvider>
 	)
 })

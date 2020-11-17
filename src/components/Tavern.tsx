@@ -83,21 +83,23 @@ function SelectedStateDevtools() {
 	})
 
 	return (
-		<div
-			className="absolute font-mono text-xs bg-white rounded-xl p-3"
-			style={{
-				minWidth: 240,
-				top: 48,
-				right: 8,
-				//@ts-ignore
-				"--bg-opacity": 0.45,
-			}}
-		>
-			<JsonOutput
-				value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
-				property={nodeAtoms.length > 1 ? "nodes" : nodeAtoms[0].id}
-			/>
-		</div>
+		nodeAtoms.length > 0 && (
+			<div
+				className="absolute font-mono text-xs bg-white rounded-xl p-3"
+				style={{
+					minWidth: 240,
+					top: 48,
+					right: 8,
+					//@ts-ignore
+					"--bg-opacity": 0.45,
+				}}
+			>
+				<JsonOutput
+					value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
+					property={nodeAtoms.length > 1 ? "nodes" : nodeAtoms[0]?.id}
+				/>
+			</div>
+		)
 	)
 }
 
@@ -105,13 +107,13 @@ import { renderState } from "../lib/logger"
 import { snapshot } from "../state/snapshot"
 
 function StateDevtools() {
-	const [at] = useAtom(stateTree)
+	const [activeStateTree] = useAtom(stateTree)
 	const [graphSnapshot] = useAtom(snapshot.graphSnapshot)
 
 	React.useEffect(() => {
-		renderState({ stateTree: at })
+		renderState({ stateTree: activeStateTree })
 		console.log(graphSnapshot)
-	}, [at])
+	}, [activeStateTree])
 
 	return null
 }

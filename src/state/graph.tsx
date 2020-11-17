@@ -5,7 +5,7 @@ import { Actions } from "./machine"
 import { scene, selector, toolState } from "."
 
 import { uid } from "uid"
-import { library } from "./libary"
+import { library } from "./library"
 
 const nodeIDMap = atom<any>({})
 

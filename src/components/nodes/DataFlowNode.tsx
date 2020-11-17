@@ -14,15 +14,8 @@ import { useNode } from "../Node"
 
 export const NodeBody = styled("div", {
 	display: "flex",
-	justifyContent: "center",
-})
-
-export const Node = React.memo(() => {
-	return (
-		<DataFlowNode>
-			<div className={"w-24"} />
-		</DataFlowNode>
-	)
+	alignItems: "center",
+	justifyContent: "space-between",
 })
 
 export function DataFlowNode({ children }) {
