@@ -1,7 +1,8 @@
-import * as React from "react";
-import { ZoomIndicator } from "./ZoomIndicator";
-import { Positions } from "./Positions";
-import { SelectedNodes } from "./SelectedNodes";
+import * as React from "react"
+import { ZoomIndicator } from "./ZoomIndicator"
+import { Positions } from "./Positions"
+import { SelectedNodes } from "./SelectedNodes"
+import { StateTree } from "./StateTree"
 
 export function Overlays() {
 	return (
@@ -9,6 +10,7 @@ export function Overlays() {
 			<Positions />
 			<ZoomIndicator />
 			<SelectedNodes />
+			<StateTree />
 		</>
-	);
+	)
 }

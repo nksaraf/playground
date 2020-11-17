@@ -20,22 +20,9 @@ export default function App() {
 				<Canvas />
 				<Toolbar />
 				<Overlays />
-				<StateDevtools />
 			</FullScreenContainer>
 		</TavernRoot>
 	)
-}
-
-function StateDevtools() {
-	const [activeStateTree] = useAtom(stateTree)
-	const [graphSnapshot] = useAtom(snapshot.graphSnapshot)
-
-	React.useEffect(() => {
-		renderState({ stateTree: activeStateTree })
-		console.log(graphSnapshot)
-	}, [activeStateTree])
-
-	return null
 }
 
 function FullScreenContainer({
