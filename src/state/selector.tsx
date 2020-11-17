@@ -75,7 +75,7 @@ const deleteSelected = atom(null, (get, set) => {
 		get(selectedConnectionIDs),
 	])
 
-	set(clearSelection, null)
+	set(clearSelection)
 
 	set(graph.nodeIDs, (ids) => ids.filter((id) => !selectedIDs.includes(id)))
 
@@ -160,13 +160,13 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		case "selectingIdle": {
 			switch (action.type) {
 				case "ESCAPE": {
-					set(selector.actions.clearSelection, null)
+					set(selector.actions.clearSelection)
 					return
 				}
 				case "BACKSPACE": {
-					set(undo.actions.saveUndoState, null)
-					set(selector.actions.deleteSelected, null)
-					set(undo.actions.saveUndoState, null)
+					set(undo.actions.saveUndoState)
+					set(selector.actions.deleteSelected)
+					set(undo.actions.saveUndoState)
 					return
 				}
 				case "POINTER_DOWN_ON_CANVAS": {
@@ -219,15 +219,15 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 
 					// if (isDistanceFarEnough) {
 					// 	set(selectToolState, "brushSelecting")
-					// 	set(clearSelection, null)
-					// 	set(startBrushWithWorker, null)
-					// 	set(setInitialSelectedIDs, null)
+					// 	set(clearSelection)
+					// 	set(startBrushWithWorker)
+					// 	set(setInitialSelectedIDs)
 					// }
 					// return
 					return
 				}
 				case "POINTER_UP": {
-					set(selector.actions.clearSelection, null)
+					set(selector.actions.clearSelection)
 					set(selectToolState, "waitingForDoublePress")
 					return
 				}
@@ -238,9 +238,9 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 			switch (action.type) {
 				case "POINTER_DOWN_ON_CANVAS": {
 					set(selectToolState, "brushSelecting")
-					set(selector.actions.clearSelection, null)
-					set(selector.actions.startBrushWithWorker, null)
-					set(selector.actions.setInitialSelectedIDs, null)
+					set(selector.actions.clearSelection)
+					set(selector.actions.startBrushWithWorker)
+					set(selector.actions.setInitialSelectedIDs)
 					return
 				}
 				case "STOP_WAITING_FOR_DOUBLE_PRESS": {
@@ -253,12 +253,12 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		case "brushSelecting": {
 			switch (action.type) {
 				case "POINTER_MOVE": {
-					set(selector.actions.moveBrush, null)
-					set(selector.actions.setSelectedIdsFromWorker, null)
+					set(selector.actions.moveBrush)
+					set(selector.actions.setSelectedIdsFromWorker)
 					return
 				}
 				case "POINTER_UP": {
-					set(selector.actions.completeBrush, null)
+					set(selector.actions.completeBrush)
 					set(selectToolState, "selectingIdle")
 					return
 				}
