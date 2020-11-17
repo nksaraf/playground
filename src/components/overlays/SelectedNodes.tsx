@@ -26,6 +26,7 @@ export function SelectedNodes() {
 				<JsonOutput
 					value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
 					property={nodeAtoms.length > 1 ? "nodes" : nodeAtoms[0]?.id}
+					defaultOpenDepth={10}
 				/>
 			</div>
 		)
