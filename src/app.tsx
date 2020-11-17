@@ -8,7 +8,7 @@ import { Toolbar } from "./components/toolbar/toolbar"
 import { ZoomIndicator } from "./components/overlays/zoom-indicator"
 import { Positions } from "./components/overlays/positions"
 import { exampleGraph, writeGraph } from "./lib/graph-io"
-import { useAtom, useUpdateAtom } from "./atom"
+import { atom, useAtom, useUpdateAtom } from "./atom"
 import { Canvas } from "./components/canvas/Canvas"
 import {
 	RecoilRoot,
@@ -16,6 +16,7 @@ import {
 	useRecoilTransactionObserver_UNSTABLE,
 } from "recoil"
 import { graph, scene, selector, stateTree } from "./state"
+import JsonOutput from "./components/devtools/JsonOutput"
 
 export default function App() {
 	return (
@@ -68,6 +69,10 @@ function GraphDevtools() {
 	return null
 }
 
+const selectedNodeSnapshots = atom((get) =>
+	get(selector.selectedNodeIDs).map((id) => get(graph.getNodeSnapshot(id)))
+)
+
 function SelectedStateDevtools() {
 	const saver = useRecoilCallback((cb) => async () => {
 		localStorage.setItem(
@@ -76,23 +81,34 @@ function SelectedStateDevtools() {
 		)
 	})
 
-	useAtom(selector.selected)
+	const [nodeAtoms] = useAtom(selectedNodeSnapshots)
 
 	React.useEffect(() => {
 		saver()
 	})
 
-	return null
+	return (
+		<div
+			className="absolute font-mono text-xs bg-white rounded-xl p-3"
+			style={{ minWidth: 240, top: 48, right: 8, "--bg-opacity": 0.45 }}
+		>
+			<JsonOutput
+				value={nodeAtoms.length > 1 ? nodeAtoms : nodeAtoms[0]}
+				property={nodeAtoms.length > 1 ? "nodes" : nodeAtoms[0].id}
+			/>
+		</div>
+	)
 }
 
 import { renderState } from "./logger"
 
 function StateDevtools() {
 	const [at] = useAtom(stateTree)
+	const [snapshot] = useAtom(graph.snapshot)
 
 	React.useEffect(() => {
-		console.log(at)
 		renderState({ stateTree: at })
+		console.log(snapshot)
 	}, [at])
 
 	return null
