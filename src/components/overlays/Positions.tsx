@@ -32,8 +32,6 @@ export function Value({
 }
 
 export function Positions() {
-	const [showPositions, setShowPositions] = React.useState(false)
-
 	return (
 		<>
 			<div
@@ -41,32 +39,24 @@ export function Positions() {
 					position: "absolute",
 					userSelect: "none",
 					pointerEvents: "none",
-					bottom: 8,
+					bottom: 32,
 					left: 8,
 				}}
 			>
-				{showPositions && (
-					<div
-						style={{
-							display: "grid",
-							alignItems: "baseline",
-							gridTemplateColumns: "64px 64px 80px auto",
-							pointerEvents: "none",
-							gap: "8px",
-							padding: "2px 0",
-							textAlign: "left",
-						}}
-					>
-						<Scene />
-						<PointerPositions />
-					</div>
-				)}
-				<button
-					style={{ marginTop: 8, pointerEvents: "all" }}
-					onClick={() => setShowPositions(!showPositions)}
+				<div
+					style={{
+						display: "grid",
+						alignItems: "baseline",
+						gridTemplateColumns: "64px 64px 80px auto",
+						pointerEvents: "none",
+						gap: "8px",
+						padding: "2px 0",
+						textAlign: "left",
+					}}
 				>
-					{showPositions ? "Hide" : "Show"}
-				</button>
+					<Scene />
+					<PointerPositions />
+				</div>
 			</div>
 		</>
 	)

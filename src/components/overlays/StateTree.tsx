@@ -16,7 +16,15 @@ function State({ state }) {
 					{state.name}
 				</div>
 				{hasChildren && (
-					<div className={`${hasChildren ? "border-2 p-2 rounded-md" : ""}`}>
+					<div
+						className={`${
+							hasChildren
+								? `border-2 p-2 rounded-md ${
+										state.active ? "border-gray-800" : "border-gray-400"
+								  }`
+								: ""
+						}`}
+					>
 						{Object.keys(state.states).map((st) => (
 							<div
 								key={state.states[st].name}
