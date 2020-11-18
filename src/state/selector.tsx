@@ -129,24 +129,11 @@ const getNodeIsFocused = atomFamily((id: string) => (get) =>
 	get(focusedNode) === id
 )
 
-const selectToolState = atom(
-	"selectingIdle" as
-		| "selectingIdle"
-		| "dragging"
-		| "inserting"
-		| "edgeResizing"
-		| "cornerResizing"
-		| "pointingCanvas"
-		| "brushSelecting"
-		| "waitingForDoublePress"
-)
-
 export const selector = {
 	selectionBrushStart,
 	selectionBrushEnd,
 	selectionBrush,
 	selectedSnapshot,
-	selectToolState,
 	getNodeIsSelected,
 	selectedNodeIDs,
 	selectedConnectionIDs,
@@ -164,7 +151,19 @@ export const selector = {
 	},
 }
 
-export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
+const selectToolState = atom(
+	"selectingIdle" as
+		| "selectingIdle"
+		| "dragging"
+		| "inserting"
+		| "edgeResizing"
+		| "cornerResizing"
+		| "pointingCanvas"
+		| "brushSelecting"
+		| "waitingForDoublePress"
+)
+
+const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 	switch (get(selectToolState)) {
 		case "selectingIdle": {
 			switch (action.type) {
@@ -278,3 +277,8 @@ export const selectToolDispatch = atom(null, (get, set, action: Actions) => {
 		}
 	}
 })
+
+export const selectTool = {
+	state: selectToolState,
+	dispatch: selectToolDispatch,
+}

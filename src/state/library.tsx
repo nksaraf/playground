@@ -1,5 +1,4 @@
 import { atom, atomFamily } from "../lib/atom"
-import { NumberValue, ProductNumbers, SumNumbers } from "../plugins/math"
 
 const core = {}
 
@@ -25,9 +24,16 @@ function registerComp(Component) {
 	}
 }
 
-registerComp(NumberValue)
-registerComp(SumNumbers)
-registerComp(ProductNumbers)
+import importAll from "import-all.macro"
+
+const plugins = importAll.sync("../plugins/*.tsx")
+
+Object.values(plugins).forEach((plugin) => {
+	Object.values(plugin).forEach((comp) => {
+		registerComp(comp)
+		// a
+	})
+})
 
 export const componentIDs = atom(Object.keys(core))
 
@@ -43,28 +49,17 @@ export const getComponentMetadata = atomFamily<ComputeComponent>((id: string) =>
 	core[id]
 		? core[id]
 		: {
-				render: null,
+				render: () => {},
 				type: "missing",
 				id,
 				pins: [],
+				metadata: {},
 		  }
 )
 
 export const components = atom((get) =>
 	get(componentIDs).map((id) => get(getComponentMetadata(id)))
 )
-
-// export const registerComponent = atom(
-// 	null,
-// 	(get, set, { componentID, render, type, ...meta }) => {
-// 		const oldLib = get(componentIDs)
-// 		if (oldLib.includes(componentID))) {
-// 			throw new Error(`${componentID} already exists in the library`)
-// 		}
-// 		set(library, [...oldLib, componentID])
-// 		set(getComponentMetadata(componentID), { render, type, ...meta })
-// 	}
-// )
 
 export const library = {
 	components,

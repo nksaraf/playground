@@ -1,6 +1,6 @@
 import { atom, atomFamily } from "../lib/atom"
 import { IFrame, IPoint } from "../../types"
-import { selector, selectToolDispatch } from "./selector"
+import { selector, selectTool } from "./selector"
 import { undo } from "./undo"
 import { scene } from "./scene"
 import { graph, insertToolDispatch } from "./graph"
@@ -59,7 +59,7 @@ export const globalDispatch = atom(null, (get, set, action: Actions) => {
 })
 
 const states = {
-	selectTool: selector.selectToolState,
+	selectTool: selectTool.state,
 	insertTool: graph.insertToolState,
 }
 
@@ -80,56 +80,56 @@ export const stateTree = atom<StateTreeNode>((get) => {
 						name: "selectingIdle",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "selectingIdle",
+							get(selectTool.state) === "selectingIdle",
 						states: {},
 					},
 					dragging: {
 						name: "dragging",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "dragging",
+							get(selectTool.state) === "dragging",
 						states: {},
 					},
 					inserting: {
 						name: "inserting",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "inserting",
+							get(selectTool.state) === "inserting",
 						states: {},
 					},
 					edgeResizing: {
 						name: "edgeResizing",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "edgeResizing",
+							get(selectTool.state) === "edgeResizing",
 						states: {},
 					},
 					cornerResizing: {
 						name: "cornerResizing",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "cornerResizing",
+							get(selectTool.state) === "cornerResizing",
 						states: {},
 					},
 					pointingCanvas: {
 						name: "pointingCanvas",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "pointingCanvas",
+							get(selectTool.state) === "pointingCanvas",
 						states: {},
 					},
 					brushSelecting: {
 						name: "brushSelecting",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "brushSelecting",
+							get(selectTool.state) === "brushSelecting",
 						states: {},
 					},
 					waitingForDoublePress: {
 						name: "waitingForDoublePress",
 						active:
 							get(toolState) === "selectTool" &&
-							get(selector.selectToolState) === "waitingForDoublePress",
+							get(selectTool.state) === "waitingForDoublePress",
 						states: {},
 					},
 				},
@@ -169,7 +169,7 @@ export const dispatch = atom(null, (get, set, action: Actions) => {
 	set(globalDispatch, action)
 	switch (get(toolState)) {
 		case "selectTool": {
-			set(selectToolDispatch, action)
+			set(selectTool.dispatch, action)
 			return
 		}
 		case "insertTool": {

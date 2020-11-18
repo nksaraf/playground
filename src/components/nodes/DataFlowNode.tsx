@@ -18,7 +18,7 @@ export const NodeBody = styled("div", {
 	justifyContent: "space-between",
 })
 
-export function ComputeNode({ children }) {
+export function ComputeNode({ children = <div className="w-4" /> }) {
 	const focus = useUpdateAtom(selector.focusedNode)
 	const ndooe = useNode()
 	return (
