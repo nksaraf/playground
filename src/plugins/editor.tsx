@@ -4,7 +4,7 @@ import { ComputeNode } from "../components/nodes/DataNode";
 import { useCompute, useNodeState } from "../sdk";
 
 export function Monaco({ node }) {
-  const [code, setCode] = useNodeState("value", "");
+  const [code, setCode] = useNodeState("value", "a");
 
   useCompute(() => {
     return { value: code };
@@ -13,7 +13,9 @@ export function Monaco({ node }) {
   const { containerRef } = useMonacoEditor({
     path: "model.graphql",
     theme: "vs-light",
-    onChange: setCode,
+    onChange: (e) => {
+      setCode(e);
+    },
     defaultValue: ["a"].join("\n"),
   });
 
