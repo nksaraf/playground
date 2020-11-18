@@ -1,6 +1,6 @@
-import { atom } from "../lib/atom"
-import { graph } from "./graph"
-import { getFromWorker } from "./selector"
+import { atom } from "../../lib/atom"
+// import { graph } from "./graph"
+// import { getFromWorker } from "./selector"
 
 const undoStack = atom([])
 const redoStack = atom([])

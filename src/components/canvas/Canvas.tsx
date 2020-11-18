@@ -1,12 +1,12 @@
 import * as React from "react"
-import { useMachine } from "../../state"
+import { model, useMachine } from "../../state"
 import { SvgCanvas } from "./SvgCanvas"
 import { SelectionBrush } from "./SelectionBrush"
 import { atom, useAtom } from "../../lib/atom"
 import { Connection, Spline } from "./Connection"
-import { activeState, graph, scene, selector } from "../../state"
+import { machine, graph, scene, selector } from "../../state"
 import { Node } from "../Node"
-import useWindowEvents from "../../hooks/useWindowEvents"
+import { insertTool } from "../../state/machine/insert"
 
 export function useWheel() {
 	const state = useMachine()
@@ -91,7 +91,7 @@ export function CanvasBackground({ children, height, width }) {
 }
 
 function InsertingNodeGhost() {
-	const [state] = useAtom(activeState)
+	const [state] = useAtom(machine.activeState)
 	const [pointer] = useAtom(scene.documentPointer)
 
 	return state.includes("insertingComponent") ? (
@@ -101,13 +101,17 @@ function InsertingNodeGhost() {
 
 const addingConnectorFromPin = atom((get) => {
 	return {
-		position: get(graph.getPinPosition(get(graph.addingConnectorFromPinID))),
-		metadata: get(graph.getPinMetadata(get(graph.addingConnectorFromPinID))),
+		position: get(
+			graph.getPinPosition(get(insertTool.addingConnectorFromPinID))
+		),
+		metadata: get(
+			model.getPinMetadata(get(insertTool.addingConnectorFromPinID))
+		),
 	}
 })
 
 function InsertingConnectortGhost() {
-	const [state] = useAtom(activeState)
+	const [state] = useAtom(machine.activeState)
 	const [connectorPin] = useAtom(addingConnectorFromPin)
 	const [pointer] = useAtom(scene.documentPointer)
 	const start =
@@ -138,7 +142,7 @@ function ComponentGhost({ x, y }) {
 }
 
 export const Connections = React.memo(() => {
-	const [allConnectionIDs] = useAtom(graph.connectionIDs)
+	const [allConnectionIDs] = useAtom(model.connectionIDs)
 
 	return (
 		<>
@@ -150,7 +154,7 @@ export const Connections = React.memo(() => {
 })
 
 export const Nodes = React.memo(() => {
-	const [nodeIDs] = useAtom(graph.nodeIDs)
+	const [nodeIDs] = useAtom(model.nodeIDs)
 
 	return (
 		<>

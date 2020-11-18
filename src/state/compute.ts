@@ -1,17 +1,33 @@
 import { atomFamily } from "../lib/atom"
-import { graph } from "./graph"
+import { model } from "./model"
 
-export const getPinRawValue = atomFamily((id: string) => null)
+const getNodeInputIDs = atomFamily((id: string) => (get) => {
+	const nodePins = get(model.getNodePinIDs(id))
+		.map((pid) => get(model.getPinMetadata(pid)))
+		.filter((port) => port.type === "input")
 
-export const getPinValue = atomFamily(
+	return nodePins.map((np) => np.id)
+})
+
+const getNodeOutputIDs = atomFamily((id: string) => (get) => {
+	const nodePins = get(model.getNodePinIDs(id))
+		.map((pid) => get(model.getPinMetadata(pid)))
+		.filter((port) => port.type === "output")
+
+	return nodePins.map((np) => np.id)
+})
+
+const getPinRawValue = atomFamily((id: string) => null)
+
+const getPinValue = atomFamily(
 	(id: string) => (get) => {
-		const metadata = get(graph.getPinMetadata(id))
+		const metadata = get(model.getPinMetadata(id))
 		if (metadata.type === "input") {
-			const connIDs = get(graph.getPinConnectionIDs(id))
+			const connIDs = get(model.getPinConnectionIDs(id))
 			if (connIDs.length === 0) {
 				return get(getPinRawValue(id))
 			} else {
-				const con = get(graph.getConnectionParams(connIDs[0]))
+				const con = get(model.getConnectionParams(connIDs[0]))
 				return get(getPinRawValue(con.from))
 			}
 		} else {
@@ -23,12 +39,12 @@ export const getPinValue = atomFamily(
 	}
 )
 
-export const getNodeState = atomFamily((id) => ({} as any))
+const getNodeState = atomFamily((id) => ({} as any))
 
 const getNodeInputValues = atomFamily((id: string) => (get) =>
 	Object.fromEntries(
-		get(graph.getNodeInputIDs(id)).map((id) => [
-			get(graph.getPinMetadata(id)).name,
+		get(getNodeInputIDs(id)).map((id) => [
+			get(model.getPinMetadata(id)).name,
 			get(getPinValue(id)),
 		])
 	)
@@ -37,6 +53,8 @@ const getNodeInputValues = atomFamily((id: string) => (get) =>
 export const compute = {
 	getPinValue,
 	getPinRawValue,
+	getNodeInputIDs,
 	getNodeInputValues,
 	getNodeState,
+	getNodeOutputIDs,
 }

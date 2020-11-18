@@ -2,8 +2,7 @@ import React from "react"
 import { useRecoilCallback } from "recoil"
 import { NodeAtoms, useNode } from "./components/Node"
 import { useAtom } from "./lib/atom"
-import { graph } from "./state"
-import { getPinValue } from "./state/compute"
+import { compute, graph, model } from "./state"
 
 export function useUpdate(node: NodeAtoms) {
 	return useRecoilCallback(
@@ -11,11 +10,11 @@ export function useUpdate(node: NodeAtoms) {
 			const outputIDs = await snapshot.getPromise(node.outputIDs)
 			const id = outputIDs.find(
 				(id) =>
-					(snapshot.getLoadable(graph.getPinMetadata(id)).contents as any)
+					(snapshot.getLoadable(model.getPinMetadata(id)).contents as any)
 						.name === name
 			)
 			if (id) {
-				set(getPinValue(id), val)
+				set(compute.getPinValue(id), val)
 			}
 		},
 		[]

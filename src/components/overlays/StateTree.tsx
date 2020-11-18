@@ -1,5 +1,5 @@
 import { useAtom } from "../../lib/atom"
-import { stateTree } from "../../state"
+import { machine } from "../../state"
 
 function State({ state }) {
 	const hasChildren = Object.keys(state.states).length > 0
@@ -43,7 +43,7 @@ function State({ state }) {
 }
 
 export function StateTree() {
-	const [activeStateTree] = useAtom(stateTree)
+	const [activeStateTree] = useAtom(machine.stateTree)
 
 	return (
 		<div

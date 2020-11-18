@@ -1,13 +1,13 @@
 import * as React from "react"
 import { useMachine } from "../../state"
 import { useAtom } from "../../lib/atom"
-import { activeState, selector } from "../../state"
+import { machine, selector } from "../../state"
 import { IBrush } from "../../../types"
 
 export function SelectionBrush() {
 	const [brush] = useAtom(selector.selectionBrush)
 	const state = useMachine()
-	const [active] = useAtom(activeState)
+	const [active] = useAtom(machine.activeState)
 
 	React.useEffect(() => {
 		if (active.includes("waitingForDoublePress")) {

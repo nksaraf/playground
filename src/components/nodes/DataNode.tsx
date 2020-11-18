@@ -1,5 +1,5 @@
 import * as React from "react"
-import { compute, selector, useMachine } from "../../state"
+import { compute, machine, model, selector, useMachine } from "../../state"
 import {
 	atom,
 	atomFamily,
@@ -71,7 +71,7 @@ export function NodeContainer({
 			onMouseDown={(e) => {
 				e.stopPropagation()
 				onMouseDown?.()
-				machine.send("POINTER_DOWN_ON_BOX", { id: node.id })
+				machine.send("POINTER_DOWN_ON_NODE", { id: node.id })
 			}}
 			style={{
 				transform: `translateX(${position.x}px) translateY(${position.y}px)`,
@@ -86,7 +86,7 @@ export function NodeContainer({
 
 export function NodeHeader({ className = "", ...props }) {
 	const node = useNode()
-	const [meta] = useAtom(graph.getNodeMetadata(node.id))
+	const [meta] = useAtom(model.getNodeMetadata(node.id))
 	const [isSelected, setIsSelected] = useAtom(node.isSelected)
 
 	return (
@@ -136,22 +136,22 @@ export function NodeOutputs() {
 }
 
 export const getPinHasConnections = atomFamily((id: string) => (get) => {
-	return get(graph.getPinConnectionIDs(id)).length > 0
+	return get(model.getPinConnectionIDs(id)).length > 0
 })
 
 export const getPinIsAcceptingConnections = atomFamily(
 	(id: string) => (get) => {
-		const fromPin = get(graph.addingConnectorFromPinID)
+		const fromPin = get(machine.insertTool.addingConnectorFromPinID)
 		if (fromPin === null) {
 			return true
 		} else {
 			if (fromPin === id) {
 				return false
 			} else if (
-				get(graph.getPinMetadata(fromPin)).parentNode ===
-					get(graph.getPinMetadata(id)).parentNode ||
-				get(graph.getPinMetadata(fromPin)).type ===
-					get(graph.getPinMetadata(id)).type
+				get(model.getPinMetadata(fromPin)).parentNode ===
+					get(model.getPinMetadata(id)).parentNode ||
+				get(model.getPinMetadata(fromPin)).type ===
+					get(model.getPinMetadata(id)).type
 			) {
 				return false
 			}
@@ -161,11 +161,11 @@ export const getPinIsAcceptingConnections = atomFamily(
 )
 
 export const getPinIsAddingNewConnection = atomFamily((id: string) => (get) => {
-	return get(graph.addingConnectorFromPinID) === id
+	return get(machine.insertTool.addingConnectorFromPinID) === id
 })
 
 export function NodeInput({ inputID }) {
-	const [input] = useAtom(graph.getPinMetadata(inputID))
+	const [input] = useAtom(model.getPinMetadata(inputID))
 	const ref = usePinRef(inputID)
 	const [hasConnections] = useAtom(getPinHasConnections(inputID))
 	const [isAcceptingConnection] = useAtom(getPinIsAcceptingConnections(inputID))
@@ -236,8 +236,8 @@ function Pin({ isActive, ...props }) {
 }
 
 export function NodeOutput({ outputID }) {
-	const [output] = useAtom(graph.getPinMetadata(outputID))
-	const [connIDs] = useAtom(graph.getPinConnectionIDs(outputID))
+	const [output] = useAtom(model.getPinMetadata(outputID))
+	const [connIDs] = useAtom(model.getPinConnectionIDs(outputID))
 	const machine = useMachine()
 	const ref = usePinRef(outputID)
 	const [value] = useAtom(compute.getPinValue(outputID))

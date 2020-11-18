@@ -6,7 +6,7 @@ import useViewBox from "../hooks/useViewBox"
 
 import { Toolbar } from "./toolbar/toolbar"
 import { Canvas } from "./canvas/Canvas"
-import { TavernRoot } from "../state/storage"
+import { TavernRoot } from "../lib/storage"
 import { Overlays } from "./overlays/Overlays"
 
 export default function App() {
