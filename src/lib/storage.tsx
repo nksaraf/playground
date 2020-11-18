@@ -33,9 +33,14 @@ export const withAtomsFromLocalStorage = (
     );
   }
 
-  return function Root({ children }) {
+  return function Root({ children, initializeState = (m: any) => {} }) {
     return (
-      <RecoilRoot initializeState={initializeAtoms}>
+      <RecoilRoot
+        initializeState={(mut) => {
+          initializeAtoms(mut);
+          initializeState(mut);
+        }}
+      >
         {children}
         <Saver />
       </RecoilRoot>

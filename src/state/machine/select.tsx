@@ -1,12 +1,12 @@
 import { atom } from "../../lib/atom";
 import { scene } from "../scene";
-import { undo } from "./undo";
 import { graph } from "../graph";
 import { model } from "../model";
 import { selector } from "../selector";
 import flatten from "lodash/flatten";
 import * as Comlink from "comlink";
 import { Actions } from "./toolState";
+import { undo } from "./undo";
 
 type GetFromWorker = (type: string, payload: any) => Promise<any>;
 

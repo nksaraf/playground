@@ -10,7 +10,7 @@ import {
 import { graph } from "../../state";
 import useResizeObserver from "use-resize-observer";
 import { styled } from "../../lib/theme";
-import { useNode } from "../Node";
+import { useNode } from "./NodeProvider";
 
 export const NodeBody = styled("div", {
   display: "flex",

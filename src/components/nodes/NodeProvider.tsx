@@ -1,8 +1,7 @@
 import { createContext } from "create-hook-context";
 import React from "react";
-import { useAtom } from "../lib/atom";
-import { compute, graph, selector, model } from "../state";
-import { library } from "../state";
+import { useAtom } from "../../lib/atom";
+import { library, compute, graph, selector, model } from "../../state";
 
 const [NodeProvider, useNode] = createContext(
   ({ node }: { node: NodeAtoms }) => {
@@ -18,19 +17,9 @@ export let getNodeAtoms = (id: string) => ({
   pinIDs: model.getNodePinIDs(id),
   outputIDs: compute.getNodeOutputIDs(id),
   size: graph.getNodeSize(id),
+  box: graph.getNodeBox(id),
   state: compute.getNodeState(id),
   inputValues: compute.getNodeInputValues(id),
-  isSelected: selector.getNodeIsSelected(id),
-  connectionIDs: model.getNodeConnectionIDs(id),
-  metadata: model.getNodeMetadata(id),
-  id,
-});
-
-export let getPinAtoms = (id: string) => ({
-  position: graph.getNodePosition(id),
-  inputIDs: compute.getNodeInputIDs(id),
-  outputIDs: compute.getNodeOutputIDs(id),
-  size: graph.getNodeSize(id),
   isSelected: selector.getNodeIsSelected(id),
   connectionIDs: model.getNodeConnectionIDs(id),
   metadata: model.getNodeMetadata(id),

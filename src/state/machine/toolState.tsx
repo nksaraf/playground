@@ -41,4 +41,5 @@ export type Actions =
   | Action<"EXITED_META_MODE">
   | Action<"PASTED">
   | Action<"COPIED">;
+
 export const toolState = atom("selectTool");

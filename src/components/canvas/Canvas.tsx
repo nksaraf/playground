@@ -5,7 +5,7 @@ import { SelectionBrush } from "./SelectionBrush";
 import { atom, useAtom } from "../../lib/atom";
 import { Connection, Spline } from "./Connection";
 import { machine, graph, scene, selector } from "../../state";
-import { Node } from "../Node";
+import { Node } from "../nodes/NodeProvider";
 
 export function useWheel() {
   const state = useMachine();

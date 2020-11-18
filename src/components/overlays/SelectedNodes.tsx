@@ -3,7 +3,9 @@ import { machine, selector } from "../../state";
 import JsonOutput from "../devtools/JsonOutput";
 
 const selectedNodeSnapshots = atom((get) =>
-  get(selector.selectedNodeIDs).map((id) => get(machine.snapshot.getNodeSnapshot(id)))
+  get(selector.selectedNodeIDs).map((id) =>
+    get(machine.snapshot.getNodeSnapshot(id))
+  )
 );
 
 export function SelectedNodes() {

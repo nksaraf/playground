@@ -1,14 +1,16 @@
 import { atom, atomFamily } from "../../lib/atom";
-import { IFrame, IPoint } from "../../../types";
+import { Actions, toolState } from "./toolState";
 import { selector } from "../selector";
-import { selectTool } from "./select";
-import { undo } from "./undo";
 import { scene } from "../scene";
-import { insertTool } from "./insert";
+
+import { IFrame, IPoint } from "../../../types";
+import { undo } from "./undo";
 import { StateTreeNode } from "../../lib/logger";
 import clamp from "lodash/clamp";
-import { Actions } from "./toolState";
 import { snapshot } from "./snapshot";
+
+import { selectTool } from "./select";
+import { insertTool } from "./insert";
 
 const updatePointerOnPointerMove = atom(null, (get, set, point: IPoint) => {
   if (!point) return; // Probably triggered by a zoom / scroll
@@ -101,13 +103,13 @@ const globalDispatch = atom(null, (get, set, action: Actions) => {
       return set(savePointer, action.payload);
     }
     case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
-      set(toolState, "insertTool");
       set(insertTool.dispatch, action);
+      set(toolState, "insertTool");
       return;
     }
     case "POINTER_DOWN_ON_PIN": {
-      set(toolState, "insertTool");
       set(insertTool.dispatch, action);
+      set(toolState, "insertTool");
       return;
     }
     // case "POINTER_DOWN_ON_COMPONENT_BUTTON": {
@@ -134,8 +136,6 @@ const globalDispatch = atom(null, (get, set, action: Actions) => {
   }
 });
 
-console.log(selectTool, insertTool);
-
 const states = {
   selectTool: selectTool.state,
   insertTool: insertTool.state,
@@ -144,8 +144,6 @@ const states = {
 const activeState = atom((get) => {
   return `${get(toolState)}.${get(states[get(toolState)])}`;
 });
-
-export const toolState = atom("selectTool");
 
 const stateTree = atom<StateTreeNode>((get) => {
   return {
@@ -250,11 +248,11 @@ const dispatch = atom(null, (get, set, action: Actions) => {
   switch (get(toolState)) {
     case "selectTool": {
       set(selectTool.dispatch, action);
-      return;
+      break;
     }
     case "insertTool": {
       set(insertTool.dispatch, action);
-      return;
+      break;
     }
   }
 });
