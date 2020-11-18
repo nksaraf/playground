@@ -2,7 +2,7 @@ import { createContext } from "create-hook-context";
 import React from "react";
 import { useAtom } from "../../lib/atom";
 import { library, compute, graph, selector, model } from "../../state";
-
+import * as tavern from "../../state";
 const [NodeProvider, useNode] = createContext(
   ({ node }: { node: NodeAtoms }) => {
     return node;
@@ -18,6 +18,7 @@ export let getNodeAtoms = (id: string) => ({
   outputIDs: compute.getNodeOutputIDs(id),
   size: graph.getNodeSize(id),
   box: graph.getNodeBox(id),
+  isFocused: selector.getNodeIsFocused(id),
   state: compute.getNodeState(id),
   inputValues: compute.getNodeInputValues(id),
   isSelected: selector.getNodeIsSelected(id),
@@ -38,7 +39,7 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
 
   return (
     <NodeProvider node={node}>
-      <Component node={node} />
+      <Component node={node} tavern={tavern} />
     </NodeProvider>
   );
 });

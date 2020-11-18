@@ -2,9 +2,13 @@ import React from "react";
 import { useRecoilCallback } from "recoil";
 import { NodeAtoms, useNode } from "./components/nodes/NodeProvider";
 import { useAtom } from "./lib/atom";
-import { compute, graph, model } from "./state";
+import { compute, model } from "./state";
+import * as tavern from "./state";
 
-export function useUpdate(node: NodeAtoms) {
+export type Props = { node: NodeAtoms; tavern: typeof tavern };
+
+export function useUpdate() {
+  const node = useNode();
   return useRecoilCallback(
     ({ snapshot, set }) => async (name, val) => {
       const outputIDs = await snapshot.getPromise(node.outputIDs);
@@ -26,7 +30,7 @@ export function useUpdateEffect(
   deps: any[] = []
 ) {
   const node = useNode();
-  const update = useUpdate(node);
+  const update = useUpdate();
   React.useEffect(() => {
     fn(update);
   }, [update, ...deps]);
@@ -34,7 +38,7 @@ export function useUpdateEffect(
 
 export function useCompute(fn: (inputs: any) => any, deps = []) {
   const node = useNode();
-  const update = useUpdate(node);
+  const update = useUpdate();
   const [inputs] = useAtom(node.inputValues);
 
   React.useEffect(() => {

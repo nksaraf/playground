@@ -116,6 +116,9 @@ const selectToolDispatch = atom(null, (get, set, action: Actions) => {
           if (!get(selector.getNodeIsSelected(action.payload.id))) {
             set(selector.selectedNodeIDs, [action.payload.id]);
           }
+          if (get(selector.focusedNode) != null) {
+            set(selector.focusedNode, null);
+          }
           set(selectToolState, "dragging");
           return;
         }

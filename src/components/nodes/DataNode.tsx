@@ -11,6 +11,8 @@ import { graph } from "../../state";
 import useResizeObserver from "use-resize-observer";
 import { styled } from "../../lib/theme";
 import { useNode } from "./NodeProvider";
+import { useRecoilCallback } from "recoil";
+import { snapshot } from "../../state/machine/snapshot";
 
 export const NodeBody = styled("div", {
   display: "flex",
@@ -18,28 +20,73 @@ export const NodeBody = styled("div", {
   justifyContent: "space-between",
 });
 
+export function Focusable({ children, ...props }) {
+  const focus = useRecoilCallback(({ snapshot, set }) => (id) => {
+    set(selector.focusedNode, id);
+    set(selector.selectedNodeIDs, [id]);
+  });
+  const node = useNode();
+
+  return (
+    <div
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        focus(node.id);
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function ComputeNode({ children = <div className="w-4" /> }) {
-  const focus = useUpdateAtom(selector.focusedNode);
-  const ndooe = useNode();
   return (
     <NodeContainer>
       <NodeHeader />
       <NodeBody>
         <NodeInputs />
-        <div
-          className="mx-3"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            focus(ndooe.id);
-          }}
-        >
-          {children}
-        </div>
+        <Focusable className="mx-3">{children}</Focusable>
         <NodeOutputs />
       </NodeBody>
     </NodeContainer>
   );
 }
+
+export const useNodeContainerProps = ({
+  onMouseDown = (e) => {},
+  style = {},
+  onResize = (s) => {},
+}) => {
+  const node = useNode();
+  const [position, setNodePosition] = useAtom(node.position);
+  const [nodeSize, setNodeSize] = useAtom(node.size);
+  const setResseter = useUpdateAtom(resetter);
+  const { ref } = useResizeObserver({
+    onResize: (s) => {
+      setNodeSize(s);
+      onResize?.(s);
+      setResseter((r) => r + 1);
+    },
+  });
+
+  const [isSelected, setIsSelected] = useAtom(node.isSelected);
+  const machine = useMachine();
+
+  return {
+    onMouseDown: (e) => {
+      e.stopPropagation();
+      onMouseDown?.(e);
+      machine.send("POINTER_DOWN_ON_NODE", { id: node.id });
+    },
+    style: {
+      transform: `translateX(${position.x}px) translateY(${position.y}px)`,
+      position: "absolute",
+      ...style,
+    },
+    ref,
+  };
+};
 
 export function NodeContainer({
   children,
@@ -49,34 +96,15 @@ export function NodeContainer({
   ...props
 }) {
   const node = useNode();
-  const [position, setNodePosition] = useAtom(node.position);
-  const [nodeSize, setNodeSize] = useAtom(node.size);
-  const setResseter = useUpdateAtom(resetter);
-  const { ref } = useResizeObserver({
-    onResize: (s) => {
-      setNodeSize(s);
-      setResseter((r) => r + 1);
-    },
-  });
-
   const [isSelected, setIsSelected] = useAtom(node.isSelected);
-  const machine = useMachine();
+  const containerProps: any = useNodeContainerProps({});
 
   return (
     <section
       className={`absolute bg-white border-2 ${
         isSelected ? "border-blue-500" : "border-gray-100"
-      } rounded-xl shadow-xl pb-3 ${className}`}
-      ref={ref}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        onMouseDown?.();
-        machine.send("POINTER_DOWN_ON_NODE", { id: node.id });
-      }}
-      style={{
-        transform: `translateX(${position.x}px) translateY(${position.y}px)`,
-        ...style,
-      }}
+      } rounded-lg shadow-xl pb-3 ${className}`}
+      {...containerProps}
       {...props}
     >
       {children}
@@ -87,7 +115,6 @@ export function NodeContainer({
 export function NodeHeader({ className = "", ...props }) {
   const node = useNode();
   const [meta] = useAtom(model.getNodeMetadata(node.id));
-  const [isSelected, setIsSelected] = useAtom(node.isSelected);
 
   return (
     <header
