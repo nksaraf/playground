@@ -69,7 +69,6 @@ export function NodeContainer({
 			} rounded-xl shadow-xl pb-3 ${className}`}
 			ref={ref}
 			onMouseDown={(e) => {
-				e.preventDefault()
 				e.stopPropagation()
 				onMouseDown?.()
 				machine.send("POINTER_DOWN_ON_BOX", { id: node.id })
@@ -191,7 +190,6 @@ export function NodeInput({ inputID }) {
 					setIsHovered(false)
 				}}
 				onMouseUp={(e) => {
-					e.preventDefault()
 					e.stopPropagation()
 					machine.send("POINTER_UP_ON_PIN", { pinID: inputID })
 				}}
@@ -199,7 +197,6 @@ export function NodeInput({ inputID }) {
 				<div
 					ref={ref}
 					onMouseDown={(e) => {
-						e.preventDefault()
 						e.stopPropagation()
 						machine.send("POINTER_DOWN_ON_PIN", { pinID: inputID })
 					}}
@@ -268,7 +265,6 @@ export function NodeOutput({ outputID }) {
 					setIsHovered(false)
 				}}
 				onMouseUp={(e) => {
-					e.preventDefault()
 					e.stopPropagation()
 					machine.send("POINTER_UP_ON_PIN", { pinID: outputID })
 				}}
@@ -279,7 +275,6 @@ export function NodeOutput({ outputID }) {
 				<div
 					ref={ref}
 					onMouseDown={(e) => {
-						e.preventDefault()
 						e.stopPropagation()
 						machine.send("POINTER_DOWN_ON_PIN", { pinID: outputID })
 					}}

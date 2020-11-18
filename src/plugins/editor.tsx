@@ -1,19 +1,15 @@
 import React from "react"
 import { useMonacoEditor } from "use-monaco"
-import { useNode } from "../components/Node"
-import { ComputeNode } from "../components/nodes/DataFlowNode"
+import { ComputeNode } from "../components/nodes/DataNode"
 import { useAtom } from "../lib/atom"
-import { useUpdate } from "../sdk"
-import { compute } from "../state"
+import { useCompute, useNodeState } from "../sdk"
 
-export function Monaco() {
-	const node = useNode()
-	const update = useUpdate(node)
-	const [{ value = "a" }, setVal] = useAtom(compute.getNodeState(node.id))
+export function Monaco({ node }) {
+	const [{ value = "" as string }, setVal] = useAtom(node.state)
 
-	React.useEffect(() => {
-		update("value", value)
-	}, [update, value])
+	useCompute(() => {
+		return { value }
+	}, [value])
 
 	const { containerRef } = useMonacoEditor({
 		path: "model.graphql",
@@ -33,6 +29,60 @@ export function Monaco() {
 
 Monaco.config = {
 	id: "monaco",
+	outputs: {
+		value: {
+			config: {
+				type: "string",
+			},
+		},
+	},
+}
+
+import Highlight, { defaultProps } from "prism-react-renderer"
+import { useEditable } from "use-editable"
+
+export const Edit = ({ node }) => {
+	const [code, setCode] = useNodeState("code", "")
+
+	useCompute(() => {
+		return { value: code }
+	}, [code])
+
+	const editorRef = React.useRef(null)
+
+	useEditable(editorRef, setCode, {
+		disabled: false,
+		indentation: 2,
+	})
+
+	return (
+		<ComputeNode>
+			<Highlight {...defaultProps} code={code} language="jsx">
+				{({ className, style, tokens, getTokenProps }) => (
+					<pre
+						className={className}
+						style={{ ...style, width: 200, height: 200 }}
+						ref={editorRef}
+					>
+						{tokens.map((line, i) => (
+							<React.Fragment key={i}>
+								{line
+									.filter((token) => !token.empty)
+									.map((token, key) => (
+										<span {...getTokenProps({ token, key })} />
+									))}
+								{i < tokens.length - 1 ? "\n" : null}
+							</React.Fragment>
+						))}
+					</pre>
+				)}
+			</Highlight>
+		</ComputeNode>
+	)
+}
+
+Edit.config = {
+	id: "editor",
 	outputs: {
 		value: {
 			config: {

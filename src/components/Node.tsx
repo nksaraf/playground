@@ -1,7 +1,8 @@
 import { createContext } from "create-hook-context"
 import React from "react"
 import { useAtom } from "../lib/atom"
-import { graph, selector } from "../state"
+import { useUpdate } from "../sdk"
+import { compute, graph, selector } from "../state"
 import { getComponentMetadata } from "../state/library"
 
 const [NodeProvider, useNode] = createContext(
@@ -15,8 +16,11 @@ export { NodeProvider, useNode }
 export let getNodeAtoms = (id: string) => ({
 	position: graph.getNodePosition(id),
 	inputIDs: graph.getNodeInputIDs(id),
+	pinIDs: graph.getNodePinIDs(id),
 	outputIDs: graph.getNodeOutputIDs(id),
 	size: graph.getNodeSize(id),
+	state: compute.getNodeState(id),
+	inputValues: compute.getNodeInputValues(id),
 	isSelected: selector.getNodeIsSelected(id),
 	connectionIDs: graph.getNodeConnectionIDs(id),
 	metadata: graph.getNodeMetadata(id),
@@ -37,11 +41,11 @@ export let getPinAtoms = (id: string) => ({
 export type NodeAtoms = ReturnType<typeof getNodeAtoms>
 
 export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
-	const [metadata] = useAtom(graph.getNodeMetadata(nodeID))
+	const node = React.useMemo(() => getNodeAtoms(nodeID), [nodeID])
+	const [metadata] = useAtom(node.metadata)
 	const [component] = useAtom(getComponentMetadata(metadata.componentID))
 	const Component = component.render
 
-	const node = getNodeAtoms(nodeID)
 	return (
 		<NodeProvider node={node}>
 			<Component node={node} />

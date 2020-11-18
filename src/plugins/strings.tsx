@@ -1,11 +1,12 @@
 import React from "react"
-import { ComputeNode } from "../components/nodes/DataFlowNode"
+import { ComputeNode } from "../components/nodes/DataNode"
 import { useCompute } from "../sdk"
 
 export function SumNumbers() {
 	useCompute(({ a, b }) => {
 		return { concat: a + b }
 	})
+
 	return <ComputeNode />
 }
 

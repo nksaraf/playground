@@ -34,7 +34,6 @@ export function Toolbar() {
 						key={l.id}
 						isActive={false}
 						onMouseDown={(e) => {
-							e.preventDefault()
 							e.stopPropagation()
 							machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
 								componentID: l.id,

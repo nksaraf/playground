@@ -301,7 +301,7 @@ export const graph = {
 	getNodeMetadata,
 	getNodePosition,
 	getNodeBox,
-	getNodePortIDs: getNodePinIDs,
+	getNodePinIDs,
 	getNodeConnectionIDs,
 	getPinMetadata,
 	getPinConnectionIDs,

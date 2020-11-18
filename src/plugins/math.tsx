@@ -1,21 +1,13 @@
-import { multiply, sum } from "lodash"
+import { sum } from "lodash"
 import React from "react"
-import { useRecoilCallback } from "recoil"
-import { NodeAtoms, useNode } from "../components/Node"
-import { ComputeNode } from "../components/nodes/DataFlowNode"
-import { atomFamily, useAtom } from "../lib/atom"
-import { useCompute, useUpdate } from "../sdk"
-import { graph } from "../state"
-import { compute, getPinValue } from "../state/compute"
+import { ComputeNode } from "../components/nodes/DataNode"
+import { useAtom } from "../lib/atom"
+import { useCompute } from "../sdk"
 
-export function NumberValue() {
-	const node = useNode()
-	const update = useUpdate(node)
-	const [{ value = 0 }, setVal] = useAtom(compute.getNodeState(node.id))
+export function NumberValue({ node }) {
+	const [{ value = 0 as number }, setVal] = useAtom(node.state)
 
-	React.useEffect(() => {
-		update("value", value)
-	}, [update, value])
+	useCompute(() => ({ value }), [value])
 
 	return (
 		<ComputeNode>
@@ -40,11 +32,10 @@ NumberValue.config = {
 			},
 		},
 	},
-	inputs: {},
 }
 
 export function SumNumbers() {
-	useCompute(({ ...inputs }) => {
+	useCompute((inputs) => {
 		return { sum: sum(Object.values(inputs).map((i) => (i === null ? 0 : i))) }
 	})
 	return (
