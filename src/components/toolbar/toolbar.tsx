@@ -1,49 +1,46 @@
-import * as React from "react"
-import { ToolbarWrapper, ButtonGroup, Divider } from "./styled"
-import IconButton from "./icon-button"
-import { graph } from "../../state/graph"
-import { useAtom } from "../../lib/atom"
-import { useMachine } from "../../state"
-import * as Icons from "./icons/svgr"
-import { components } from "../../state/library"
+import * as React from "react";
+import { ToolbarWrapper, ButtonGroup, Divider } from "./styled";
+import IconButton from "./icon-button";
+import { useAtom } from "../../lib/atom";
+import { library, useMachine } from "../../state";
 
 export function Toolbar() {
-	const machine = useMachine()
-	const [lib] = useAtom(components)
+  const machine = useMachine();
+  const [lib] = useAtom(library.components);
 
-	// const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
-	// const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
+  // const [selectedBoxIds] = useAtom(graph.selectedNodeIDs)
+  // const [selectedArrowIds] = useAtom(graph.selectedConnectionIDs)
 
-	// const hasSelection = selectedBoxIds.length + selectedArrowIds.length > 0
-	// const hasSelectedBox = selectedBoxIds.length > 0
-	// const hasSelectedBoxes = selectedBoxIds.length > 1
-	// const hasManySelectedBoxes = selectedBoxIds.length > 1
+  // const hasSelection = selectedBoxIds.length + selectedArrowIds.length > 0
+  // const hasSelectedBox = selectedBoxIds.length > 0
+  // const hasSelectedBoxes = selectedBoxIds.length > 1
+  // const hasManySelectedBoxes = selectedBoxIds.length > 1
 
-	return (
-		<ToolbarWrapper onClick={(e) => e.stopPropagation()}>
-			<ButtonGroup>
-				{/* <IconButton
+  return (
+    <ToolbarWrapper onClick={(e) => e.stopPropagation()}>
+      <ButtonGroup>
+        {/* <IconButton
 					src="Select"
 					// isActive={local.isIn("selectTool")}
 					isActive={true}
 					event="SELECTED_SELECT_TOOL"
 					shortcut="V"
 				/> */}
-				{lib.map((l) => (
-					<IconButton
-						key={l.id}
-						isActive={false}
-						onMouseDown={(e) => {
-							e.stopPropagation()
-							machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
-								componentID: l.id,
-							})
-						}}
-					>
-						<span className="text-black text-sm underline">{l.id}</span>
-					</IconButton>
-				))}
-				{/* <IconButton
+        {lib.map((l) => (
+          <IconButton
+            key={l.id}
+            isActive={false}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              machine.send("POINTER_DOWN_ON_COMPONENT_BUTTON", {
+                componentID: l.id,
+              });
+            }}
+          >
+            <span className="text-black text-sm underline">{l.id}</span>
+          </IconButton>
+        ))}
+        {/* <IconButton
 					src="Box"
 					isActive={local.isIn("boxTool")}
 					onClick={() => state.send("SELECTED_BOX_TOOL")}
@@ -131,15 +128,15 @@ export function Toolbar() {
 					disabled={!hasManySelectedBoxes}
 					shortcut="⌥ ⌃ V"
 				/> */}
-				{/* <Divider />
+        {/* <Divider />
 				<IconButton
 					src="Delete"
 					event="DELETED_SELECTED"
 					shortcut="⌫"
 					disabled={!hasSelection}
 				/> */}
-			</ButtonGroup>
-			{/* <ButtonGroup>
+      </ButtonGroup>
+      {/* <ButtonGroup>
 				<IconButton
 					src="Undo"
 					event="UNDO"
@@ -153,6 +150,6 @@ export function Toolbar() {
 					disabled={local.values.redosLength === 0}
 				/>
 			</ButtonGroup> */}
-		</ToolbarWrapper>
-	)
+    </ToolbarWrapper>
+  );
 }

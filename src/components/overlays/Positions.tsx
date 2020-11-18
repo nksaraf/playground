@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useAtom } from "../../lib/atom"
-import { scene } from "../../state/scene"
+import { scene } from "../../state"
 import { selector } from "../../state"
 
 export function Value({

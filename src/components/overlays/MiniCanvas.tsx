@@ -1,5 +1,5 @@
 import * as React from "react"
-import { scene } from "../../state/scene"
+import { scene } from "../../state"
 import { useRecoilState } from "recoil"
 
 export function Model() {

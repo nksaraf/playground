@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useAtom } from "../../lib/atom"
-import { scene } from "../../state/scene"
+import { scene } from "../../state"
 
 export function Camera({ children }) {
 	const [{ x, y, zoom }] = useAtom(scene.camera)

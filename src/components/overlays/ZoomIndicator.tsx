@@ -1,6 +1,6 @@
 import { useAtom } from "../../lib/atom"
 import * as React from "react"
-import { scene } from "../../state/scene"
+import { scene } from "../../state"
 
 export function ZoomIndicator() {
 	const [zoom] = useAtom(scene.cameraZoom)
