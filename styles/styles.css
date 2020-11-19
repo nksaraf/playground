@@ -13,15 +13,14 @@
 
 @import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic);
 
-.connector {
-	fill: none;
-	stroke: #4299e1;
-	stroke-width: 2;
-	-webkit-box-shadow: 6px 6px 28px -2px rgba(0, 0, 0, 0.75);
-	-moz-box-shadow: 6px 6px 28px -2px rgba(0, 0, 0, 0.75);
-	box-shadow: 6px 6px 28px -2px rgba(0, 0, 0, 0.75);
-	-webkit-filter: drop-shadow(-5px -5px 5px #000);
-	filter: drop-shadow(-5px -5px 5px #000);
+.bg-grid {
+  background-size: var(--grid-size) var(--grid-size);
+  background-image: linear-gradient(
+      to right,
+      var(--grid-color) 2px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, var(--grid-color) 2px, transparent 1px);
 }
 /* 
 .connector-click-area {
@@ -43,33 +42,33 @@
 
 ul,
 li {
-	list-style-type: none;
-	margin: 0 0 0 8px;
-	padding: 0;
-	border: none;
+  list-style-type: none;
+  margin: 0 0 0 8px;
+  padding: 0;
+  border: none;
 }
 
 li > button {
-	background: transparent;
-	border: none;
-	outline: none;
-	font-weight: bold;
-	margin: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-weight: bold;
+  margin: 0;
 }
 
 .number {
-	color: #1a01cc;
+  color: #1a01cc;
 }
 
 .text {
-	color: #0b7552;
+  color: #0b7552;
 }
 
 .null {
-	color: lightgray;
+  color: lightgray;
 }
 
 .toggle-button {
-	margin-left: -12px;
-	position: absolute;
+  margin-left: -12px;
+  position: absolute;
 }

@@ -5,7 +5,7 @@ import { SelectionBrush } from "./SelectionBrush";
 import { atom, useAtom } from "../../lib/atom";
 import { Connection, Spline } from "./Connection";
 import { machine, graph, scene, selector } from "../../state";
-import { Node } from "../nodes/NodeProvider";
+import { Node } from "../../api";
 
 export function useWheel() {
   const state = useMachine();
@@ -37,14 +37,14 @@ export function Canvas() {
 
   return (
     <div
-      className="relative overflow-x-hidden overflow-y-hidden"
+      className="relative bg-grid overflow-x-hidden overflow-y-hidden"
       style={{
         height,
         width,
+        // @ts-ignore
+        "--grid-color": "#e9ecf1",
+        "--grid-size": "30px",
         userSelect: "none",
-        backgroundSize: "40px 40px",
-        backgroundImage:
-          "linear-gradient(to right, #f2f4f7 2px, transparent 1px), linear-gradient(to bottom, #f2f4f7 2px, transparent 1px)",
       }}
       onMouseDown={(e) => {
         machine.send("POINTER_DOWN_ON_CANVAS", {

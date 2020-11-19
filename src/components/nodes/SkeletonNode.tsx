@@ -1,5 +1,5 @@
 import { useAtom } from "../../lib/atom";
-import { NodeAtoms } from "./NodeProvider";
+import { NodeAtoms } from "../../api";
 
 export function SkeletonNode({ node }: { node: NodeAtoms }) {
   const [nodeBox] = useAtom(node.box);

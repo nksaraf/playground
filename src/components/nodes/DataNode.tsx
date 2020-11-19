@@ -10,9 +10,8 @@ import {
 import { graph } from "../../state";
 import useResizeObserver from "use-resize-observer";
 import { styled } from "../../lib/theme";
-import { useNode } from "./NodeProvider";
+import { useNode } from "../../api";
 import { useRecoilCallback } from "recoil";
-import { snapshot } from "../../state/machine/snapshot";
 
 export const NodeBody = styled("div", {
   display: "flex",

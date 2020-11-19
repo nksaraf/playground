@@ -1,26 +1,17 @@
 import importAll from "import-all.macro";
+import { createComponent } from "../api";
 
 export const registeredPlugins = {};
 function registerComp(Component) {
-  const { id, inputs = {}, outputs = {}, ...metadata } = Component.config;
-  registeredPlugins[Component.config.id] = {
-    render: Component,
-    id,
-    pins: [
-      ...Object.keys(inputs).map((i) => ({
-        ...inputs[i],
-        name: i,
-        role: "input",
-      })),
-      ...Object.keys(outputs).map((i) => ({
-        ...outputs[i],
-        name: i,
-        role: "output",
-      })),
-    ],
-    type: "component",
-    metadata,
-  };
+  if (typeof Component === "function" && Component?.config?.id) {
+    const { id, inputs = {}, outputs = {}, ...metadata } = Component.config;
+    registeredPlugins[Component.config.id] = createComponent(
+      Component.config,
+      Component
+    );
+  } else if (Component && Component.render && Component.id) {
+    registeredPlugins[Component.id] = Component;
+  }
 }
 
 const plugins = importAll.sync("../plugins/*.tsx");
