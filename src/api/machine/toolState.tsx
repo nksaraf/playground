@@ -1,4 +1,4 @@
-import { IFrame, IPoint } from "../types";
+import { IFrame, IPoint } from "../state/types";
 import { atom } from "../state/atom";
 
 export type Action<S, T = undefined> = {

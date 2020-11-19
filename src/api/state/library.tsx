@@ -2,7 +2,7 @@ import { atom, atomFamily } from "./atom";
 
 const componentIDs = atom([]);
 
-type ComputeComponent = {
+type Component = {
   render?: Function;
   type: string;
   id: string;
@@ -10,7 +10,7 @@ type ComputeComponent = {
   metadata: any;
 };
 
-const getComponentMetadata = atomFamily<ComputeComponent>((id: string) => ({
+const getComponentMetadata = atomFamily<Component>((id: string) => ({
   render: null,
   type: "missing",
   id,

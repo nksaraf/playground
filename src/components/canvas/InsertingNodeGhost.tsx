@@ -1,6 +1,6 @@
 import * as React from "react";
 import { model } from "../../api";
-import { atom, useAtom } from "../../api/state/atom";
+import { atom, useAtom } from "../../api";
 import { machine, graph, scene } from "../../api";
 import { ComponentGhost } from "./ComponentGhost";
 

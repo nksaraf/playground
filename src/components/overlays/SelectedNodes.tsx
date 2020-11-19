@@ -1,4 +1,4 @@
-import { atom, useAtom } from "../../api/state/atom";
+import { atom, useAtom } from "../../api";
 import { machine, selector } from "../../api";
 import JsonOutput from "../devtools/JsonOutput";
 

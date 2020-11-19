@@ -6,7 +6,7 @@ import {
   useAtom,
   useAtom as _useAtom,
   useUpdateAtom,
-} from "../../api/state/atom";
+} from "../../api";
 import { graph } from "../../api";
 import useResizeObserver from "use-resize-observer";
 import { styled } from "../../lib/theme";

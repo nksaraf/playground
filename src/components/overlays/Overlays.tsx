@@ -3,7 +3,7 @@ import { ZoomIndicator } from "./ZoomIndicator";
 import { Positions } from "./Positions";
 import { SelectedNodes } from "./SelectedNodes";
 import { StateTree } from "./StateTree";
-import { atom } from "../../api/state/atom";
+import { atom } from "../../api";
 
 export function Overlays() {
   const [show, setShow] = React.useState(false);

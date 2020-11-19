@@ -3,9 +3,8 @@ import { Actions, toolState } from "./toolState";
 import { selector } from "../state/selector";
 import { scene } from "../state/scene";
 
-import { IFrame, IPoint } from "../types";
+import { IFrame, IPoint } from "../state/types";
 import { undo } from "./undo";
-import { StateTreeNode } from "../../lib/logger";
 import clamp from "lodash/clamp";
 import { snapshot } from "./snapshot";
 
@@ -144,6 +143,12 @@ const states = {
 const activeState = atom((get) => {
   return `${get(toolState)}.${get(states[get(toolState)])}`;
 });
+
+export type StateTreeNode = {
+  name: string;
+  active: boolean;
+  states: { [key: string]: StateTreeNode };
+};
 
 const stateTree = atom<StateTreeNode>((get) => {
   return {

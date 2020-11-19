@@ -1,6 +1,6 @@
 import { getBoxToBoxArrow, ArrowOptions } from "perfect-arrows";
 import uniqueId from "lodash/uniqueId";
-import { IPoint, IBounds, IFrame, IBox, IArrow } from "../api/types";
+import { IPoint, IBounds, IFrame, IBox, IArrow } from "../api";
 
 export let scale = 1;
 export const pressedKeys = {} as Record<string, boolean>;
@@ -10,9 +10,6 @@ export const cameraOrigin = { x: 0, y: 0 };
 export const camera = { x: 0, y: 0, cx: 0, cy: 0, width: 0, height: 0 };
 
 export const DPR = window.devicePixelRatio || 1;
-
-
-
 
 export function mapValues<P, T>(
   obj: { [key: string]: T },

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ToolbarWrapper, ButtonGroup, Divider } from "./styled";
 import IconButton from "./icon-button";
-import { useAtom } from "../../api/state/atom";
+import { useAtom } from "../../api";
 import { library, useMachine } from "../../api";
 
 export function Toolbar() {

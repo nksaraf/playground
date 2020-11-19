@@ -1,6 +1,6 @@
 import * as React from "react";
 import useResizeObserver from "use-resize-observer";
-import { useMachine } from "../api/machine/useMachine";
+import { useMachine } from "../api";
 
 export default function useViewBox<T extends HTMLElement = HTMLDivElement>() {
   // Resize Observer

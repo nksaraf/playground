@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useAtom } from "../../api/state/atom";
+import { useAtom } from "../../api";
 import { scene } from "../../api";
 import { selector } from "../../api";
 

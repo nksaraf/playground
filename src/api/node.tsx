@@ -1,6 +1,5 @@
 import { createContext } from "create-hook-context";
 import React from "react";
-import { useRecoilCallback } from "recoil";
 
 import * as tavern from "./core";
 
@@ -42,7 +41,7 @@ export { NodeProvider, useNode };
 
 function useUpdateOutputs() {
   const node = useNode();
-  return useRecoilCallback(
+  return tavern.useCallback(
     ({ snapshot, set }) => async (name: string, val: any) => {
       const outputIDs = await snapshot.getPromise(node.outputIDs);
       const id = outputIDs.find(

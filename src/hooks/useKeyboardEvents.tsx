@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMachine } from "../api/machine/useMachine";
+import { useMachine } from "../api";
 
 // export function handleKeyPress(e: KeyboardEvent) {
 // 	if (e.key === " ")

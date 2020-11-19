@@ -1,5 +1,5 @@
 import { atom, ValueOf } from "./atom";
-import { IPoint } from "../types";
+import { IPoint } from "./types";
 
 const cameraPosition = atom({
   x: 0,

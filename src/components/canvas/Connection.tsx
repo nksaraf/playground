@@ -1,4 +1,4 @@
-import { useAtom } from "../../api/state/atom";
+import { useAtom } from "../../api";
 import { graph } from "../../api";
 import React, { useState } from "react";
 

@@ -1,4 +1,4 @@
-import { IBoxSnapshot, IPoint, IBounds, IBox, IFrame } from "../api/types";
+import { IBoxSnapshot, IPoint, IBounds, IBox, IFrame } from "../api";
 
 export function stretchBoxesX(boxes: IBox[]) {
   const [first, ...rest] = boxes;

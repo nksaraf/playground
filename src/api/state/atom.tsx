@@ -7,6 +7,11 @@ import {
   AtomEffect,
 } from "recoil";
 
+export {
+  RecoilRoot as Molecule,
+  useRecoilCallback as useCallback,
+} from "recoil";
+
 var key = 0;
 
 type Getter = <Value>(atom: RecoilState<Value>) => Value;

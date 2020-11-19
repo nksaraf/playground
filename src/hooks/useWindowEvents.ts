@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useMachine } from "../api/machine/useMachine";
+import { useMachine } from "../api";
 
 export default function useWindowEvents() {
   const state = useMachine();

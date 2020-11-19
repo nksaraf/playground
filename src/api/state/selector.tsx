@@ -1,4 +1,4 @@
-import { IBounds, IFrame, IPoint } from "../types";
+import { IBounds, IFrame, IPoint } from "./types";
 import { atom, atomFamily } from "./atom";
 import { graph } from "./graph";
 

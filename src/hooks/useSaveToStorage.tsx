@@ -1,6 +1,6 @@
 import React from "react";
 import { useRecoilCallback } from "recoil";
-import { useAtom } from "../api/state/atom";
+import { useAtom } from "../api";
 
 export const useSaveToStorage = (key, atomToSave) => {
   const saver = useRecoilCallback((cb) => async () => {

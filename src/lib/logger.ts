@@ -1,6 +1,6 @@
 // import log from "./ololog"
 
-import flatten from "lodash/flatten";
+import { StateTreeNode } from "../api";
 
 class Grid {
   rows = [];
@@ -97,12 +97,6 @@ class Grid {
 }
 
 const grid = new Grid();
-
-export type StateTreeNode = {
-  name: string;
-  active: boolean;
-  states: { [key: string]: StateTreeNode };
-};
 
 class TNode {
   left = 0;

@@ -1,6 +1,6 @@
 import * as React from "react";
 // import state from "../../../components/state"
-import { IBounds } from "../../api/types";
+import { IBounds } from "../../api";
 import Corner from "./corner";
 import Edge from "./edge";
 
