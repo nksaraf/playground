@@ -69,17 +69,17 @@ export function CanvasBackground({ children, height, width }) {
   const [{ x, y, zoom }] = useAtom(scene.camera);
   return (
     <div
-      className="absolute"
+      className="absolute camera"
       style={{
-        transform: `scale(${zoom}) translateX(${-x / zoom}px) translateY(${
-          -y / zoom
-        }px)`,
-        transformOrigin: "0px 0px",
+        // @ts-ignore
+        "--x": `${x}px`,
+        "--y": `${y}px`,
+        "--zoom": zoom,
         height,
         width,
       }}
     >
-      <div className="relative">{children} </div>
+      <div className="relative">{children}</div>
     </div>
   );
 }

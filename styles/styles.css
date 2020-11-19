@@ -22,6 +22,15 @@
     ),
     linear-gradient(to bottom, var(--grid-color) 2px, transparent 1px);
 }
+
+.camera {
+  --trans-y: calc(0px - var(--y) / var(--zoom));
+  --trans-x: calc(0px - var(--x) / var(--zoom));
+  transform: scale(var(--zoom)) translateX(var(--trans-x))
+    translateY(var(--trans-y));
+  transform-origin: 0px 0px;
+}
+
 /* 
 .connector-click-area {
 	cursor: pointer;
