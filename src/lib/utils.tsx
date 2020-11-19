@@ -1,6 +1,6 @@
 import { getBoxToBoxArrow, ArrowOptions } from "perfect-arrows";
 import uniqueId from "lodash/uniqueId";
-import { IPoint, IBounds, IFrame, IBox, IArrow } from "../../types";
+import { IPoint, IBounds, IFrame, IBox, IArrow } from "../api/types";
 
 export let scale = 1;
 export const pressedKeys = {} as Record<string, boolean>;
@@ -11,52 +11,8 @@ export const camera = { x: 0, y: 0, cx: 0, cy: 0, width: 0, height: 0 };
 
 export const DPR = window.devicePixelRatio || 1;
 
-export function viewBoxToCamera(
-  point: IPoint,
-  viewBox: IFrame,
-  camera: { x: number; y: number; zoom: number }
-) {
-  return {
-    x: (camera.x + point.x - viewBox.x) / camera.zoom,
-    y: (camera.y + point.y - viewBox.y) / camera.zoom,
-  };
-}
 
-export function getBoundingBox(boxes: IFrame[]): IBounds {
-  if (boxes.length === 0) {
-    return {
-      x: 0,
-      y: 0,
-      maxX: 0,
-      maxY: 0,
-      width: 0,
-      height: 0,
-    };
-  }
 
-  const first = boxes[0];
-
-  let x = first.x;
-  let maxX = first.x + first.width;
-  let y = first.y;
-  let maxY = first.y + first.height;
-
-  for (let box of boxes) {
-    x = Math.min(x, box.x);
-    maxX = Math.max(maxX, box.x + box.width);
-    y = Math.min(y, box.y);
-    maxY = Math.max(maxY, box.y + box.height);
-  }
-
-  return {
-    x,
-    y,
-    width: maxX - x,
-    height: maxY - y,
-    maxX,
-    maxY,
-  };
-}
 
 export function mapValues<P, T>(
   obj: { [key: string]: T },

@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useAtom } from "../../lib/atom";
-import { scene } from "../../state";
+import { useAtom } from "../../api/state/atom";
+import { scene } from "../../api";
 
-export function Camera({ children }) {
+export function SvgCamera({ children }) {
   const [{ x, y, zoom }] = useAtom(scene.camera);
 
   return (
@@ -15,19 +15,27 @@ export function Camera({ children }) {
   );
 }
 
-export function SvgCanvas({ children, height, width }) {
-  const [viewBoxSize] = useAtom(scene.viewBoxSize);
+export function SvgCanvas({
+  children,
+  className = "",
+  style = {},
+  height,
+  width,
+  ...props
+}) {
   return (
     <svg
-      className="absolute"
+      className={`absolute ${className}`}
       style={{
         height,
         width,
         userSelect: "none",
+        ...style,
       }}
-      viewBox={`${0} ${0} ${viewBoxSize.width} ${viewBoxSize.height}`}
+      viewBox={`${0} ${0} ${width} ${height}`}
+      {...props}
     >
-      <Camera>{children}</Camera>
+      <SvgCamera>{children}</SvgCamera>
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-import { atom, atomFamily } from "../lib/atom";
+import { atom, atomFamily } from "./atom";
 import flatten from "lodash/flatten";
 
 const nodeIDMap = atom<any>({});

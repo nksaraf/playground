@@ -1,13 +1,13 @@
 import * as React from "react";
-import { compute, machine, model, selector, useMachine } from "../../state";
+import { compute, machine, model, selector, useMachine } from "../../api";
 import {
   atom,
   atomFamily,
   useAtom,
   useAtom as _useAtom,
   useUpdateAtom,
-} from "../../lib/atom";
-import { graph } from "../../state";
+} from "../../api/state/atom";
+import { graph } from "../../api";
 import useResizeObserver from "use-resize-observer";
 import { styled } from "../../lib/theme";
 import { useNode } from "../../api";

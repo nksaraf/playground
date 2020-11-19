@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useAtom } from "../../lib/atom";
-import { scene } from "../../state";
-import { selector } from "../../state";
+import { useAtom } from "../../api/state/atom";
+import { scene } from "../../api";
+import { selector } from "../../api";
 
 export function Value({
   label,

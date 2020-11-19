@@ -1,4 +1,4 @@
-import { useAtom } from "../../lib/atom";
+import { useAtom } from "../../api";
 import { NodeAtoms } from "../../api";
 
 export function SkeletonNode({ node }: { node: NodeAtoms }) {

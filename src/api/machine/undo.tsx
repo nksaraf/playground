@@ -1,4 +1,4 @@
-import { atom } from "../../lib/atom";
+import { atom } from "../state/atom";
 // import { graph } from "./graph"
 // import { getFromWorker } from "./selector"
 

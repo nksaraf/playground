@@ -1,9 +1,9 @@
-import { atom, atomFamily } from "../../lib/atom";
+import { atom, atomFamily } from "../state/atom";
 import { Actions, toolState } from "./toolState";
-import { selector } from "../selector";
-import { scene } from "../scene";
+import { selector } from "../state/selector";
+import { scene } from "../state/scene";
 
-import { IFrame, IPoint } from "../../../types";
+import { IFrame, IPoint } from "../types";
 import { undo } from "./undo";
 import { StateTreeNode } from "../../lib/logger";
 import clamp from "lodash/clamp";

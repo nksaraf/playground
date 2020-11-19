@@ -1,5 +1,5 @@
-import { atom, useAtom } from "../../lib/atom";
-import { machine, selector } from "../../state";
+import { atom, useAtom } from "../../api/state/atom";
+import { machine, selector } from "../../api";
 import JsonOutput from "../devtools/JsonOutput";
 
 const selectedNodeSnapshots = atom((get) =>

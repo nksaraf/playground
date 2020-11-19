@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useMachine } from "../../state";
-import { useAtom } from "../../lib/atom";
-import { machine, selector } from "../../state";
-import { IBrush } from "../../../types";
+import { useMachine } from "../../api";
+import { useAtom } from "../../api/state/atom";
+import { machine, selector } from "../../api";
+import { IBrush } from "../../api/types";
 
 export function SelectionBrush() {
   const [brush] = useAtom(selector.selectionBrush);

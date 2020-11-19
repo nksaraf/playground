@@ -1,11 +1,9 @@
-import { atom, atomFamily } from "../lib/atom";
-
-import { SkeletonNode } from "../components/nodes/SkeletonNode";
+import { atom, atomFamily } from "./atom";
 
 const componentIDs = atom([]);
 
 type ComputeComponent = {
-  render: Function;
+  render?: Function;
   type: string;
   id: string;
   pins: any[];
@@ -13,7 +11,7 @@ type ComputeComponent = {
 };
 
 const getComponentMetadata = atomFamily<ComputeComponent>((id: string) => ({
-  render: SkeletonNode,
+  render: null,
   type: "missing",
   id,
   pins: [],

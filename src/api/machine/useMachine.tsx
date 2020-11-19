@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useUpdateAtom } from "../lib/atom";
-import { Actions, machine } from "../state/machine";
+import { useUpdateAtom } from "../state/atom";
+import { Actions, machine } from "./machine";
 
 export function useMachine() {
   const send = useUpdateAtom(machine.dispatch);

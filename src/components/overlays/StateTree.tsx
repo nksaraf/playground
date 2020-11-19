@@ -1,5 +1,5 @@
-import { useAtom } from "../../lib/atom";
-import { machine } from "../../state";
+import { useAtom } from "../../api/state/atom";
+import { machine } from "../../api";
 
 function State({ state }) {
   const hasChildren = Object.keys(state.states).length > 0;

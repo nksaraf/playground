@@ -1,4 +1,4 @@
-import { atomFamily } from "../lib/atom";
+import { atomFamily } from "./atom";
 import { model } from "./model";
 
 const getNodeInputIDs = atomFamily((id: string) => (get) => {

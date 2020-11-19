@@ -1,13 +1,10 @@
 import { createContext } from "create-hook-context";
 import React from "react";
 import { useRecoilCallback } from "recoil";
-export * from "./state";
 
-import * as tavern from "./state";
+import * as tavern from "./core";
 
 export type Props = { node: NodeAtoms; tavern: typeof tavern };
-
-export { NodeProvider, useNode };
 
 export let getNodeAtoms = (id: string) => ({
   position: tavern.graph.getNodePosition(id),
@@ -40,6 +37,8 @@ const [NodeProvider, useNode] = createContext(
     };
   }
 );
+
+export { NodeProvider, useNode };
 
 function useUpdateOutputs() {
   const node = useNode();
@@ -102,36 +101,7 @@ function useState(key, defaultValue?: any) {
   ] as const;
 }
 
-interface ComponentConfig<Inputs = {}, Outputs = {}> {
-  id: string;
-  title?: string;
-  type?: string;
-  inputs?: {
-    [key in keyof Inputs]: {
-      config: {
-        type: Inputs[key];
-      };
-    };
-  };
-  outputs?: {
-    [key in keyof Outputs]: {
-      config: {
-        type: Outputs[key];
-      };
-    };
-  };
-  [key: string]: any;
-}
-
-interface TavernComponent<Inputs, Outputs> {
-  render: RenderNode<Inputs, Outputs>;
-  type: string;
-  id: string;
-  metadata: any;
-  pins: any[];
-}
-
-interface Node<Inputs, Outputs> extends NodeAtoms<Inputs, Outputs> {
+export interface Node<Inputs, Outputs> extends NodeAtoms<Inputs, Outputs> {
   useUpdateEffect(
     fn: (update: (output: keyof Outputs, val: any) => void) => void,
     deps?: any[]
@@ -152,7 +122,7 @@ interface Node<Inputs, Outputs> extends NodeAtoms<Inputs, Outputs> {
   useUpdateOutputs(): (name: keyof Outputs, val: any) => Promise<void>;
 }
 
-type RenderNode<Inputs, Outputs> = React.FC<{
+export type RenderNode<Inputs, Outputs> = React.FC<{
   node: Node<Inputs, Outputs>;
   tavern: typeof tavern;
 }>;
@@ -180,34 +150,3 @@ export const Node = React.memo(({ nodeID }: { nodeID: string }) => {
     </NodeProvider>
   );
 });
-
-export function createComponent<Inputs, Outputs>(
-  config: ComponentConfig<Inputs, Outputs>,
-  render: RenderNode<Inputs, Outputs>
-) {
-  const {
-    id,
-    inputs = {},
-    outputs = {},
-    type = "component",
-    ...metadata
-  } = config;
-  return {
-    render,
-    type,
-    id,
-    metadata,
-    pins: [
-      ...Object.keys(inputs).map((i) => ({
-        ...inputs[i],
-        name: i,
-        role: "input",
-      })),
-      ...Object.keys(outputs).map((i) => ({
-        ...outputs[i],
-        name: i,
-        role: "output",
-      })),
-    ],
-  } as TavernComponent<Inputs, Outputs>;
-}

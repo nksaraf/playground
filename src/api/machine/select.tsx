@@ -1,8 +1,8 @@
-import { atom } from "../../lib/atom";
-import { scene } from "../scene";
-import { graph } from "../graph";
-import { model } from "../model";
-import { selector } from "../selector";
+import { atom } from "../state/atom";
+import { scene } from "../state/scene";
+import { graph } from "../state/graph";
+import { model } from "../state/model";
+import { selector } from "../state/selector";
 import flatten from "lodash/flatten";
 import * as Comlink from "comlink";
 import { Actions } from "./toolState";

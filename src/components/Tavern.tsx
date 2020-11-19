@@ -9,7 +9,7 @@ import { Canvas } from "./canvas/Canvas";
 import { TavernRoot } from "../lib/storage";
 import { Overlays } from "./overlays/Overlays";
 import { MutableSnapshot } from "recoil";
-import { library } from "../state";
+import { library } from "../api";
 import { registeredPlugins } from "../lib/plugins";
 
 export default function App() {

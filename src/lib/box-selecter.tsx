@@ -1,4 +1,4 @@
-import { IPoint, IBox } from "../../types";
+import { IPoint, IBox } from "../api/types";
 import RBush from "rbush";
 
 class Bush extends RBush<{

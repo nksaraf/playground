@@ -1,7 +1,7 @@
 import * as React from "react";
 import { MutableSnapshot, RecoilRoot, RecoilState } from "recoil";
 import { useSaveToStorage } from "../hooks/useSaveToStorage";
-import { machine } from "../state";
+import { machine } from "../api";
 
 export const withAtomsFromLocalStorage = (
   ...items: { key: string; defaultValue: any; atom: RecoilState<any> }[]

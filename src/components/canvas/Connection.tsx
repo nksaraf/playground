@@ -1,5 +1,5 @@
-import { useAtom } from "../../lib/atom";
-import { graph } from "../../state";
+import { useAtom } from "../../api/state/atom";
+import { graph } from "../../api";
 import React, { useState } from "react";
 
 export const Connection = React.memo(

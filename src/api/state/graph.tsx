@@ -1,7 +1,7 @@
-import { atomFamily } from "../lib/atom";
+import { atomFamily } from "./atom";
 
 import { model } from "./model";
-import { IFrame, IPoint, ISize } from "../../types";
+import { IFrame, IPoint, ISize } from "../types";
 
 export const getNodePosition = atomFamily<IPoint>((id: string) => ({
   x: 0,

@@ -1,10 +1,10 @@
-import { atom } from "../../lib/atom";
-import { scene } from "../scene";
-import { selector } from "../selector";
+import { atom } from "../state/atom";
+import { scene } from "../state/scene";
+import { selector } from "../state/selector";
 import { uid } from "uid";
-import { library } from "../library";
-import { model } from "../model";
-import { getNodePosition } from "../graph";
+import { library } from "../state/library";
+import { model } from "../state";
+import { getNodePosition } from "../state/graph";
 import { Actions, toolState } from "./toolState";
 
 function getUUID() {

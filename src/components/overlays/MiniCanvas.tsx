@@ -1,5 +1,5 @@
 import * as React from "react";
-import { scene } from "../../state";
+import { scene } from "../../api";
 import { useRecoilState } from "recoil";
 
 export function Model() {

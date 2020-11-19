@@ -1,9 +1,9 @@
-import { atom, atomFamily } from "../../lib/atom";
-import { compute } from "../compute";
-import { graph } from "../graph";
-import { model } from "../model";
-import { scene } from "../scene";
-import { selector } from "../selector";
+import { atom, atomFamily } from "../state/atom";
+import { compute } from "../state/compute";
+import { graph } from "../state/graph";
+import { model } from "../state/model";
+import { scene } from "../state/scene";
+import { selector } from "../state/selector";
 
 const getNodeSnapshot = atomFamily(
   (id: string) => (get) => ({

@@ -1,6 +1,6 @@
 import * as React from "react";
 // import state from "../../../components/state"
-import { IFrame } from "../../../types";
+import { IFrame } from "../../api/types";
 
 export default function BoundingBox({ x, y, height, width }: IFrame) {
   return (
