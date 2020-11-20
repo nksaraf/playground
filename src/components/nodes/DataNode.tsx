@@ -239,8 +239,9 @@ export function NodeInput({ inputID }) {
             } ${isActive ? "text-blue-500" : "text-gray-500"}`}
           />
         </div>
-        <div className="text-gray-700 text-xs">
-          {input.name} <span className="text-gray-500 text-xs">{val}</span>
+        <div className="text-gray-700 font-bold flex gap-2 items-center text-sm">
+          {input.name}{" "}
+          <pre className="text-gray-400 font-normal text-xxs">{val}</pre>
         </div>
       </div>
     </div>
@@ -299,8 +300,9 @@ export function NodeOutput({ outputID }) {
           machine.send("POINTER_UP_ON_PIN", { pinID: outputID });
         }}
       >
-        <div className="text-gray-500 text-xs">
-          {value} {output.name}
+        <div className="text-gray-700 font-bold text-sm flex gap-2 items-center">
+          <pre className="text-xxs text-gray-400 font-normal">{value}</pre>{" "}
+          {output.name}
         </div>
         <div
           ref={ref}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { model, useMachine } from "../../api";
-import { SvgCanvas } from "./SvgCanvas";
+import { SvgCamera, SvgCanvas } from "./SvgCanvas";
 import { SelectionBrush } from "./SelectionBrush";
 import { useAtom } from "../../api";
 import { Connection } from "./Connection";
@@ -53,30 +53,30 @@ export function Canvas() {
   return (
     <ViewBox width={width} height={height}>
       <SvgCanvas height={height} width={width}>
-        <SelectionBrush />
-        <InsertingNodeGhost />
-        <InsertingConnectortGhost />
-        <Connections />
+        <SvgCamera>
+          <SelectionBrush />
+          <InsertingNodeGhost />
+          <InsertingConnectortGhost />
+          <Connections />
+        </SvgCamera>
       </SvgCanvas>
-      <CanvasBackground height={height} width={width}>
+      <Camera>
         <Nodes />
-      </CanvasBackground>
+      </Camera>
     </ViewBox>
   );
 }
 
-export function CanvasBackground({ children, height, width }) {
+export function Camera({ children }) {
   const [{ x, y, zoom }] = useAtom(scene.camera);
   return (
     <div
-      className="absolute camera"
+      className="absolute camera h-full w-full"
       style={{
         // @ts-ignore
         "--x": `${x}px`,
         "--y": `${y}px`,
         "--zoom": zoom,
-        height,
-        width,
       }}
     >
       <div className="relative">{children}</div>

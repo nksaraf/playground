@@ -23,6 +23,11 @@
     linear-gradient(to bottom, var(--grid-color) 2px, transparent 1px);
 }
 
+.text-xxs {
+  font-size: 0.5rem;
+  line-height: 0.75rem;
+}
+
 .camera {
   --trans-y: calc(0px - var(--y) / var(--zoom));
   --trans-x: calc(0px - var(--x) / var(--zoom));

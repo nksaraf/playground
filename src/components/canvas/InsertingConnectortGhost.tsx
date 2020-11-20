@@ -2,7 +2,21 @@ import * as React from "react";
 import { useAtom } from "../../api";
 import { Spline } from "./Connection";
 import { machine, scene } from "../../api";
-import { addingConnectorFromPin } from "./InsertingNodeGhost";
+
+import { model } from "../../api";
+import { atom } from "../../api";
+import { graph } from "../../api";
+
+export const addingConnectorFromPin = atom((get) => {
+  return {
+    position: get(
+      graph.getPinPosition(get(machine.insertTool.addingConnectorFromPinID))
+    ),
+    metadata: get(
+      model.getPinMetadata(get(machine.insertTool.addingConnectorFromPinID))
+    ),
+  };
+});
 
 export function InsertingConnectortGhost() {
   const [state] = useAtom(machine.activeState);
