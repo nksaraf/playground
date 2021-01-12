@@ -9,46 +9,45 @@ import { Canvas } from "./canvas/Canvas";
 import { TavernRoot } from "../lib/storage";
 import { Overlays } from "./overlays/Overlays";
 import { MutableSnapshot } from "recoil";
-import { library } from "../api";
+import { library, model, useAtom, machine } from "../api";
 import { registeredPlugins } from "../lib/plugins";
 
 export default function App() {
-  return (
-    <TavernRoot
-      initializeState={(mut: MutableSnapshot) => {
-        Object.values(registeredPlugins).forEach((k: any) => {
-          mut.set(library.getComponentMetadata(k.id), k);
-        });
-        mut.set(library.componentIDs, Object.keys(registeredPlugins));
-      }}
-    >
-      <FullScreenContainer>
-        <Canvas />
-        <Toolbar />
-        <Overlays />
-      </FullScreenContainer>
-    </TavernRoot>
-  );
+    return (
+        <TavernRoot
+            initializeState={[...Object.values(registeredPlugins).map((k: any) => {
+                return [library.getComponentMetadata(k.id), k];
+            }),
+            [library.componentIDs, Object.keys(registeredPlugins)]]}
+
+        >
+            <FullScreenContainer>
+                <Canvas />
+                <Toolbar />
+                <Overlays />
+            </FullScreenContainer>
+        </TavernRoot >
+    );
 }
 
 function FullScreenContainer({
-  children,
-  className = "",
-  style = {},
-  ...props
+    children,
+    className = "",
+    style = {},
+    ...props
 }) {
-  const { ref } = useViewBox();
-  useWindowEvents();
-  useKeyboardEvents();
+    const { ref } = useViewBox();
+    useWindowEvents();
+    useKeyboardEvents();
 
-  return (
-    <div
-      ref={ref}
-      className={`w-screen h-screen relative bg-gray-200 ${className}`}
-      style={{ fontFamily: "Nunito, sans-serif", ...style }}
-      {...props}
-    >
-      {children}
-    </div>
-  );
+    return (
+        <div
+            ref={ref}
+            className={`w-screen h-screen relative bg-gray-200 ${className}`}
+            style={{ fontFamily: "Nunito, sans-serif", ...style }}
+            {...props}
+        >
+            {children}
+        </div>
+    );
 }
