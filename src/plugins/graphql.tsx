@@ -34,6 +34,7 @@ const schema = buildSchema(`
 console.log(schema);
 
 import { ComputeNode } from "../components/nodes/DataNode";
+
 export const Edit = ({ node, tavern }) => {
   const [query, setQuery] = node.useState("query", "");
   node.useCompute(() => {
@@ -47,9 +48,9 @@ export const Edit = ({ node, tavern }) => {
         <ExplorerWrapper
           schema={schema}
           width={200}
-          query={query}
-          explorerIsOpen={true}
-          onEdit={setQuery}
+          valie={query}
+          isOpen={true}
+          onChange={setQuery}
         />
       </div>
     </ComputeNode>
