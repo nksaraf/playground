@@ -1,18 +1,14 @@
 import React from "react";
-import { useRecoilCallback } from "recoil";
 import { useAtom } from "../api";
 
 export const useSaveToStorage = (key, atomToSave) => {
-  const saver = useRecoilCallback((cb) => async () => {
-    localStorage.setItem(
-      key,
-      JSON.stringify(cb.snapshot.getLoadable(atomToSave).contents)
-    );
-  });
+    const [atom] = useAtom(atomToSave);
 
-  React.useEffect(() => {
-    saver();
-  });
+    React.useEffect(() => {
+        localStorage.setItem(
+            key,
+            JSON.stringify(atom)
+        );
+    }, [atom])
 
-  useAtom(atomToSave);
 };

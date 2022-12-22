@@ -1,0 +1,1176 @@
+diff --git a/node_modules/jotai/index.js b/node_modules/jotai/index.js
+index 6010a38..9c34fca 100644
+--- a/node_modules/jotai/index.js
++++ b/node_modules/jotai/index.js
+@@ -2,494 +2,495 @@ import React, { useRef, useState, useEffect, useMemo, createElement, useDebugVal
+ import { createContext, useContextUpdate, useContext, useContextSelector, useBridgeValue, BridgeProvider } from 'use-context-selector';
+ 
+ function _extends() {
+-  _extends = Object.assign || function (target) {
+-    for (var i = 1; i < arguments.length; i++) {
+-      var source = arguments[i];
+-
+-      for (var key in source) {
+-        if (Object.prototype.hasOwnProperty.call(source, key)) {
+-          target[key] = source[key];
++    _extends = Object.assign || function (target) {
++        for (var i = 1; i < arguments.length; i++) {
++            var source = arguments[i];
++
++            for (var key in source) {
++                if (Object.prototype.hasOwnProperty.call(source, key)) {
++                    target[key] = source[key];
++                }
++            }
+         }
+-      }
+-    }
+ 
+-    return target;
+-  };
++        return target;
++    };
+ 
+-  return _extends.apply(this, arguments);
++    return _extends.apply(this, arguments);
+ }
+ 
+ const hasInitialValue = atom => 'init' in atom;
+ 
+ const createState = initialValues => {
+-  const state = {
+-    a: new WeakMap(),
+-    m: new Map(),
+-    w: new Map()
+-  };
+-
+-  if (initialValues) {
+-    for (const [atom, value] of initialValues) {
+-      const atomState = {
+-        v: value,
+-        r: 0,
+-        d: new Map()
+-      };
+-
+-      if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-        Object.freeze(atomState);
+-      }
+-
+-      state.a.set(atom, atomState);
++    const state = {
++        a: new WeakMap(),
++        m: new Map(),
++        w: new Map()
++    };
++
++    if (initialValues) {
++        for (const [atom, value] of initialValues) {
++            const atomState = {
++                v: value,
++                r: 0,
++                d: new Map()
++            };
++
++            if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                Object.freeze(atomState);
++            }
++
++            state.a.set(atom, atomState);
++        }
+     }
+-  }
+ 
+-  return state;
++    return state;
+ };
+ 
+ const getAtomState = (state, atom) => state.w.get(atom) || state.a.get(atom);
+ 
+ const copyWip = (state, copyingState) => {
+-  if (state.w.size && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-    console.warn('[Bug] wip not empty');
+-  }
++    if (state.w.size && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++        console.warn('[Bug] wip not empty');
++    }
+ 
+-  return _extends({}, state, {
+-    w: copyingState.w
+-  });
++    return _extends({}, state, {
++        w: copyingState.w
++    });
+ };
+ 
+ const wipAtomState = (state, atom) => {
+-  let atomState = getAtomState(state, atom);
+-
+-  if (atomState) {
+-    atomState = _extends({}, atomState); // copy
+-  } else {
+-    atomState = {
+-      r: 0,
+-      d: new Map()
+-    };
++    let atomState = getAtomState(state, atom);
++
++    if (atomState) {
++        atomState = _extends({}, atomState); // copy
++    } else {
++        atomState = {
++            r: 0,
++            d: new Map()
++        };
+ 
+-    if (hasInitialValue(atom)) {
+-      atomState.v = atom.init;
++        if (hasInitialValue(atom)) {
++            atomState.v = atom.init;
++        }
+     }
+-  }
+ 
+-  const nextState = _extends({}, state, {
+-    w: new Map(state.w).set(atom, atomState)
+-  });
++    const nextState = _extends({}, state, {
++        w: new Map(state.w).set(atom, atomState)
++    });
+ 
+-  return [atomState, nextState];
++    return [atomState, nextState];
+ };
+ 
+ const replaceDependencies = (state, atomState, dependencies) => {
+-  if (dependencies) {
+-    atomState.d = new Map(Array.from(dependencies).map(a => {
+-      var _getAtomState$r, _getAtomState;
++    if (dependencies) {
++        atomState.d = new Map(Array.from(dependencies).map(a => {
++            var _getAtomState$r, _getAtomState;
+ 
+-      return [a, (_getAtomState$r = (_getAtomState = getAtomState(state, a)) == null ? void 0 : _getAtomState.r) != null ? _getAtomState$r : 0];
+-    }));
+-  }
++            return [a, (_getAtomState$r = (_getAtomState = getAtomState(state, a)) == null ? void 0 : _getAtomState.r) != null ? _getAtomState$r : 0];
++        }));
++    }
+ };
+ 
+ const setAtomValue = (state, atom, value, dependencies, promise) => {
+-  const [atomState, nextState] = wipAtomState(state, atom);
++    const [atomState, nextState] = wipAtomState(state, atom);
+ 
+-  if (promise && promise !== atomState.rp) {
+-    return state;
+-  }
+-
+-  delete atomState.re;
+-  delete atomState.rp;
+-  atomState.v = value;
+-  atomState.r++;
+-  replaceDependencies(nextState, atomState, dependencies);
+-  return nextState;
++    if (promise && promise !== atomState.rp) {
++        return state;
++    }
++
++    delete atomState.re;
++    delete atomState.rp;
++    atomState.v = value;
++    atomState.r++;
++    replaceDependencies(nextState, atomState, dependencies);
++    return nextState;
+ };
+ 
+ const setAtomReadError = (state, atom, error, dependencies, promise) => {
+-  const [atomState, nextState] = wipAtomState(state, atom);
++    const [atomState, nextState] = wipAtomState(state, atom);
+ 
+-  if (promise && promise !== atomState.rp) {
+-    return state;
+-  }
++    if (promise && promise !== atomState.rp) {
++        return state;
++    }
+ 
+-  delete atomState.rp;
+-  atomState.re = error;
+-  atomState.r++;
+-  replaceDependencies(nextState, atomState, dependencies);
+-  return nextState;
++    delete atomState.rp;
++    atomState.re = error;
++    atomState.r++;
++    replaceDependencies(nextState, atomState, dependencies);
++    return nextState;
+ };
+ 
+ const setAtomReadPromise = (state, atom, promise, dependencies) => {
+-  const [atomState, nextState] = wipAtomState(state, atom);
+-  atomState.rp = promise;
+-  atomState.r++;
+-  replaceDependencies(nextState, atomState, dependencies);
+-  return nextState;
++    const [atomState, nextState] = wipAtomState(state, atom);
++    atomState.rp = promise;
++    atomState.r++;
++    replaceDependencies(nextState, atomState, dependencies);
++    return nextState;
+ };
+ 
+ const setAtomWritePromise = (state, atom, promise) => {
+-  const [atomState, nextState] = wipAtomState(state, atom);
++    const [atomState, nextState] = wipAtomState(state, atom);
+ 
+-  if (promise) {
+-    atomState.wp = promise;
+-  } else {
+-    delete atomState.wp;
+-  }
++    if (promise) {
++        atomState.wp = promise;
++    } else {
++        delete atomState.wp;
++    }
+ 
+-  atomState.r++;
+-  return nextState;
++    atomState.r++;
++    return nextState;
+ };
+ 
+ const readAtomState = (state, updateState, atom, force) => {
+-  if (!force) {
+-    const atomState = getAtomState(state, atom);
++    if (!force) {
++        const atomState = getAtomState(state, atom);
+ 
+-    if (atomState && Array.from(atomState.d.entries()).every(([a, r]) => {
+-      var _getAtomState2;
++        if (atomState && Array.from(atomState.d.entries()).every(([a, r]) => {
++            var _getAtomState2;
+ 
+-      return ((_getAtomState2 = getAtomState(state, a)) == null ? void 0 : _getAtomState2.r) === r;
+-    })) {
+-      return [atomState, state];
++            return ((_getAtomState2 = getAtomState(state, a)) == null ? void 0 : _getAtomState2.r) === r;
++        })) {
++            return [atomState, state];
++        }
+     }
+-  }
+ 
+-  let asyncState = _extends({}, state, {
+-    w: new Map()
+-  }); // empty wip
++    let asyncState = _extends({}, state, {
++        w: new Map()
++    }); // empty wip
+ 
+ 
+-  let isSync = true;
+-  let nextState = state;
+-  let error;
+-  let promise;
+-  let value;
+-  const dependencies = new Set();
++    let isSync = true;
++    let nextState = state;
++    let error;
++    let promise;
++    let value;
++    const dependencies = new Set();
+ 
+-  try {
+-    const promiseOrValue = atom.read(a => {
+-      dependencies.add(a);
++    try {
++        const promiseOrValue = atom.read(a => {
++            dependencies.add(a);
+ 
+-      if (a !== atom) {
+-        let aState;
++            if (a !== atom) {
++                let aState;
+ 
+-        if (isSync) {
+-          ;
+-          [aState, nextState] = readAtomState(nextState, updateState, a);
+-        } else {
+-          ;
+-          [aState, asyncState] = readAtomState(asyncState, updateState, a);
+-        }
++                if (isSync) {
++                    ;
++                    [aState, nextState] = readAtomState(nextState, updateState, a);
++                } else {
++                    ;
++                    [aState, asyncState] = readAtomState(asyncState, updateState, a);
++                }
+ 
+-        if (aState.re) {
+-          throw aState.re; // read error
+-        }
++                if (aState.re) {
++                    throw aState.re; // read error
++                }
+ 
+-        if (aState.rp) {
+-          throw aState.rp; // read promise
+-        }
++                if (aState.rp) {
++                    throw aState.rp; // read promise
++                }
+ 
+-        return aState.v; // value
+-      } // a === atom
++                return aState.v; // value
++            } // a === atom
+ 
+ 
+-      const aState = getAtomState(nextState, a);
++            const aState = getAtomState(nextState, a);
+ 
+-      if (aState) {
+-        if (aState.rp) {
+-          throw aState.rp; // read promise
+-        }
++            if (aState) {
++                if (aState.rp) {
++                    throw aState.rp; // read promise
++                }
+ 
+-        return aState.v; // value
+-      }
++                return aState.v; // value
++            }
+ 
+-      if (hasInitialValue(a)) {
+-        return a.init;
+-      }
++            if (hasInitialValue(a)) {
++                return a.init;
++            }
+ 
+-      throw new Error('no atom init');
+-    });
++            throw new Error('no atom init');
++        });
+ 
+-    if (promiseOrValue instanceof Promise) {
+-      promise = promiseOrValue.then(value => {
+-        updateState(prev => setAtomValue(copyWip(prev, asyncState), atom, value, dependencies, promise));
+-      }).catch(e => {
+-        updateState(prev => setAtomReadError(copyWip(prev, asyncState), atom, e instanceof Error ? e : new Error(e), dependencies, promise));
+-      });
+-    } else {
+-      value = promiseOrValue;
++        if (promiseOrValue instanceof Promise) {
++            promise = promiseOrValue.then(value => {
++                updateState(prev => setAtomValue(copyWip(prev, asyncState), atom, value, dependencies, promise));
++            }).catch(e => {
++                updateState(prev => setAtomReadError(copyWip(prev, asyncState), atom, e instanceof Error ? e : new Error(e), dependencies, promise));
++            });
++        } else {
++            value = promiseOrValue;
++        }
++    } catch (errorOrPromise) {
++        if (errorOrPromise instanceof Promise) {
++            promise = errorOrPromise.then(() => {
++                updateState(prev => {
++                    const [, nextNextState] = readAtomState(prev, updateState, atom, true);
++
++                    if (nextNextState.w.size) {
++                        return nextNextState;
++                    }
++
++                    return prev;
++                });
++            });
++        } else if (errorOrPromise instanceof Error) {
++            error = errorOrPromise;
++        } else {
++            error = new Error(errorOrPromise);
++        }
+     }
+-  } catch (errorOrPromise) {
+-    if (errorOrPromise instanceof Promise) {
+-      promise = errorOrPromise.then(() => {
+-        updateState(prev => {
+-          const [, nextNextState] = readAtomState(prev, updateState, atom, true);
+ 
+-          if (nextNextState.w.size) {
+-            return nextNextState;
+-          }
+-
+-          return prev;
+-        });
+-      });
+-    } else if (errorOrPromise instanceof Error) {
+-      error = errorOrPromise;
++    if (error) {
++        nextState = setAtomReadError(nextState, atom, error, dependencies);
++    } else if (promise) {
++        nextState = setAtomReadPromise(nextState, atom, promise, dependencies);
+     } else {
+-      error = new Error(errorOrPromise);
++        nextState = setAtomValue(nextState, atom, value, dependencies);
+     }
+-  }
+-
+-  if (error) {
+-    nextState = setAtomReadError(nextState, atom, error, dependencies);
+-  } else if (promise) {
+-    nextState = setAtomReadPromise(nextState, atom, promise, dependencies);
+-  } else {
+-    nextState = setAtomValue(nextState, atom, value, dependencies);
+-  }
+-
+-  isSync = false;
+-  return [getAtomState(nextState, atom), nextState];
++
++    isSync = false;
++    return [getAtomState(nextState, atom), nextState];
+ };
+ 
+ const readAtom = (state, updateState, readingAtom) => {
+-  const [atomState, nextState] = readAtomState(state, updateState, readingAtom); // merge back wip
++    const [atomState, nextState] = readAtomState(state, updateState, readingAtom); // merge back wip
+ 
+-  nextState.w.forEach((atomState, atom) => {
+-    state.w.set(atom, atomState);
+-  });
+-  return atomState;
++    nextState.w.forEach((atomState, atom) => {
++        state.w.set(atom, atomState);
++    });
++    return atomState;
+ };
+ const addAtom = (state, addingAtom, useId) => {
+-  const dependents = state.m.get(addingAtom);
++    const dependents = state.m.get(addingAtom);
+ 
+-  if (dependents) {
+-    dependents.add(useId);
+-  } else {
+-    state.m.set(addingAtom, new Set([useId]));
+-  }
++    if (dependents) {
++        dependents.add(useId);
++    } else {
++        state.m.set(addingAtom, new Set([useId]));
++    }
+ };
+ const delAtom = (state, deletingAtom, useId) => {
+-  const del = (atom, dependent) => {
+-    const dependents = state.m.get(atom);
++    const del = (atom, dependent) => {
++        const dependents = state.m.get(atom);
+ 
+-    if (!dependents) {
+-      return;
+-    }
++        if (!dependents) {
++            return;
++        }
+ 
+-    dependents.delete(dependent);
++        dependents.delete(dependent);
+ 
+-    if (!dependents.size) {
+-      state.m.delete(atom);
+-      const atomState = getAtomState(state, atom);
++        if (!dependents.size) {
++            state.m.delete(atom);
++            const atomState = getAtomState(state, atom);
+ 
+-      if (atomState) {
+-        if (atomState.rp && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-          console.warn('[Bug] deleting atomState with read promise', atom);
+-        }
++            if (atomState) {
++                if (atomState.rp && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                    console.warn('[Bug] deleting atomState with read promise', atom);
++                }
+ 
+-        atomState.d.forEach((_, a) => {
+-          del(a, atom);
+-        });
+-      } else if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-        console.warn('[Bug] atomState not defined', atom);
+-      }
+-    }
+-  };
++                atomState.d.forEach((_, a) => {
++                    del(a, atom);
++                });
++            } else if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                console.warn('[Bug] atomState not defined', atom);
++            }
++        }
++    };
+ 
+-  del(deletingAtom, useId);
++    del(deletingAtom, useId);
+ };
+ 
+ const updateDependentsState = (state, updateState, atom) => {
+-  const dependents = state.m.get(atom);
+-
+-  if (!dependents) {
+-    // no dependents found
+-    // this may happen if async function is resolved before commit.
+-    // not certain this is going to be an issue in some cases.
+-    return state;
+-  }
++    const dependents = state.m.get(atom);
+ 
+-  let nextState = state;
+-  dependents.forEach(dependent => {
+-    if (dependent === atom || typeof dependent === 'symbol' || !getAtomState(nextState, dependent)) {
+-      return;
++    if (!dependents) {
++        // no dependents found
++        // this may happen if async function is resolved before commit.
++        // not certain this is going to be an issue in some cases.
++        return state;
+     }
+ 
+-    const [dependentState, nextNextState] = readAtomState(nextState, updateState, dependent, true);
+-    const promise = dependentState.rp;
+-
+-    if (promise) {
+-      promise.then(() => {
+-        updateState(prev => updateDependentsState(prev, updateState, dependent));
+-      });
+-      nextState = nextNextState;
+-    } else {
+-      nextState = updateDependentsState(nextNextState, updateState, dependent);
+-    }
+-  });
+-  return nextState;
+-};
++    let nextState = state;
++    dependents.forEach(dependent => {
++        if (dependent === atom || typeof dependent === 'symbol' || !getAtomState(nextState, dependent)) {
++            return;
++        }
+ 
+-const writeAtomState = (state, updateState, atom, update, pendingPromises) => {
+-  const atomState = getAtomState(state, atom);
++        const [dependentState, nextNextState] = readAtomState(nextState, updateState, dependent, true);
++        const promise = dependentState.rp;
+ 
+-  if (atomState && atomState.wp) {
+-    const promise = atomState.wp.then(() => {
+-      updateState(prev => writeAtomState(prev, updateState, atom, update));
++        if (promise) {
++            promise.then(() => {
++                updateState(prev => updateDependentsState(prev, updateState, dependent));
++            });
++            nextState = nextNextState;
++        } else {
++            nextState = updateDependentsState(nextNextState, updateState, dependent);
++        }
+     });
++    return nextState;
++};
+ 
+-    if (pendingPromises) {
+-      pendingPromises.push(promise);
+-    }
+-
+-    return state;
+-  }
+-
+-  let nextState = state;
+-  let isSync = true;
++const writeAtomState = (state, updateState, atom, update, pendingPromises) => {
++    const atomState = getAtomState(state, atom);
+ 
+-  try {
+-    const promiseOrVoid = atom.write(a => {
+-      const aState = getAtomState(nextState, a);
++    if (atomState && atomState.wp) {
++        const promise = atomState.wp.then(() => {
++            updateState(prev => writeAtomState(prev, updateState, atom, update));
++        });
+ 
+-      if (!aState) {
+-        if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-          console.warn('Trying to read an atom value that is never used. This may not behave as expected.', a);
++        if (pendingPromises) {
++            pendingPromises.push(promise);
+         }
+ 
+-        return a.init;
+-      }
+-
+-      if (aState.rp && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-        // TODO will try to detect this
+-        console.warn('Reading pending atom state in write operation. We need to detect this and fallback. Please file an issue with repro.', a);
+-      }
++        return state;
++    }
+ 
+-      return aState.v;
+-    }, (a, v) => {
+-      if (a === atom) {
+-        if (isSync) {
+-          nextState = updateDependentsState(setAtomValue(nextState, a, v), updateState, a);
+-        } else {
+-          updateState(prev => updateDependentsState(setAtomValue(prev, a, v), updateState, a));
++    let nextState = state;
++    let isSync = true;
++
++    try {
++        const promiseOrVoid = atom.write(a => {
++            let aState = getAtomState(nextState, a);
++
++            if (!aState) {
++                // if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                //     console.warn('Trying to read an atom value that is never used. This may not behave as expected.', a);
++                // }
++
++                [aState, nextState] = readAtomState(nextState, updateState, a, true)
++            }
++
++            if (aState.rp && typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                // TODO will try to detect this
++                console.warn('Reading pending atom state in write operation. We need to detect this and fallback. Please file an issue with repro.', a);
++            }
++
++            return aState.v;
++        }, (a, v) => {
++            if (a === atom) {
++                if (isSync) {
++                    nextState = updateDependentsState(setAtomValue(nextState, a, v), updateState, a);
++                } else {
++                    updateState(prev => updateDependentsState(setAtomValue(prev, a, v), updateState, a));
++                }
++            } else {
++                if (isSync) {
++                    nextState = writeAtomState(nextState, updateState, a, v);
++                } else {
++                    updateState(prev => writeAtomState(prev, updateState, a, v));
++                }
++            }
++        },
++            typeof update === 'function' ? update(atomState.v) : update);
++
++        if (promiseOrVoid instanceof Promise) {
++            if (pendingPromises) {
++                pendingPromises.push(promiseOrVoid);
++            }
++
++            nextState = setAtomWritePromise(nextState, atom, promiseOrVoid.then(() => {
++                updateState(prev => setAtomWritePromise(prev, atom));
++            }));
+         }
+-      } else {
+-        if (isSync) {
+-          nextState = writeAtomState(nextState, updateState, a, v);
++    } catch (e) {
++        if (pendingPromises && pendingPromises.length) {
++            pendingPromises.push(new Promise((_resolve, reject) => {
++                reject(e);
++            }));
+         } else {
+-          updateState(prev => writeAtomState(prev, updateState, a, v));
++            throw e;
+         }
+-      }
+-    }, update);
+-
+-    if (promiseOrVoid instanceof Promise) {
+-      if (pendingPromises) {
+-        pendingPromises.push(promiseOrVoid);
+-      }
+-
+-      nextState = setAtomWritePromise(nextState, atom, promiseOrVoid.then(() => {
+-        updateState(prev => setAtomWritePromise(prev, atom));
+-      }));
+-    }
+-  } catch (e) {
+-    if (pendingPromises && pendingPromises.length) {
+-      pendingPromises.push(new Promise((_resolve, reject) => {
+-        reject(e);
+-      }));
+-    } else {
+-      throw e;
+     }
+-  }
+ 
+-  isSync = false;
+-  return nextState;
++    isSync = false;
++    return nextState;
+ };
+ 
+ const writeAtom = (updateState, writingAtom, update) => {
+-  const pendingPromises = [];
+-  updateState(prev => {
+-    const nextState = writeAtomState(prev, updateState, writingAtom, update, pendingPromises);
+-    return nextState;
+-  });
++    const pendingPromises = [];
++    updateState(prev => {
++        const nextState = writeAtomState(prev, updateState, writingAtom, update, pendingPromises);
++        return nextState;
++    });
+ 
+-  if (pendingPromises.length) {
+-    return new Promise((resolve, reject) => {
+-      const loop = () => {
+-        const len = pendingPromises.length;
++    if (pendingPromises.length) {
++        return new Promise((resolve, reject) => {
++            const loop = () => {
++                const len = pendingPromises.length;
++
++                if (len === 0) {
++                    resolve();
++                } else {
++                    Promise.all(pendingPromises).then(() => {
++                        pendingPromises.splice(0, len);
++                        loop();
++                    }).catch(reject);
++                }
++            };
+ 
+-        if (len === 0) {
+-          resolve();
+-        } else {
+-          Promise.all(pendingPromises).then(() => {
+-            pendingPromises.splice(0, len);
+             loop();
+-          }).catch(reject);
+-        }
+-      };
+-
+-      loop();
+-    });
+-  }
++        });
++    }
+ };
+ 
+ const updateDependentsMap = state => {
+-  state.w.forEach((atomState, atom) => {
+-    var _state$a$get;
+-
+-    const prevDependencies = (_state$a$get = state.a.get(atom)) == null ? void 0 : _state$a$get.d;
+-
+-    if (prevDependencies === atomState.d) {
+-      return;
+-    }
++    state.w.forEach((atomState, atom) => {
++        var _state$a$get;
+ 
+-    const dependencies = new Set(atomState.d.keys());
++        const prevDependencies = (_state$a$get = state.a.get(atom)) == null ? void 0 : _state$a$get.d;
+ 
+-    if (prevDependencies) {
+-      prevDependencies.forEach((_, a) => {
+-        const aDependents = state.m.get(a);
++        if (prevDependencies === atomState.d) {
++            return;
++        }
+ 
+-        if (dependencies.has(a)) {
+-          // not changed
+-          dependencies.delete(a);
+-        } else {
+-          const newDependents = new Set(aDependents);
+-          newDependents.delete(atom);
+-          state.m.set(a, newDependents);
++        const dependencies = new Set(atomState.d.keys());
++
++        if (prevDependencies) {
++            prevDependencies.forEach((_, a) => {
++                const aDependents = state.m.get(a);
++
++                if (dependencies.has(a)) {
++                    // not changed
++                    dependencies.delete(a);
++                } else {
++                    const newDependents = new Set(aDependents);
++                    newDependents.delete(atom);
++                    state.m.set(a, newDependents);
++                }
++            });
+         }
+-      });
+-    }
+ 
+-    dependencies.forEach(a => {
+-      const aDependents = state.m.get(a);
+-      const newDependents = new Set(aDependents).add(atom);
+-      state.m.set(a, newDependents);
++        dependencies.forEach(a => {
++            const aDependents = state.m.get(a);
++            const newDependents = new Set(aDependents).add(atom);
++            state.m.set(a, newDependents);
++        });
+     });
+-  });
+ }; // commit wip
+ 
+ 
+ const commitState = state => {
+-  if (state.w.size) {
+-    updateDependentsMap(state);
+-    state.w.forEach((atomState, atom) => {
+-      if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-        Object.freeze(atomState);
+-      }
+-
+-      state.a.set(atom, atomState);
+-    });
+-    state.w.clear();
+-  }
++    if (state.w.size) {
++        updateDependentsMap(state);
++        state.w.forEach((atomState, atom) => {
++            if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++                Object.freeze(atomState);
++            }
++
++            state.a.set(atom, atomState);
++        });
++        state.w.clear();
++    }
+ };
+ 
+ const ContextsMap = new Map();
+ const getContexts = scope => {
+-  if (!ContextsMap.has(scope)) {
+-    ContextsMap.set(scope, [createContext(null), createContext(null)]);
+-  }
++    if (!ContextsMap.has(scope)) {
++        ContextsMap.set(scope, [createContext(null), createContext(null)]);
++    }
+ 
+-  return ContextsMap.get(scope);
++    return ContextsMap.get(scope);
+ };
+ 
+ const isReactExperimental = !!(typeof process === 'object' && process.env.IS_REACT_EXPERIMENTAL) || !!React.unstable_useMutableSource;
+@@ -497,67 +498,67 @@ const isReactExperimental = !!(typeof process === 'object' && process.env.IS_REA
+ const defaultContextUpdate = f => f();
+ 
+ const InnerProvider = ({
+-  r,
+-  c,
+-  children
++    r,
++    c,
++    children
+ }) => {
+-  const contextUpdate = useContextUpdate(c);
++    const contextUpdate = useContextUpdate(c);
+ 
+-  if (isReactExperimental && r.current === defaultContextUpdate) {
+-    r.current = f => contextUpdate(f);
+-  }
++    if (isReactExperimental && r.current === defaultContextUpdate) {
++        r.current = f => contextUpdate(f);
++    }
+ 
+-  return children;
++    return children;
+ };
+ 
+ const Provider = ({
+-  initialValues,
+-  scope,
+-  children
++    initialValues,
++    scope,
++    children
+ }) => {
+-  const contextUpdateRef = useRef(defaultContextUpdate);
+-  const [state, setState] = useState(() => createState(initialValues));
+-  const lastStateRef = useRef(state);
+-  useEffect(() => {
+-    commitState(state);
+-    lastStateRef.current = state;
+-  });
+-  const actions = useMemo(() => {
+-    const updateState = updater => {
+-      commitState(lastStateRef.current);
+-      lastStateRef.current = updater(lastStateRef.current);
+-      contextUpdateRef.current(() => {
+-        commitState(lastStateRef.current);
+-        setState(lastStateRef.current);
+-      });
+-    };
++    const contextUpdateRef = useRef(defaultContextUpdate);
++    const [state, setState] = useState(() => createState(initialValues));
++    const lastStateRef = useRef(state);
++    useEffect(() => {
++        commitState(state);
++        lastStateRef.current = state;
++    });
++    const actions = useMemo(() => {
++        const updateState = updater => {
++            commitState(lastStateRef.current);
++            lastStateRef.current = updater(lastStateRef.current);
++            contextUpdateRef.current(() => {
++                commitState(lastStateRef.current);
++                setState(lastStateRef.current);
++            });
++        };
++
++        return {
++            add: (atom, id) => {
++                addAtom(lastStateRef.current, atom, id);
++            },
++            del: (atom, id) => {
++                delAtom(lastStateRef.current, atom, id);
++            },
++            read: (state, atom) => readAtom(state, updateState, atom),
++            write: (atom, update) => writeAtom(updateState, atom, update)
++        };
++    }, []);
++
++    if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
++        // eslint-disable-next-line react-hooks/rules-of-hooks
++        useDebugState(state);
++    }
+ 
+-    return {
+-      add: (atom, id) => {
+-        addAtom(lastStateRef.current, atom, id);
+-      },
+-      del: (atom, id) => {
+-        delAtom(lastStateRef.current, atom, id);
+-      },
+-      read: (state, atom) => readAtom(state, updateState, atom),
+-      write: (atom, update) => writeAtom(updateState, atom, update)
+-    };
+-  }, []);
+-
+-  if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+-    // eslint-disable-next-line react-hooks/rules-of-hooks
+-    useDebugState(state);
+-  }
+-
+-  const [ActionsContext, StateContext] = getContexts(scope);
+-  return createElement(ActionsContext.Provider, {
+-    value: actions
+-  }, createElement(StateContext.Provider, {
+-    value: state
+-  }, createElement(InnerProvider, {
+-    r: contextUpdateRef,
+-    c: StateContext
+-  }, children)));
++    const [ActionsContext, StateContext] = getContexts(scope);
++    return createElement(ActionsContext.Provider, {
++        value: actions
++    }, createElement(StateContext.Provider, {
++        value: state
++    }, createElement(InnerProvider, {
++        r: contextUpdateRef,
++        c: StateContext
++    }, children)));
+ };
+ 
+ const atomToPrintable = atom => atom.debugLabel || atom.toString();
+@@ -565,116 +566,116 @@ const atomToPrintable = atom => atom.debugLabel || atom.toString();
+ const isAtom = x => typeof x !== 'symbol';
+ 
+ const stateToPrintable = state => Object.fromEntries(Array.from(state.m.entries()).map(([atom, dependents]) => {
+-  const atomState = state.a.get(atom) || {};
+-  return [atomToPrintable(atom), {
+-    value: atomState.re || atomState.rp || atomState.wp || atomState.v,
+-    dependents: Array.from(dependents).filter(isAtom).map(atomToPrintable)
+-  }];
++    const atomState = state.a.get(atom) || {};
++    return [atomToPrintable(atom), {
++        value: atomState.re || atomState.rp || atomState.wp || atomState.v,
++        dependents: Array.from(dependents).filter(isAtom).map(atomToPrintable)
++    }];
+ }));
+ 
+ const useDebugState = state => {
+-  useDebugValue(state, stateToPrintable);
++    useDebugValue(state, stateToPrintable);
+ };
+ 
+ let keyCount = 0; // global key count for all atoms
+ 
+ function atom(read, write) {
+-  const key = `atom${++keyCount}`;
+-  const config = {
+-    toString: () => key
+-  };
++    const key = `atom${++keyCount}`;
++    const config = {
++        toString: () => key
++    };
+ 
+-  if (typeof read === 'function') {
+-    config.read = read;
+-  } else {
+-    config.init = read;
++    if (typeof read === 'function') {
++        config.read = read;
++    } else {
++        config.init = read;
+ 
+-    config.read = get => get(config);
++        config.read = get => get(config);
+ 
+-    config.write = (get, set, update) => {
+-      set(config, typeof update === 'function' ? update(get(config)) : update);
+-    };
+-  }
++        config.write = (get, set, update) => {
++            set(config, typeof update === 'function' ? update(get(config)) : update);
++        };
++    }
+ 
+-  if (write) {
+-    config.write = write;
+-  }
++    if (write) {
++        config.write = write;
++    }
+ 
+-  return config;
++    return config;
+ }
+ 
+ function assertContextValue(x, scope) {
+-  if (!x) {
+-    throw new Error(`Please use <Provider${scope ? ` scope=${String(scope)}` : ''}>`);
+-  }
++    if (!x) {
++        throw new Error(`Please use <Provider${scope ? ` scope=${String(scope)}` : ''}>`);
++    }
+ }
+ 
+ const isWritable = atom => !!atom.write;
+ 
+ function useAtom(atom) {
+-  const [ActionsContext, StateContext] = getContexts(atom.scope);
+-  const actions = useContext(ActionsContext);
+-  assertContextValue(actions, atom.scope);
+-  const value = useContextSelector(StateContext, useCallback(state => {
+-    assertContextValue(state);
+-    const atomState = actions.read(state, atom);
+-
+-    if (atomState.re) {
+-      throw atomState.re; // read error
+-    }
++    const [ActionsContext, StateContext] = getContexts(atom.scope);
++    const actions = useContext(ActionsContext);
++    assertContextValue(actions, atom.scope);
++    const value = useContextSelector(StateContext, useCallback(state => {
++        assertContextValue(state);
++        const atomState = actions.read(state, atom);
++
++        if (atomState.re) {
++            throw atomState.re; // read error
++        }
+ 
+-    if (atomState.rp) {
+-      throw atomState.rp; // read promise
+-    }
++        if (atomState.rp) {
++            throw atomState.rp; // read promise
++        }
+ 
+-    if (atomState.wp) {
+-      throw atomState.wp; // write promise
+-    }
++        if (atomState.wp) {
++            throw atomState.wp; // write promise
++        }
+ 
+-    if ('v' in atomState) {
+-      return atomState.v;
+-    }
++        if ('v' in atomState) {
++            return atomState.v;
++        }
+ 
+-    throw new Error('no atom value');
+-  }, [atom, actions]));
+-  useEffect(() => {
+-    const id = Symbol();
+-    actions.add(atom, id);
+-    return () => {
+-      actions.del(atom, id);
+-    };
+-  }, [actions, atom]);
+-  const setAtom = useCallback(update => {
+-    if (isWritable(atom)) {
+-      return actions.write(atom, update);
+-    } else {
+-      throw new Error('not writable atom');
+-    }
+-  }, [atom, actions]);
+-  useDebugValue(value);
+-  return [value, setAtom];
++        throw new Error('no atom value');
++    }, [atom, actions]));
++    useEffect(() => {
++        const id = Symbol();
++        actions.add(atom, id);
++        return () => {
++            actions.del(atom, id);
++        };
++    }, [actions, atom]);
++    const setAtom = useCallback(update => {
++        if (isWritable(atom)) {
++            return actions.write(atom, update);
++        } else {
++            throw new Error('not writable atom');
++        }
++    }, [atom, actions]);
++    useDebugValue(value);
++    return [value, setAtom];
+ }
+ 
+ const useBridge = scope => {
+-  const [ActionsContext, StateContext] = getContexts(scope);
+-  const actions = useBridgeValue(ActionsContext);
+-  const state = useBridgeValue(StateContext);
+-  return useMemo(() => [actions, state], [actions, state]);
++    const [ActionsContext, StateContext] = getContexts(scope);
++    const actions = useBridgeValue(ActionsContext);
++    const state = useBridgeValue(StateContext);
++    return useMemo(() => [actions, state], [actions, state]);
+ };
+ const Bridge = ({
+-  value,
+-  scope,
+-  children
++    value,
++    scope,
++    children
+ }) => {
+-  const [actions, state] = value;
+-  const [ActionsContext, StateContext] = getContexts(scope);
+-  return createElement(BridgeProvider, {
+-    context: ActionsContext,
+-    value: actions
+-  }, createElement(BridgeProvider, {
+-    context: StateContext,
+-    value: state
+-  }, children));
++    const [actions, state] = value;
++    const [ActionsContext, StateContext] = getContexts(scope);
++    return createElement(BridgeProvider, {
++        context: ActionsContext,
++        value: actions
++    }, createElement(BridgeProvider, {
++        context: StateContext,
++        value: state
++    }, children));
+ };
+ 
+ export { Bridge, Provider, atom, useAtom, useBridge };
