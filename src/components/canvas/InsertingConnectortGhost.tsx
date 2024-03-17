@@ -29,7 +29,13 @@ export function InsertingConnectortGhost() {
 
   return state.includes("insertingConnector") ? (
     <>
-      <Spline start={start} end={end} className="connector" />
+      <Spline
+        start={start}
+        end={end}
+        fill="none"
+        className="stroke-2 connector"
+        stroke="#4299e1"
+      />
       <circle cx={pointer.x} cy={pointer.y} r={3} fill="#4299e1" />
     </>
   ) : null;
